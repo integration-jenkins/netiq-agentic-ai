@@ -1,0 +1,1 @@
+"""Report cache adapter."""

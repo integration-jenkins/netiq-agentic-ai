@@ -1,0 +1,2 @@
+# Exact HTTP method + path allow-list. Add only approved endpoints.
+allowed_apis: []
