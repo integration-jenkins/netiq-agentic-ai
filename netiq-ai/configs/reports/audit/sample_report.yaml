@@ -1,0 +1,15 @@
+# SAMPLE report metadata. Replace with a real report; register it in configs/reports/catalog.yaml.
+id: audit_summary
+name: Audit Summary (sample)
+domain: audit
+api:
+  method: GET
+  path: /api/sample/audit/summary            # must also appear in configs/allowed_apis.yaml
+  paged: true
+  page_size: 1000
+columns: [circle, site_id, audit_status, audit_date]
+filters:
+  - { name: circle, type: string, required: false }
+  - { name: date,   type: date,   required: false }
+circle_scope: server_side     # never taken from user text
+empty_result_message: "No Data Found!!"

@@ -1,0 +1,1 @@
+"""Available local model registry."""

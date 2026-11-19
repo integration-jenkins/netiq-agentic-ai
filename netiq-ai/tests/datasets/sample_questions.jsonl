@@ -1,0 +1,3 @@
+{"id": "q001", "question": "Show RAN KPI for Delhi", "expected_route": "api"}
+{"id": "q002", "question": "What does availability mean?", "expected_route": "knowledge"}
+{"id": "q003", "question": "Count sites per circle using the latest table", "expected_route": "sql"}

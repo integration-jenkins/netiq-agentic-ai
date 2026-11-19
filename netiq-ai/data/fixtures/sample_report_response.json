@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "message": "OK",
+  "hasNext": false,
+  "data": [
+    { "circle": "Delhi",  "site_id": "S-1001", "technology": "4G", "kpi_name": "availability", "kpi_value": 99.2 },
+    { "circle": "Delhi",  "site_id": "S-1002", "technology": "5G", "kpi_name": "availability", "kpi_value": 98.7 },
+    { "circle": "Punjab", "site_id": "S-2001", "technology": "4G", "kpi_name": "availability", "kpi_value": 97.9 }
+  ]
+}

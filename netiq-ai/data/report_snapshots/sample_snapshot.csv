@@ -1,0 +1,4 @@
+circle,site_id,technology,kpi_name,kpi_value,snapshot_date
+Delhi,S-1001,4G,availability,99.2,2026-11-18
+Delhi,S-1002,5G,availability,98.7,2026-11-18
+Punjab,S-2001,4G,availability,97.9,2026-11-18

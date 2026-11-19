@@ -1,0 +1,15 @@
+# SAMPLE report metadata. Replace with a real report; register it in configs/reports/catalog.yaml.
+id: wireline_port_usage
+name: Wireline Port Utilisation (sample)
+domain: wireline
+api:
+  method: GET
+  path: /api/sample/wireline/port-usage            # must also appear in configs/allowed_apis.yaml
+  paged: true
+  page_size: 1000
+columns: [circle, exchange, total_ports, used_ports]
+filters:
+  - { name: circle, type: string, required: false }
+  - { name: date,   type: date,   required: false }
+circle_scope: server_side     # never taken from user text
+empty_result_message: "No Data Found!!"
