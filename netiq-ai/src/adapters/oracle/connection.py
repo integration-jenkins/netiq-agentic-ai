@@ -1,1 +1,0 @@
-"""Oracle connection adapter."""

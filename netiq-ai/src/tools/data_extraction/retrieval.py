@@ -1,1 +1,0 @@
-"""Deterministic report-data retrieval."""
