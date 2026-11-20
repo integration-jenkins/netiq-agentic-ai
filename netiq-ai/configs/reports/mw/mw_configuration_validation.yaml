@@ -1,0 +1,153 @@
+id: MW_CONFIGURATION_VALIDATION
+name: MW - Configuration Validation
+description: MW configuration validation for frequency, modulation, channel spacing
+  and hop settings.
+domain: MW
+report_code: planned-vs-configured-audit
+file_path: configs/reports/mw/mw_configuration_validation.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 35
+  source_evidence: AuditReportType enum + AuditReportController
+  notes: Verify exact configured validation query
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  path_template: /api/v1/audit/reports/TXN/{type}
+  request_dto: DataRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: AuditReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: manufacturer
+  ui_header: Vendor
+  dto_accessor: manufacturer
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: frequencyStatus
+  ui_header: Frequency Status
+  dto_accessor: frequencyStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: channelStatus
+  ui_header: Channel Spacing Status
+  dto_accessor: channelStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: modulationStatus
+  ui_header: Modulation Status
+  dto_accessor: modulationStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hopTypeStatus
+  ui_header: HOP Type Status
+  dto_accessor: hopTypeStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedHopNmsStatus
+  ui_header: Planned HOP NMS Status
+  dto_accessor: plannedHopNmsStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: txFrequencyMHz
+  ui_header: TX Frequency (MHz)
+  dto_accessor: txFrequencyMHz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: rxFrequencyMHz
+  ui_header: RX Frequency (MHz)
+  dto_accessor: rxFrequencyMHz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: bandwidthMHz
+  ui_header: Bandwidth (MHz)
+  dto_accessor: bandwidthMHz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsPlanId
+  ui_header: MIDS Plan ID
+  dto_accessor: midsPlanId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsLinkId
+  ui_header: MIDS Link ID
+  dto_accessor: midsLinkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteIdA
+  ui_header: Site A
+  dto_accessor: midsSiteIdA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteIdB
+  ui_header: Site B
+  dto_accessor: midsSiteIdB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: validationTimestamp
+  ui_header: Validation Time
+  dto_accessor: validationTimestamp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

@@ -1,0 +1,213 @@
+id: AI_BASELINE_AUDIT
+name: AI - Baseline Audit
+description: Baseline comparison records showing expected versus actual cell parameters,
+  deviation status and severity.
+domain: AI
+report_code: ai-baseline-all
+file_path: configs/reports/ai/ai_baseline_audit.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 6
+  source_evidence: ReportRequestType enum + ReportController
+  notes: Baseline variants share this column family
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/ai-baseline-all
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: reportType
+  ui_header: Technology
+  dto_accessor: reportType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: Node ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cellId
+  ui_header: Cell ID
+  dto_accessor: cellId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cellName
+  ui_header: Cell Name
+  dto_accessor: cellName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: duplexMode
+  ui_header: Duplex Mode
+  dto_accessor: duplexMode
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: dlFrequency
+  ui_header: EARFCN / NARFCN DL
+  dto_accessor: dlFrequency
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: ulFrequency
+  ui_header: EARFCN / NARFCN UL
+  dto_accessor: ulFrequency
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: bandwidthDl
+  ui_header: Bandwidth DL
+  dto_accessor: bandwidthDl
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: bandwidthUl
+  ui_header: Bandwidth UL
+  dto_accessor: bandwidthUl
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: mcc
+  ui_header: MCC
+  dto_accessor: mcc
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: mnc
+  ui_header: MNC
+  dto_accessor: mnc
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: validationStatus
+  ui_header: Validation Status
+  dto_accessor: validationStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: totalDeviations
+  ui_header: Total Deviations
+  dto_accessor: totalDeviations
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: deviationPct
+  ui_header: Deviation %
+  dto_accessor: deviationPct
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: severity
+  ui_header: Severity
+  dto_accessor: severity
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: mlAnomalyStatus
+  ui_header: ML Anomaly Status
+  dto_accessor: mlAnomalyStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: deviatingAttributes
+  ui_header: Deviating Attributes
+  dto_accessor: deviatingAttributes
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: expectedVsActual
+  ui_header: Expected vs Actual
+  dto_accessor: expectedVsActual
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: aiRemark
+  ui_header: AI Remark
+  dto_accessor: aiRemark
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: paramsWithoutBaseline
+  ui_header: Parameters Without Baseline
+  dto_accessor: paramsWithoutBaseline
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Last Updated
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

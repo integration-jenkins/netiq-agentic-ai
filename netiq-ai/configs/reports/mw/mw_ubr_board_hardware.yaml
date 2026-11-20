@@ -1,0 +1,227 @@
+id: MW_UBR_BOARD_HARDWARE
+name: MW / UBR - Board Hardware
+description: MW/UBR cabinet and board inventory with shelf, slot and hardware information.
+domain: MW / UBR
+report_code: mw-board
+file_path: configs/reports/mw/mw_ubr_board_hardware.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 39
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/mw-board
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: CIRCLE
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: NODE ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: Node Type
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cabinetName
+  ui_header: CABINET NAME
+  dto_accessor: cabinetName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cabinetSerialNumber
+  ui_header: CABINET SERIAL NUMBER
+  dto_accessor: cabinetSerialNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cabinetProductNumber
+  ui_header: CABINET PRODUCT NUMBER
+  dto_accessor: cabinetProductNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cabinetIndex
+  ui_header: CABINET INDEX
+  dto_accessor: cabinetIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: shelfName
+  ui_header: Shelf NAME
+  dto_accessor: shelfName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: shelfNumber
+  ui_header: Shelf Number
+  dto_accessor: shelfNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: shelfProductName
+  ui_header: Shelf PRODUCT NAME
+  dto_accessor: shelfProductName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: shelfSerialNumber
+  ui_header: Shelf SERIAL NUMBER
+  dto_accessor: shelfSerialNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: slotIndex
+  ui_header: SLOT INDEX
+  dto_accessor: slotIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: indexOnSlot
+  ui_header: INDEX ON SLOT
+  dto_accessor: indexOnSlot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardName
+  ui_header: BOARD NAME
+  dto_accessor: boardName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardProductCode
+  ui_header: BOARD PRODUCT CODE
+  dto_accessor: boardProductCode
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardSerialNumber
+  ui_header: BOARD SERIAL NUMBER
+  dto_accessor: boardSerialNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: manufacture
+  ui_header: Manufacturer
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hwVersion
+  ui_header: HW VERSION
+  dto_accessor: hwVersion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardSwVersion
+  ui_header: SW VERSION
+  dto_accessor: boardSwVersion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS NAME
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: SITE ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeCategory
+  ui_header: SUPPORTED TECHNOLOGY
+  dto_accessor: supportedTechnology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardDiscoverySource
+  ui_header: Board Discovery Source
+  dto_accessor: boardDiscoverySource
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: CREATED DATE
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdateDate
+  ui_header: LAST UPDATED
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    vendor: manufacture
+    supportedTechnology: nodeCategory
+    lastUpdatedDate: lastUpdateDate
+circle_scope: server_side
+empty_result_message: No Data Found!!

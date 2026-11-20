@@ -1,0 +1,10 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture demonstrating backend 500 database error."
+  },
+  "success": false,
+  "message": "ORA-01013: user requested cancel of current operation / Gateway query timeout",
+  "data": null
+}

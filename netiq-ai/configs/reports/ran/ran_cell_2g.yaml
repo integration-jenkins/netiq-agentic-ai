@@ -1,0 +1,227 @@
+id: RAN_CELL_2G
+name: RAN - Cell 2G
+description: 2G cell inventory with BTS, BCCH, LAC/RAC and site details.
+domain: RAN
+report_code: 2g
+file_path: configs/reports/ran/ran_cell_2g.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 33
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/2g
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: btsId
+  ui_header: BTS ID
+  dto_accessor: btsId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: btsName
+  ui_header: BTS Name
+  dto_accessor: btsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cellId
+  ui_header: Cell ID
+  dto_accessor: cellId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cellName
+  ui_header: Cell Name
+  dto_accessor: cellName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: sbtsId
+  ui_header: SBTS ID
+  dto_accessor: sbtsId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Bcch
+  ui_header: BCCH
+  dto_accessor: bcch
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: freq2g
+  ui_header: 2G FREQ
+  dto_accessor: freq2g
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Lac
+  ui_header: LAC
+  dto_accessor: lac
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Rac
+  ui_header: RAC
+  dto_accessor: rac
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: bcchArfcn
+  ui_header: BCCH ARFCN
+  dto_accessor: bcchArfcn
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gprsEnabled
+  ui_header: GPRS ENABLED
+  dto_accessor: gprsEnabled
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: parentBSCName
+  ui_header: PARENT BSC NAME
+  dto_accessor: parentBSCName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: parentBscId
+  ui_header: PARENT BSC ID
+  dto_accessor: parentBscId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Cgi
+  ui_header: CGI
+  dto_accessor: cgi
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: locationSource
+  ui_header: Location Source
+  dto_accessor: locationSource
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Latitude
+  ui_header: Latitude
+  dto_accessor: latitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Longitude
+  ui_header: Longitude
+  dto_accessor: longitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: Node Type
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Mcc
+  ui_header: MCC
+  dto_accessor: mcc
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Mnc
+  ui_header: MNC
+  dto_accessor: mnc
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS Name
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Created Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Last Updated
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    bcch: Bcch
+    lac: Lac
+    rac: Rac
+    cgi: Cgi
+    latitude: Latitude
+    longitude: Longitude
+    mcc: Mcc
+    mnc: Mnc
+circle_scope: server_side
+empty_result_message: No Data Found!!

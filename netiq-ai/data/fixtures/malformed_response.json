@@ -1,0 +1,9 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture demonstrating a malformed backend payload missing mandatory data array."
+  },
+  "unexpected_key": "some random data",
+  "status_code": 200
+}

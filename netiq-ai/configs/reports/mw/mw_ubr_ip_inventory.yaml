@@ -1,0 +1,183 @@
+id: MW_UBR_IP_INVENTORY
+name: MW / UBR - IP Inventory
+description: MW/UBR IP configuration inventory including plane, VLAN, gateway and
+  subnet.
+domain: MW / UBR
+report_code: mw-ip
+file_path: configs/reports/mw/mw_ubr_ip_inventory.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 15
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/mw-ip
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: NODE ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: NODE NAME
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeIpAddress
+  ui_header: IP ADDRESS
+  dto_accessor: nodeIpAddress
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Vlan
+  ui_header: VLAN ID
+  dto_accessor: vlan
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: planeType
+  ui_header: PLANE TYPE
+  dto_accessor: planeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: ipType
+  ui_header: IP TYPE
+  dto_accessor: ipType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gatewayIp
+  ui_header: GATEWAY IP
+  dto_accessor: gatewayIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Subnet
+  ui_header: SUBNET MASK
+  dto_accessor: subnet
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: SITE ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: supportedTechnology
+  ui_header: SUPPORTED TECHNOLOGY
+  dto_accessor: supportedTechnology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: Node Type
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: manufacturer
+  ui_header: Manufacturer
+  dto_accessor: manufacturer
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS/NMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS/NMS NAME
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Latitude
+  ui_header: Latitude
+  dto_accessor: latitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Longitude
+  ui_header: Longitude
+  dto_accessor: longitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: CREATED DATE
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdateDate
+  ui_header: LAST UPDATED
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    vlan: Vlan
+    subnet: Subnet
+    latitude: Latitude
+    longitude: Longitude
+    lastUpdatedDate: lastUpdateDate
+circle_scope: server_side
+empty_result_message: No Data Found!!

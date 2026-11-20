@@ -1,0 +1,25 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for Audit Missing Remarks Report (missing-remarks)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "siteId": "S_UPW_901",
+      "circle": "UP_WEST",
+      "vendor": "ERICSSON",
+      "auditDate": "2026-11-15",
+      "issueCategory": "MISSING_REMARKS",
+      "deviationDetails": "Site decommissioned without mandatory audit engineer remarks."
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

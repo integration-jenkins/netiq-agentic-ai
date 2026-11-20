@@ -1,0 +1,27 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for RAN 5G Cells (5g)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "cellId": "NR_MUM_8001",
+      "cellName": "NR_MUM_BKC_01",
+      "siteId": "S_MUM_801",
+      "circle": "MUMBAI",
+      "vendor": "NOKIA",
+      "nrarfcn": 643334,
+      "ssbFrequency": 3650010,
+      "bandwidth": 100
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

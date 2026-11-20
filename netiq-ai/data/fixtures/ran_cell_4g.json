@@ -1,0 +1,37 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for RAN 4G Cells (4g). Demonstrates multi-page paginated response."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "cellId": "CELL_4G_BR_001",
+      "cellName": "LTE_BR_PATNA_01",
+      "siteId": "S_BR_5001",
+      "circle": "BR",
+      "vendor": "ERICSSON",
+      "earfcnDl": 1300,
+      "tac": 41201,
+      "administrativeState": "UNLOCKED"
+    },
+    {
+      "cellId": "CELL_4G_BR_002",
+      "cellName": "LTE_BR_PATNA_02",
+      "siteId": "S_BR_5001",
+      "circle": "BR",
+      "vendor": "ERICSSON",
+      "earfcnDl": 1300,
+      "tac": 41201,
+      "administrativeState": "UNLOCKED"
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 2,
+    "totalRecords": 1500,
+    "hasNext": true
+  }
+}

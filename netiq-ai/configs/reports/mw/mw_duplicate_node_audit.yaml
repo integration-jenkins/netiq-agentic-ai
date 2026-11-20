@@ -1,0 +1,154 @@
+id: MW_DUPLICATE_NODE_AUDIT
+name: MW - Duplicate Node Audit
+description: Duplicate MW node audit entries with duplicate reason, value and count.
+domain: MW
+report_code: duplicate_mw_node
+file_path: configs/reports/mw/mw_duplicate_node_audit.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 22
+  source_evidence: AuditReportType enum + AuditReportController
+  notes: Audit variant also exists
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/v1/audit/reports/duplicate_mw_node
+  path_template: /api/v1/audit/reports/{type}
+  request_dto: AuditReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: AuditReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: CIRCLE
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: NODE ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: NODE NAME
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: NODE TYPE
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: SITE ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeCategory
+  ui_header: NODE CATEGORY
+  dto_accessor: nodeCategory
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Vendor
+  ui_header: Manufacturer
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: duplicateValue
+  ui_header: DUPLICATE VALUE
+  dto_accessor: duplicateValue
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: issueCategory
+  ui_header: Category
+  dto_accessor: issueCategory
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: duplicateReason
+  ui_header: Sub Category
+  dto_accessor: duplicateReason
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: duplicateCount
+  ui_header: DUPLICATE COUNT
+  dto_accessor: duplicateCount
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS NAME
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Created Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: updatedDate
+  ui_header: Last Updated
+  dto_accessor: updatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    vendor: Vendor
+circle_scope: server_side
+empty_result_message: No Data Found!!

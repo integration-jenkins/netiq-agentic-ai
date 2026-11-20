@@ -1,0 +1,203 @@
+id: RAN_SRAN
+name: RAN - SRAN
+description: SRAN node subset with linked eNodeB, gNodeB and BTS identifiers.
+domain: RAN
+report_code: node-report
+file_path: configs/reports/ran/ran_sran.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 29
+  source_evidence: ReportRequestType enum + ReportController
+  notes: Filter nodeType=SRANBS; verify supported value
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/node-report
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: sranbsId
+  ui_header: SRAN ID
+  dto_accessor: sranbsId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: sranbsName
+  ui_header: SRAN Name
+  dto_accessor: sranbsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gnodebId
+  ui_header: gNodeB ID
+  dto_accessor: gnodebId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gnodebName
+  ui_header: gNodeB Name
+  dto_accessor: gnodebName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: enodebId
+  ui_header: eNodeB ID
+  dto_accessor: enodebId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: enodebName
+  ui_header: eNodeB Name
+  dto_accessor: enodebName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: Node ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: btsId
+  ui_header: BTS ID
+  dto_accessor: btsId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: btsName
+  ui_header: BTS Name
+  dto_accessor: btsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Latitude
+  ui_header: Latitude
+  dto_accessor: latitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Longitude
+  ui_header: Longitude
+  dto_accessor: longitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: locationSource
+  ui_header: Location Source
+  dto_accessor: locationSource
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: productName
+  ui_header: Cabinet Name
+  dto_accessor: productName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: productCode
+  ui_header: Cabinet Product Code
+  dto_accessor: productCode
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: Node Type
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS Name
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: supportedTechnology
+  ui_header: Supported Technology
+  dto_accessor: supportedTechnology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Created Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Last Updated
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    latitude: Latitude
+    longitude: Longitude
+circle_scope: server_side
+empty_result_message: No Data Found!!

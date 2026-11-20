@@ -1,0 +1,26 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for FTTH Node Inventory (ftth-node)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "oltId": "OLT_BLR_001",
+      "oltName": "BLR_WHITEFIELD_OLT_01",
+      "circle": "KARNATAKA",
+      "vendor": "NOKIA",
+      "ponPortsTotal": 16,
+      "ponPortsUtilized": 12,
+      "status": "OPERATIONAL"
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

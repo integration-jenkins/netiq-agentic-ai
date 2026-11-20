@@ -1,0 +1,153 @@
+id: AI_DAILY_NETWORK_CHANGE_SUMMARY
+name: AI - Daily Network Change Summary
+description: Daily network inventory change summary with changes by network category.
+domain: AI
+report_code: Not established
+file_path: configs/reports/ai/ai_daily_network_change_summary.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 61
+  source_evidence: DailyNetworkChangeController
+  notes: GET /api/v1/ai/daily-change/summary; GET /aggregations; GET /trend; POST
+    /reports
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: GET
+  path: /api/v1/ai/daily-change/summary
+  path_template: /api/v1/ai/daily-change/summary
+  request_dto: Query parameters (inspect contract)
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: DailyNetworkChangeController.java
+columns:
+- ui_column_id: changeDate
+  ui_header: Date
+  dto_accessor: changeDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: entityType
+  ui_header: Entity Type
+  dto_accessor: entityType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: entityId
+  ui_header: Entity ID
+  dto_accessor: entityId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: entityName
+  ui_header: Entity Name
+  dto_accessor: entityName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: domain
+  ui_header: Domain
+  dto_accessor: domain
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: technology
+  ui_header: Technology
+  dto_accessor: technology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: changeType
+  ui_header: Change Type
+  dto_accessor: changeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: changedAttribute
+  ui_header: Changed Attribute
+  dto_accessor: changedAttribute
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: previousValue
+  ui_header: Previous Value
+  dto_accessor: previousValue
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: currentValue
+  ui_header: Current Value
+  dto_accessor: currentValue
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: auditStatus
+  ui_header: Audit Status
+  dto_accessor: auditStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: changeReason
+  ui_header: Change Reason
+  dto_accessor: changeReason
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdated
+  ui_header: Last Updated
+  dto_accessor: lastUpdated
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

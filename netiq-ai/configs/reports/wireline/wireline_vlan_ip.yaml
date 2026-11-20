@@ -1,0 +1,170 @@
+id: WIRELINE_VLAN_IP
+name: Wireline - VLAN IP
+description: Wireline VLAN and IP configuration with circuit and interface associations.
+domain: Wireline
+report_code: wireline-vlan
+file_path: configs/reports/wireline/wireline_vlan_ip.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 45
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/wireline-vlan
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: nodeId
+  ui_header: Node ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: mePortion
+  ui_header: ME Portion
+  dto_accessor: mePortion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeInterface
+  ui_header: Node Interface
+  dto_accessor: nodeInterface
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: portLabel
+  ui_header: Port Label
+  dto_accessor: portLabel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: physicalInterface
+  ui_header: Physical Interface
+  dto_accessor: physicalInterface
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: physicalPortLabel
+  ui_header: Physical Port Label
+  dto_accessor: physicalPortLabel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vlanId
+  ui_header: VLAN ID
+  dto_accessor: vlanId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: wanIp
+  ui_header: WAN IP
+  dto_accessor: wanIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: l2Circuit
+  ui_header: L2 Circuit
+  dto_accessor: l2Circuit
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: l3Circuit
+  ui_header: L3 Circuit
+  dto_accessor: l3Circuit
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: l2VpnId
+  ui_header: L2 VPN ID
+  dto_accessor: l2VpnId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: ctpPortion
+  ui_header: CTP Portion
+  dto_accessor: ctpPortion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: emsPortion
+  ui_header: EMS Portion
+  dto_accessor: emsPortion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: sourceTable
+  ui_header: Source Table
+  dto_accessor: sourceTable
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Insert Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Update Date
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

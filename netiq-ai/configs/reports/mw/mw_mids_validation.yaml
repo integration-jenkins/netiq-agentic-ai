@@ -1,0 +1,176 @@
+id: MW_MIDS_VALIDATION
+name: MW - MIDS Validation
+description: MW MIDS-related planning/validation report fields.
+domain: MW
+report_code: planned-vs-configured-audit
+file_path: configs/reports/mw/mw_mids_validation.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 50
+  source_evidence: AuditReportType enum + AuditReportController
+  notes: Verify MIDS-specific filters
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  path_template: /api/v1/audit/reports/TXN/{type}
+  request_dto: DataRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: AuditReportController.java
+columns:
+- ui_column_id: circleId
+  ui_header: Circle
+  dto_accessor: circleId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsPlanId
+  ui_header: Deployed Link Plan Id
+  dto_accessor: midsPlanId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsLinkId
+  ui_header: Deployed HOP ID
+  dto_accessor: midsLinkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsManufacturer
+  ui_header: Deployed HOP Manufacturer
+  dto_accessor: midsManufacturer
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteIdA
+  ui_header: Deployed HOP Site A
+  dto_accessor: midsSiteIdA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteIdB
+  ui_header: Deployed HOP Site B
+  dto_accessor: midsSiteIdB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteALat
+  ui_header: Deployed HOP Site A Latitude
+  dto_accessor: midsSiteALat
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteALong
+  ui_header: Deployed HOP Site A Longitude
+  dto_accessor: midsSiteALong
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteBLat
+  ui_header: Deployed HOP Site B Latitude
+  dto_accessor: midsSiteBLat
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsSiteBLong
+  ui_header: Deployed HOP Site B Longitude
+  dto_accessor: midsSiteBLong
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: bandwidthMhz
+  ui_header: Deployed Channel Spacing
+  dto_accessor: bandwidthMhz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: modulation
+  ui_header: Deployed Modulation
+  dto_accessor: modulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsHopType
+  ui_header: Deployed HOP Type
+  dto_accessor: midsHopType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: txFrequencyMhz
+  ui_header: Deployed HOP TX Frequency
+  dto_accessor: txFrequencyMhz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: rxFrequencyMhz
+  ui_header: Deployed HOP RX Frequency
+  dto_accessor: rxFrequencyMhz
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsMwChasisSiteA
+  ui_header: Deployed HOP MW Chasis Site A
+  dto_accessor: midsMwChasisSiteA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: midsMwChasisSiteB
+  ui_header: Deployed HOP MW Chasis Site B
+  dto_accessor: midsMwChasisSiteB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedHopNmsStatus
+  ui_header: Deployed HOP NMS STATUS
+  dto_accessor: plannedHopNmsStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: partialMatchedDetails
+  ui_header: Planned Matched Details
+  dto_accessor: partialMatchedDetails
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

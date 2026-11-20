@@ -1,0 +1,216 @@
+id: AI_MW_FREQUENCY_DEVIATION
+name: AI - MW Frequency Deviation
+description: MW frequency validation comparing planned and live configuration, with
+  risk and deviation attributes.
+domain: AI
+report_code: ai-mw-deviation-all
+file_path: configs/reports/ai/ai_mw_frequency_deviation.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 8
+  source_evidence: ReportRequestType enum + ReportController
+  notes: MW deviation variants share this family
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/ai-mw-deviation-all
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hopId
+  ui_header: Hop ID
+  dto_accessor: hopId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteA
+  ui_header: Site A
+  dto_accessor: siteA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteB
+  ui_header: Site B
+  dto_accessor: siteB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedTx
+  ui_header: Planned TX
+  dto_accessor: plannedTx
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: liveRx
+  ui_header: Live RX
+  dto_accessor: liveRx
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedRx
+  ui_header: Planned RX
+  dto_accessor: plannedRx
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: liveTx
+  ui_header: Live TX
+  dto_accessor: liveTx
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: validationStatus
+  ui_header: Validation Status
+  dto_accessor: validationStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Severity
+  ui_header: Severity
+  dto_accessor: severity
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: aiConfidencePct
+  ui_header: AI Confidence %
+  dto_accessor: aiConfidencePct
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: matchType
+  ui_header: Match Type
+  dto_accessor: matchType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedSpacing
+  ui_header: Planned Spacing
+  dto_accessor: plannedSpacing
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: liveSpacing
+  ui_header: Live Spacing
+  dto_accessor: liveSpacing
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedModulation
+  ui_header: Planned Modulation
+  dto_accessor: plannedModulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: liveModulation
+  ui_header: Live Modulation
+  dto_accessor: liveModulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedVendor
+  ui_header: Planned Vendor
+  dto_accessor: plannedVendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: liveVendor
+  ui_header: Live Vendor
+  dto_accessor: liveVendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: interferenceRisk
+  ui_header: Interference Risk
+  dto_accessor: interferenceRisk
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: interferenceCluster
+  ui_header: Interference Cluster
+  dto_accessor: interferenceCluster
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: dataHealth
+  ui_header: Data Health
+  dto_accessor: dataHealth
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: noveltyScore
+  ui_header: Novelty Score
+  dto_accessor: noveltyScore
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: History
+  ui_header: History
+  dto_accessor: history
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: aiRemark
+  ui_header: AI Remark
+  dto_accessor: aiRemark
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Last Updated
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    severity: Severity
+    history: History
+circle_scope: server_side
+empty_result_message: No Data Found!!

@@ -1,0 +1,24 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for non-paginated Stitching Summary metrics."
+  },
+  "summary": [
+    {
+      "label": "Total Active Paths",
+      "value": 14250,
+      "unit": "paths"
+    },
+    {
+      "label": "Degraded Hops",
+      "value": 18,
+      "unit": "hops"
+    },
+    {
+      "label": "Average Latency",
+      "value": 4.2,
+      "unit": "ms"
+    }
+  ]
+}

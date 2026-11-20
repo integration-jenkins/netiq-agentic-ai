@@ -1,0 +1,218 @@
+id: AI_RAN_UPGRADE_AND_LOCATION_INTELLIGENCE
+name: AI - RAN Upgrade and Location Intelligence
+description: RAN upgrade and location-intelligence results.
+domain: AI
+report_code: ran-upgrade
+file_path: configs/reports/ai/ai_ran_upgrade_and_location_intelligence.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 59
+  source_evidence: ReportRequestType enum + ReportController
+  notes: GET and POST /api/v1/ai/ran-upgrade/report also exist
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/ran-upgrade
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: Node ID
+  dto_accessor: nodeId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeType
+  ui_header: Node Type
+  dto_accessor: nodeType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: technology
+  ui_header: Technology
+  dto_accessor: technology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: combinedTechnology
+  ui_header: Combined Technology
+  dto_accessor: combinedTechnology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: basebandModel
+  ui_header: Baseband Model
+  dto_accessor: basebandModel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: rruModel
+  ui_header: RRU Model
+  dto_accessor: rruModel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: installedSwVersion
+  ui_header: Installed SW Version
+  dto_accessor: installedSwVersion
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: targetTechnology
+  ui_header: Target Technology
+  dto_accessor: targetTechnology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: upgradeStatus
+  ui_header: Upgrade Status
+  dto_accessor: upgradeStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: recommendedAction
+  ui_header: Recommended Action
+  dto_accessor: recommendedAction
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: confidenceScore
+  ui_header: Confidence Score
+  dto_accessor: confidenceScore
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteStatus
+  ui_header: Site Status
+  dto_accessor: siteStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: dateAdded
+  ui_header: Date Added
+  dto_accessor: dateAdded
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: dateRemoved
+  ui_header: Date Removed
+  dto_accessor: dateRemoved
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: findingDate
+  ui_header: Finding Date
+  dto_accessor: findingDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: status
+  ui_header: Status
+  dto_accessor: status
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: priorityTier
+  ui_header: Priority Tier
+  dto_accessor: priorityTier
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gpsStatus
+  ui_header: GPS Audit
+  dto_accessor: gpsStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nearestActiveSiteDistanceM
+  ui_header: Dist to 5G (m)
+  dto_accessor: nearestActiveSiteDistanceM
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: neighboursOnTargetTech
+  ui_header: Active 5G Neighbours
+  dto_accessor: neighboursOnTargetTech
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: legacyIslandId
+  ui_header: Legacy Island
+  dto_accessor: legacyIslandId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: upgradeCorridorId
+  ui_header: Upgrade Corridor
+  dto_accessor: upgradeCorridorId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

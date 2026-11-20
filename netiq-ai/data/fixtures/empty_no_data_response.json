@@ -1,0 +1,16 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for 'No Data Found!!' empty response."
+  },
+  "success": false,
+  "message": "No Data Found!!",
+  "data": [],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 0,
+    "hasNext": false
+  }
+}

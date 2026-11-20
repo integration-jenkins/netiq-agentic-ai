@@ -1,0 +1,142 @@
+id: AI_CELL_INFERENCE
+name: AI - Cell Inference
+description: AI cell-inference report fields indicating inferred cell mappings.
+domain: AI
+report_code: Not established
+file_path: configs/reports/ai/ai_cell_inference.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 57
+  source_evidence: Column mapping document only
+  notes: No verified direct report mapping from this column title
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: NOT_AVAILABLE
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api: null
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: technology
+  ui_header: Technology
+  dto_accessor: technology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: elementType
+  ui_header: Element Type
+  dto_accessor: elementType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: elementId
+  ui_header: Element ID
+  dto_accessor: elementId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: currentName
+  ui_header: Current Name
+  dto_accessor: currentName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: namingStatus
+  ui_header: Naming Status
+  dto_accessor: namingStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: predictedName
+  ui_header: Predicted Name
+  dto_accessor: predictedName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: currentSiteId
+  ui_header: Current Site ID
+  dto_accessor: currentSiteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteInferenceStatus
+  ui_header: Site Inference Status
+  dto_accessor: siteInferenceStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: remark
+  ui_header: Remark
+  dto_accessor: remark
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: EMS IP
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: EMS Name
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: insertDate
+  ui_header: Insert Date
+  dto_accessor: insertDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: updateDate
+  ui_header: Update Date
+  dto_accessor: updateDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

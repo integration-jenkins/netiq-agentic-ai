@@ -1,0 +1,150 @@
+id: RAN_CABINET_HARDWARE
+name: RAN - Cabinet Hardware
+description: RAN cabinet inventory including product, vendor and serial number.
+domain: RAN
+report_code: cabinet
+file_path: configs/reports/ran/ran_cabinet_hardware.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 38
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/cabinet
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeId
+  ui_header: Node ID
+  dto_accessor: node_id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: node_name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: cabinetName
+  ui_header: Cabinet Name
+  dto_accessor: cabinet_name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: productName
+  ui_header: Cabinet Product Name
+  dto_accessor: product_name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: srNumber
+  ui_header: Cabinet Serial Number
+  dto_accessor: sr_number
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendorName
+  ui_header: Vendor
+  dto_accessor: vendor_name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: emsName
+  ui_header: EMS Name
+  dto_accessor: nms_name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: emsIp
+  ui_header: EMS IP
+  dto_accessor: nms_ip
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: supportedTechnology
+  ui_header: Supported Technology
+  dto_accessor: tech
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: site_id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Created Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdatedDate
+  ui_header: Last Updated
+  dto_accessor: lastUpdatedDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    node_id: nodeId
+    node_name: nodeName
+    cabinet_name: cabinetName
+    product_name: productName
+    sr_number: srNumber
+    vendor_name: vendorName
+    nms_name: emsName
+    nms_ip: emsIp
+    tech: supportedTechnology
+    site_id: siteId
+circle_scope: server_side
+empty_result_message: No Data Found!!

@@ -1,0 +1,212 @@
+id: AI_DISMANTLED_HARDWARE_INTELLIGENCE
+name: AI - Dismantled Hardware Intelligence
+description: Dismantled hardware records, estimated reuse status, classification and
+  review indicators.
+domain: AI
+report_code: ai-dismantled-hardware
+file_path: configs/reports/ai/ai_dismantled_hardware_intelligence.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 7
+  source_evidence: ReportRequestType enum + ReportController
+  notes: Specialized read endpoint also exists
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/ai-dismantled-hardware
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: site
+  ui_header: Site
+  dto_accessor: site
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: neId
+  ui_header: NE ID
+  dto_accessor: neId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nodeName
+  ui_header: Node Name
+  dto_accessor: nodeName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Cabinet
+  ui_header: Cabinet
+  dto_accessor: cabinet
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Shelf
+  ui_header: Shelf
+  dto_accessor: shelf
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Slot
+  ui_header: Slot
+  dto_accessor: slot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Port
+  ui_header: Port
+  dto_accessor: port
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardModel
+  ui_header: Board Model
+  dto_accessor: boardModel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hardwareModel
+  ui_header: Hardware Model
+  dto_accessor: hardwareModel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: equipmentModel
+  ui_header: Equipment Model
+  dto_accessor: equipmentModel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: boardType
+  ui_header: Board Type
+  dto_accessor: boardType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: serialNumber
+  ui_header: Serial Number
+  dto_accessor: serialNumber
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: netiqStatus
+  ui_header: NetIQ Status
+  dto_accessor: netiqStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: dismantleStatus
+  ui_header: Dismantle Status
+  dto_accessor: dismantleStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: reusableStatus
+  ui_header: Reusable
+  dto_accessor: reusableStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: unusedStatus
+  ui_header: Unused
+  dto_accessor: unusedStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: predictedClass
+  ui_header: Predicted Class
+  dto_accessor: predictedClass
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: aiConfidence
+  ui_header: AI Confidence
+  dto_accessor: aiConfidence
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: noveltyScore
+  ui_header: Novelty Score
+  dto_accessor: noveltyScore
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: needsReview
+  ui_header: Needs Review
+  dto_accessor: needsReview
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: updateDate
+  ui_header: Update Date
+  dto_accessor: updateDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Remarks
+  ui_header: Remarks
+  dto_accessor: remarks
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    cabinet: Cabinet
+    shelf: Shelf
+    slot: Slot
+    port: Port
+    remarks: Remarks
+circle_scope: server_side
+empty_result_message: No Data Found!!

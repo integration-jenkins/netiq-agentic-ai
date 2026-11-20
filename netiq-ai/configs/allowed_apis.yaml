@@ -1,2 +1,148 @@
-# Exact HTTP method + path allow-list. Add only approved endpoints.
-allowed_apis: []
+policy: fail_closed_exact_template
+wildcards_permitted: false
+allowed_apis:
+- id: netiq_inventory_reports
+  method: POST
+  path_template: /api/nodes/reports/{reportType}
+  description: Primary generic inventory and AI parameter report endpoint
+  request_dto: ReportRequest
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: ReportController.java
+- id: netiq_audit_reports
+  method: POST
+  path_template: /api/v1/audit/reports/{type}
+  description: Primary audit report retrieval endpoint
+  request_dto: AuditReportRequest
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: AuditReportController.java
+- id: netiq_audit_reports_txn
+  method: POST
+  path_template: /api/v1/audit/reports/TXN/{type}
+  description: Audit report transaction variant endpoint
+  request_dto: DataRequest
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: AuditReportController.java
+- id: netiq_stitching_report
+  method: POST
+  path_template: /api/v1/stitching/report
+  description: End-to-end stitching service report endpoint
+  request_dto: StitchingReportRequest
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: StitchingController.java
+- id: netiq_stitching_summary
+  method: GET
+  path_template: /api/v1/stitching/summary
+  description: Stitching overview and summary metrics
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: StitchingController.java
+- id: netiq_daily_change_summary
+  method: GET
+  path_template: /api/v1/ai/daily-change/summary
+  description: Daily network change summary metric endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: DailyNetworkChangeController.java
+- id: netiq_daily_change_report
+  method: POST
+  path_template: /api/v1/ai/daily-change/report
+  description: Daily network change detailed report endpoint
+  request_dto: DailyChangeRequest
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: DailyNetworkChangeController.java
+- id: netiq_cells_4g
+  method: GET
+  path_template: /api/cells/4g
+  description: Direct 4G cells query endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: CellController.java
+- id: netiq_cells_5g
+  method: GET
+  path_template: /api/cells/5g
+  description: Direct 5G cells query endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: CellController.java
+- id: netiq_ip_reports_ip_data
+  method: GET
+  path_template: /api/ip-reports/ip-data
+  description: Direct IP data query endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: IpDataController.java
+- id: netiq_ran_predictions_records
+  method: GET
+  path_template: /api/v1/ai/ran-predictions/records
+  description: RAN prediction records query endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: MissingParameterReportController.java
+- id: netiq_mw_degradation_report
+  method: GET
+  path_template: /api/v1/ai/mw-degradation/report
+  description: Microwave link degradation report endpoint
+  request_dto: null
+  read_only: true
+  contract_status: UNVERIFIED
+  production_eligible: false
+  controller: MwDegradationController.java
+explicitly_excluded:
+- path_template: /api/db-console/verify
+  method: POST
+  reason: Arbitrary SQL verification hazard
+- path_template: /api/db-console/execute
+  method: POST
+  reason: Arbitrary SQL execution hazard
+- path_template: /api/data/import
+  method: POST
+  reason: Data mutation / import operation
+- path_template: /api/data/importMW
+  method: POST
+  reason: Data mutation / MW import operation
+- path_template: /api/data/importDelta
+  method: POST
+  reason: Data mutation / delta import operation
+- path_template: /api/data/import/**
+  method: ANY
+  reason: Bulk ETL / import operations
+- path_template: '**/export'
+  method: ANY
+  reason: Export endpoints excluded from read-only query layer
+- path_template: /api/refresh
+  method: GET
+  reason: Dashboard cache / view refresh operation
+- path_template: /api/data/refresh/{type}
+  method: GET
+  reason: Materialized-view refresh operation
+- path_template: /api/nodes/mw-tr-link/trigger-scheduler
+  method: POST
+  reason: Scheduler job trigger mutation
+- path_template: /api/frequency/sync
+  method: POST
+  reason: Frequency sync state change
+- path_template: /api/v1/ai/cell-to-ru/train
+  method: POST
+  reason: Model training mutation

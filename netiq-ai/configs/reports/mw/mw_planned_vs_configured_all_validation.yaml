@@ -1,0 +1,206 @@
+id: MW_PLANNED_VS_CONFIGURED_ALL_VALIDATION
+name: MW - Planned vs Configured (All Validation)
+description: All-validation view of planned versus configured MW link parameters.
+domain: MW
+report_code: planned-vs-configured-audit
+file_path: configs/reports/mw/mw_planned_vs_configured_all_validation.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 42
+  source_evidence: AuditReportType enum + AuditReportController
+  notes: Verify exact all-validation query
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  path_template: /api/v1/audit/reports/TXN/{type}
+  request_dto: DataRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: AuditReportController.java
+columns:
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkId
+  ui_header: Link ID
+  dto_accessor: linkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsLinkId
+  ui_header: NMS Link ID
+  dto_accessor: nmsLinkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteIdA
+  ui_header: Site ID A
+  dto_accessor: siteIdA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteIdB
+  ui_header: Site ID B
+  dto_accessor: siteIdB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsSiteA
+  ui_header: NMS Site A
+  dto_accessor: nmsSiteA
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsSiteB
+  ui_header: NMS Site B
+  dto_accessor: nmsSiteB
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedTxFreq
+  ui_header: Planned TX (MHz)
+  dto_accessor: plannedTxFreq
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedRxFreq
+  ui_header: Planned RX (MHz)
+  dto_accessor: plannedRxFreq
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: configuredTxFreq
+  ui_header: Configured TX (MHz)
+  dto_accessor: configuredTxFreq
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: configuredRxFreq
+  ui_header: Configured RX (MHz)
+  dto_accessor: configuredRxFreq
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: frequencyStatus
+  ui_header: Frequency Status
+  dto_accessor: frequencyStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedChannel
+  ui_header: Planned Channel (MHz)
+  dto_accessor: plannedChannel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: configuredChannel
+  ui_header: Configured Channel (MHz)
+  dto_accessor: configuredChannel
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: channelStatus
+  ui_header: Channel Status
+  dto_accessor: channelStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedModulation
+  ui_header: Planned Modulation
+  dto_accessor: plannedModulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: configuredModulation
+  ui_header: Configured Modulation
+  dto_accessor: configuredModulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: modulationStatus
+  ui_header: Modulation Status
+  dto_accessor: modulationStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: plannedHopType
+  ui_header: Planned HOP Type
+  dto_accessor: plannedHopType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: configuredHopType
+  ui_header: Configured HOP Type
+  dto_accessor: configuredHopType
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hopTypeStatus
+  ui_header: HOP Type Status
+  dto_accessor: hopTypeStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: overallValidationStatus
+  ui_header: Overall Status
+  dto_accessor: overallValidationStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: validationTimestamp
+  ui_header: Validation Time
+  dto_accessor: validationTimestamp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

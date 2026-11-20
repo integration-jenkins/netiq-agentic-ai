@@ -1,0 +1,206 @@
+id: AI_RAN_GPS_IMPUTATION
+name: AI - RAN GPS Imputation
+description: RAN GPS missing-location imputation and associated inference context.
+domain: AI
+report_code: ran-gps-imputation
+file_path: configs/reports/ai/ai_ran_gps_imputation.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 60
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/ran-gps-imputation
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: reportName
+  ui_header: Report Name
+  dto_accessor: reportName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteId
+  ui_header: Site ID
+  dto_accessor: siteId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: technology
+  ui_header: Technology
+  dto_accessor: technology
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: existingLatitude
+  ui_header: Existing Latitude
+  dto_accessor: existingLatitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: existingLongitude
+  ui_header: Existing Longitude
+  dto_accessor: existingLongitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: suggestedLatitude
+  ui_header: Suggested Latitude
+  dto_accessor: suggestedLatitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: suggestedLongitude
+  ui_header: Suggested Longitude
+  dto_accessor: suggestedLongitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gpsSource
+  ui_header: GPS Source
+  dto_accessor: gpsSource
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: gpsStatus
+  ui_header: GPS Status
+  dto_accessor: gpsStatus
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: sourcePriority
+  ui_header: Source Priority
+  dto_accessor: sourcePriority
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: firstAuditDate
+  ui_header: First Audit Date
+  dto_accessor: firstAuditDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdated
+  ui_header: Last Updated
+  dto_accessor: lastUpdated
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: finalLatitude
+  ui_header: Final Latitude
+  dto_accessor: finalLatitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: finalLongitude
+  ui_header: Final Longitude
+  dto_accessor: finalLongitude
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: finalGpsSource
+  ui_header: Final GPS Source
+  dto_accessor: finalGpsSource
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: siteName
+  ui_header: Site Name
+  dto_accessor: siteName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: vendor
+  ui_header: Vendor
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: remarks
+  ui_header: Remarks
+  dto_accessor: remarks
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: aiConfidence
+  ui_header: AI Confidence
+  dto_accessor: aiConfidence
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: confidenceBand
+  ui_header: Confidence Band
+  dto_accessor: confidenceBand
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: noveltyScore
+  ui_header: Novelty Score
+  dto_accessor: noveltyScore
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: predictionRadiusKm
+  ui_header: Prediction Radius (km)
+  dto_accessor: predictionRadiusKm
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: estimateBasis
+  ui_header: Estimate Basis
+  dto_accessor: estimateBasis
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases: {}
+circle_scope: server_side
+empty_result_message: No Data Found!!

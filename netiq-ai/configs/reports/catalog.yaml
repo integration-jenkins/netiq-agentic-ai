@@ -1,2 +1,869 @@
-# Central report catalogue.
-reports: []
+metadata_version: 1.0.0
+total_reports: 57
+source_derived_date: '2026-11-20'
+reports:
+- id: AI_MISSING_PARAMETER_PREDICTIONS
+  name: AI - Missing Parameter Predictions
+  domain: AI
+  report_code: prediction-all-missing
+  folder: ai
+  file_path: configs/reports/ai/ai_missing_parameter_predictions.yaml
+  columns_count: 8
+  api_endpoint: POST /api/nodes/reports/prediction-all-missing
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_BASELINE_AUDIT
+  name: AI - Baseline Audit
+  domain: AI
+  report_code: ai-baseline-all
+  folder: ai
+  file_path: configs/reports/ai/ai_baseline_audit.yaml
+  columns_count: 25
+  api_endpoint: POST /api/nodes/reports/ai-baseline-all
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_DISMANTLED_HARDWARE_INTELLIGENCE
+  name: AI - Dismantled Hardware Intelligence
+  domain: AI
+  report_code: ai-dismantled-hardware
+  folder: ai
+  file_path: configs/reports/ai/ai_dismantled_hardware_intelligence.yaml
+  columns_count: 24
+  api_endpoint: POST /api/nodes/reports/ai-dismantled-hardware
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_MW_FREQUENCY_DEVIATION
+  name: AI - MW Frequency Deviation
+  domain: AI
+  report_code: ai-mw-deviation-all
+  folder: ai
+  file_path: configs/reports/ai/ai_mw_frequency_deviation.yaml
+  columns_count: 25
+  api_endpoint: POST /api/nodes/reports/ai-mw-deviation-all
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_NODE_INVENTORY
+  name: MW / UBR - Node Inventory
+  domain: MW / UBR
+  report_code: mw-node
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_node_inventory.yaml
+  columns_count: 15
+  api_endpoint: POST /api/nodes/reports/mw-node
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_DUPLICATE_NODES_MWDUPLICATENODES
+  name: MW / UBR - Duplicate Nodes (MwDuplicateNodes)
+  domain: MW / UBR
+  report_code: mw-duplicate-node
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_duplicate_nodes_mwduplicatenodes.yaml
+  columns_count: 11
+  api_endpoint: POST /api/nodes/reports/mw-duplicate-node
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_PORT_INVENTORY
+  name: MW / UBR - Port Inventory
+  domain: MW / UBR
+  report_code: mw-port
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_port_inventory.yaml
+  columns_count: 26
+  api_endpoint: POST /api/nodes/reports/mw-port
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_VLAN_INVENTORY
+  name: MW / UBR - VLAN Inventory
+  domain: MW / UBR
+  report_code: mw-vlan
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_vlan_inventory.yaml
+  columns_count: 18
+  api_endpoint: POST /api/nodes/reports/mw-vlan
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_NODE_INVENTORY
+  name: Wireline - Node Inventory
+  domain: Wireline
+  report_code: wireline-node
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_node_inventory.yaml
+  columns_count: 13
+  api_endpoint: POST /api/nodes/reports/wireline-node
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_SITE_INVENTORY
+  name: MW / UBR - Site Inventory
+  domain: MW / UBR
+  report_code: mw-site
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_site_inventory.yaml
+  columns_count: 11
+  api_endpoint: POST /api/nodes/reports/mw-site
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_IP_INVENTORY
+  name: MW / UBR - IP Inventory
+  domain: MW / UBR
+  report_code: mw-ip
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_ip_inventory.yaml
+  columns_count: 19
+  api_endpoint: POST /api/nodes/reports/mw-ip
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_NODE_VALIDATION
+  name: MW / UBR - Node Validation
+  domain: MW / UBR
+  report_code: mw-node-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_node_validation.yaml
+  columns_count: 16
+  api_endpoint: POST /api/v1/audit/reports/mw-node-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_TRANSMISSION_LINK_INVENTORY
+  name: MW - Transmission Link Inventory
+  domain: MW
+  report_code: mw-tr-link
+  folder: mw
+  file_path: configs/reports/mw/mw_transmission_link_inventory.yaml
+  columns_count: 68
+  api_endpoint: POST /api/nodes/reports/mw-tr-link
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_CAPACITY_HOP
+  name: MW - Capacity Hop
+  domain: MW
+  report_code: mw-hop-config-report
+  folder: mw
+  file_path: configs/reports/mw/mw_capacity_hop.yaml
+  columns_count: 30
+  api_endpoint: POST /api/nodes/reports/mw-hop-config-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: UBR_TRANSMISSION_LINK_INVENTORY
+  name: UBR - Transmission Link Inventory
+  domain: UBR
+  report_code: ubr-tr-link
+  folder: mw
+  file_path: configs/reports/mw/ubr_transmission_link_inventory.yaml
+  columns_count: 59
+  api_endpoint: POST /api/nodes/reports/ubr-tr-link
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: UBR_TRANSMISSION_LINK_AUDIT
+  name: UBR - Transmission Link Audit
+  domain: UBR
+  report_code: ubr-tr-audit
+  folder: mw
+  file_path: configs/reports/mw/ubr_transmission_link_audit.yaml
+  columns_count: 30
+  api_endpoint: POST /api/v1/audit/reports/TXN/ubr-tr-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_PLANNED_VS_CONFIGURED
+  name: MW - Planned vs Configured
+  domain: MW
+  report_code: planned-vs-configured-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_planned_vs_configured.yaml
+  columns_count: 29
+  api_endpoint: POST /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_DUPLICATE_NODE_AUDIT
+  name: MW - Duplicate Node Audit
+  domain: MW
+  report_code: duplicate_mw_node
+  folder: mw
+  file_path: configs/reports/mw/mw_duplicate_node_audit.yaml
+  columns_count: 15
+  api_endpoint: POST /api/v1/audit/reports/duplicate_mw_node
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_LINK_AUDIT
+  name: MW - Link Audit
+  domain: MW
+  report_code: mw-tr-link-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_link_audit.yaml
+  columns_count: 29
+  api_endpoint: POST /api/v1/audit/reports/TXN/mw-tr-link-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_NODE_INVENTORY
+  name: RAN - Node Inventory
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_node_inventory.yaml
+  columns_count: 21
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_GHOST_NODE
+  name: RAN - Ghost Node
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_ghost_node.yaml
+  columns_count: 12
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_ENODEB
+  name: RAN - eNodeB
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_enodeb.yaml
+  columns_count: 17
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_GNODEB
+  name: RAN - gNodeB
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_gnodeb.yaml
+  columns_count: 17
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_BTS
+  name: RAN - BTS
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_bts.yaml
+  columns_count: 15
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_SRAN
+  name: RAN - SRAN
+  domain: RAN
+  report_code: node-report
+  folder: ran
+  file_path: configs/reports/ran/ran_sran.yaml
+  columns_count: 23
+  api_endpoint: POST /api/nodes/reports/node-report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_HARDWARE_VALIDATION
+  name: MW - Hardware Validation
+  domain: MW
+  report_code: mw-hard-cab
+  folder: mw
+  file_path: configs/reports/mw/mw_hardware_validation.yaml
+  columns_count: 18
+  api_endpoint: POST /api/nodes/reports/mw-hard-cab
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_CELL_4G
+  name: RAN - Cell 4G
+  domain: RAN
+  report_code: 4g
+  folder: ran
+  file_path: configs/reports/ran/ran_cell_4g.yaml
+  columns_count: 28
+  api_endpoint: POST /api/nodes/reports/4g
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_CELL_5G
+  name: RAN - Cell 5G
+  domain: RAN
+  report_code: 5g
+  folder: ran
+  file_path: configs/reports/ran/ran_cell_5g.yaml
+  columns_count: 28
+  api_endpoint: POST /api/nodes/reports/5g
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_CELL_2G
+  name: RAN - Cell 2G
+  domain: RAN
+  report_code: 2g
+  folder: ran
+  file_path: configs/reports/ran/ran_cell_2g.yaml
+  columns_count: 26
+  api_endpoint: POST /api/nodes/reports/2g
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_IP_INVENTORY
+  name: RAN - IP Inventory
+  domain: RAN
+  report_code: ip-data
+  folder: ran
+  file_path: configs/reports/ran/ran_ip_inventory.yaml
+  columns_count: 20
+  api_endpoint: POST /api/nodes/reports/ip-data
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_CONFIGURATION_VALIDATION
+  name: MW - Configuration Validation
+  domain: MW
+  report_code: planned-vs-configured-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_configuration_validation.yaml
+  columns_count: 15
+  api_endpoint: POST /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_CORE_IP
+  name: RAN - Core IP
+  domain: RAN
+  report_code: core-ip-data
+  folder: ran
+  file_path: configs/reports/ran/ran_core_ip.yaml
+  columns_count: 17
+  api_endpoint: POST /api/nodes/reports/core-ip-data
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_BOARD_HARDWARE
+  name: RAN - Board Hardware
+  domain: RAN
+  report_code: boards
+  folder: ran
+  file_path: configs/reports/ran/ran_board_hardware.yaml
+  columns_count: 17
+  api_endpoint: POST /api/nodes/reports/boards
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: RAN_CABINET_HARDWARE
+  name: RAN - Cabinet Hardware
+  domain: RAN
+  report_code: cabinet
+  folder: ran
+  file_path: configs/reports/ran/ran_cabinet_hardware.yaml
+  columns_count: 13
+  api_endpoint: POST /api/nodes/reports/cabinet
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_BOARD_HARDWARE
+  name: MW / UBR - Board Hardware
+  domain: MW / UBR
+  report_code: mw-board
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_board_hardware.yaml
+  columns_count: 27
+  api_endpoint: POST /api/nodes/reports/mw-board
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_UBR_TRANSCEIVER
+  name: MW / UBR - Transceiver
+  domain: MW / UBR
+  report_code: mw-transceiver
+  folder: mw
+  file_path: configs/reports/mw/mw_ubr_transceiver.yaml
+  columns_count: 21
+  api_endpoint: POST /api/nodes/reports/mw-transceiver
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_TRANSMISSION_LINK_TXN_VARIANT
+  name: MW - Transmission Link (TXN variant)
+  domain: MW
+  report_code: mw-trlink-combined
+  folder: mw
+  file_path: configs/reports/mw/mw_transmission_link_txn_variant.yaml
+  columns_count: 44
+  api_endpoint: POST /api/nodes/reports/mw-trlink-combined
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_PLANNED_VS_CONFIGURED_ALL_VALIDATION
+  name: MW - Planned vs Configured (All Validation)
+  domain: MW
+  report_code: planned-vs-configured-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_planned_vs_configured_all_validation.yaml
+  columns_count: 24
+  api_endpoint: POST /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_HARDWARE
+  name: Wireline - Hardware
+  domain: Wireline
+  report_code: wireline-hardware
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_hardware.yaml
+  columns_count: 16
+  api_endpoint: POST /api/nodes/reports/wireline-hardware
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_LOGICAL_INTERFACE
+  name: Wireline - Logical Interface
+  domain: Wireline
+  report_code: wireline-logical
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_logical_interface.yaml
+  columns_count: 22
+  api_endpoint: POST /api/nodes/reports/wireline-logical
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_VLAN_IP
+  name: Wireline - VLAN IP
+  domain: Wireline
+  report_code: wireline-vlan
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_vlan_ip.yaml
+  columns_count: 18
+  api_endpoint: POST /api/nodes/reports/wireline-vlan
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: FTTH_NODE_INVENTORY
+  name: FTTH - Node Inventory
+  domain: FTTH
+  report_code: ftth-node
+  folder: ftth
+  file_path: configs/reports/ftth/ftth_node_inventory.yaml
+  columns_count: 11
+  api_endpoint: POST /api/nodes/reports/ftth-node
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: FTTH_PORT_INVENTORY
+  name: FTTH - Port Inventory
+  domain: FTTH
+  report_code: ftth-port
+  folder: ftth
+  file_path: configs/reports/ftth/ftth_port_inventory.yaml
+  columns_count: 16
+  api_endpoint: POST /api/nodes/reports/ftth-port
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: FTTH_HARDWARE
+  name: FTTH - Hardware
+  domain: FTTH
+  report_code: ftth-hardware
+  folder: ftth
+  file_path: configs/reports/ftth/ftth_hardware.yaml
+  columns_count: 19
+  api_endpoint: POST /api/nodes/reports/ftth-hardware
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: FTTH_LINK_INVENTORY
+  name: FTTH - Link Inventory
+  domain: FTTH
+  report_code: ftth-link
+  folder: ftth
+  file_path: configs/reports/ftth/ftth_link_inventory.yaml
+  columns_count: 15
+  api_endpoint: POST /api/nodes/reports/ftth-link
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: MW_MIDS_VALIDATION
+  name: MW - MIDS Validation
+  domain: MW
+  report_code: planned-vs-configured-audit
+  folder: mw
+  file_path: configs/reports/mw/mw_mids_validation.yaml
+  columns_count: 19
+  api_endpoint: POST /api/v1/audit/reports/TXN/planned-vs-configured-audit
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_PORT_INVENTORY
+  name: Wireline - Port Inventory
+  domain: Wireline
+  report_code: wireline-port
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_port_inventory.yaml
+  columns_count: 21
+  api_endpoint: POST /api/nodes/reports/wireline-port
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: WIRELINE_LINK_INVENTORY
+  name: Wireline - Link Inventory
+  domain: Wireline
+  report_code: wireline-link
+  folder: wireline
+  file_path: configs/reports/wireline/wireline_link_inventory.yaml
+  columns_count: 15
+  api_endpoint: POST /api/nodes/reports/wireline-link
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: STITCHING_END_TO_END_SERVICE_REPORT
+  name: Stitching - End-to-End Service Report
+  domain: Stitching
+  report_code: Not established
+  folder: ai
+  file_path: configs/reports/ai/stitching_end_to_end_service_report.yaml
+  columns_count: 35
+  api_endpoint: POST /api/v1/stitching/report
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: NETWORK_CHANGE_DETAILS
+  name: Network - Change Details
+  domain: Network
+  report_code: change-details
+  folder: ai
+  file_path: configs/reports/ai/network_change_details.yaml
+  columns_count: 11
+  api_endpoint: POST /api/nodes/reports/change-details
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_SITE_INFERENCE
+  name: AI - Site Inference
+  domain: AI
+  report_code: Not established
+  folder: ai
+  file_path: configs/reports/ai/ai_site_inference.yaml
+  columns_count: 14
+  api_endpoint: null
+  production_eligible: false
+  verification_status: NOT_AVAILABLE
+- id: AI_NODE_INFERENCE
+  name: AI - Node Inference
+  domain: AI
+  report_code: Not established
+  folder: ai
+  file_path: configs/reports/ai/ai_node_inference.yaml
+  columns_count: 15
+  api_endpoint: null
+  production_eligible: false
+  verification_status: NOT_AVAILABLE
+- id: AI_CELL_INFERENCE
+  name: AI - Cell Inference
+  domain: AI
+  report_code: Not established
+  folder: ai
+  file_path: configs/reports/ai/ai_cell_inference.yaml
+  columns_count: 15
+  api_endpoint: null
+  production_eligible: false
+  verification_status: NOT_AVAILABLE
+- id: AI_CELL_TO_RU_LINK_AUDIT
+  name: AI - Cell-to-RU Link Audit
+  domain: AI
+  report_code: cell-to-ru
+  folder: ai
+  file_path: configs/reports/ai/ai_cell_to_ru_link_audit.yaml
+  columns_count: 32
+  api_endpoint: POST /api/nodes/reports/cell-to-ru
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_RAN_UPGRADE_AND_LOCATION_INTELLIGENCE
+  name: AI - RAN Upgrade and Location Intelligence
+  domain: AI
+  report_code: ran-upgrade
+  folder: ai
+  file_path: configs/reports/ai/ai_ran_upgrade_and_location_intelligence.yaml
+  columns_count: 26
+  api_endpoint: POST /api/nodes/reports/ran-upgrade
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_RAN_GPS_IMPUTATION
+  name: AI - RAN GPS Imputation
+  domain: AI
+  report_code: ran-gps-imputation
+  folder: ai
+  file_path: configs/reports/ai/ai_ran_gps_imputation.yaml
+  columns_count: 24
+  api_endpoint: POST /api/nodes/reports/ran-gps-imputation
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+- id: AI_DAILY_NETWORK_CHANGE_SUMMARY
+  name: AI - Daily Network Change Summary
+  domain: AI
+  report_code: Not established
+  folder: ai
+  file_path: configs/reports/ai/ai_daily_network_change_summary.yaml
+  columns_count: 15
+  api_endpoint: GET /api/v1/ai/daily-change/summary
+  production_eligible: false
+  verification_status: SOURCE_DERIVED
+reconciliation_anomalies:
+  shared_report_codes:
+    planned-vs-configured-audit:
+    - MW - Planned vs Configured
+    - MW - Configuration Validation
+    - MW - Planned vs Configured (All Validation)
+    - MW - MIDS Validation
+    node-report:
+    - RAN - Node Inventory
+    - RAN - Ghost Node
+    - RAN - eNodeB
+    - RAN - gNodeB
+    - RAN - BTS
+    - RAN - SRAN
+  missing_api_mappings:
+  - report_number: 51
+    report_name: AI - Site Inference
+    domain: AI
+    note: AI site/node/cell inference UI group lacks confirmed distinct read API mapping.
+  - report_number: 52
+    report_name: AI - Node Inference
+    domain: AI
+    note: AI site/node/cell inference UI group lacks confirmed distinct read API mapping.
+  - report_number: 53
+    report_name: AI - Cell Inference
+    domain: AI
+    note: AI site/node/cell inference UI group lacks confirmed distinct read API mapping.
+  conflicting_endpoints:
+  - report_code: ip-data-audit-report
+    display_name: IP Address Validator
+    conflict: Code exists in both Inventory (POST /api/nodes/reports/ip-data-audit-report
+      via ReportRequest) and Audit (POST /api/v1/audit/reports/ip-data-audit-report
+      via AuditReportRequest).
+  unmapped_inventory_codes:
+  - enum_name: IP_DATA_AUDIT_REPORTS
+    report_code: ip-data-audit-report
+    display_name: IP Data Audit Report
+    endpoint: /api/nodes/reports/ip-data-audit-report
+    request_dto: ReportRequest
+  - enum_name: DUPLICATES_NODES
+    report_code: duplicate-nodes
+    display_name: Duplicate Node Audit
+    endpoint: /api/nodes/reports/duplicate-nodes
+    request_dto: ReportRequest
+  - enum_name: DUPLICATES_4GCELL
+    report_code: duplicate-4gcell
+    display_name: 4G Duplicate Cell Audit
+    endpoint: /api/nodes/reports/duplicate-4gcell
+    request_dto: ReportRequest
+  - enum_name: DUPLICATES_5GCELL
+    report_code: duplicate-5gcell
+    display_name: 5G Duplicate Cell Audit
+    endpoint: /api/nodes/reports/duplicate-5gcell
+    request_dto: ReportRequest
+  - enum_name: DUPLICATES_HARDWARE
+    report_code: duplicate-hardware
+    display_name: Duplicate Equipment Audit
+    endpoint: /api/nodes/reports/duplicate-hardware
+    request_dto: ReportRequest
+  - enum_name: MW_VENDOR_WISE_NODE
+    report_code: mw_node_report
+    display_name: Vendor wise Node Distribution
+    endpoint: /api/nodes/reports/mw_node_report
+    request_dto: ReportRequest
+  - enum_name: MW_NODE_IP_VERSION
+    report_code: mw-node-ip-version
+    display_name: IP Details
+    endpoint: /api/nodes/reports/mw-node-ip-version
+    request_dto: ReportRequest
+  - enum_name: PREDICTION_2G_MISSING
+    report_code: prediction-2g-missing
+    display_name: 2G Prediction Missing Parameters
+    endpoint: /api/nodes/reports/prediction-2g-missing
+    request_dto: ReportRequest
+  - enum_name: PREDICTION_4G_MISSING
+    report_code: prediction-4g-missing
+    display_name: 4G Prediction Missing Parameters
+    endpoint: /api/nodes/reports/prediction-4g-missing
+    request_dto: ReportRequest
+  - enum_name: PREDICTION_5G_MISSING
+    report_code: prediction-5g-missing
+    display_name: 5G Prediction Missing Parameters
+    endpoint: /api/nodes/reports/prediction-5g-missing
+    request_dto: ReportRequest
+  - enum_name: PREDICTION_HW_MISSING
+    report_code: prediction-hw-missing
+    display_name: Hardware Prediction Missing Parameters
+    endpoint: /api/nodes/reports/prediction-hw-missing
+    request_dto: ReportRequest
+  - enum_name: RAN_DUPLICATE
+    report_code: ran-duplicate
+    display_name: RAN Duplicate AI Report
+    endpoint: /api/nodes/reports/ran-duplicate
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_MATCHING
+    report_code: ai-baseline-matching
+    display_name: Matching Baseline Records
+    endpoint: /api/nodes/reports/ai-baseline-matching
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_DEVIATED
+    report_code: ai-baseline-deviated
+    display_name: Deviated Baseline Records
+    endpoint: /api/nodes/reports/ai-baseline-deviated
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_HIGH
+    report_code: ai-baseline-high
+    display_name: High Severity Deviations
+    endpoint: /api/nodes/reports/ai-baseline-high
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_MEDIUM
+    report_code: ai-baseline-medium
+    display_name: Medium Severity Deviations
+    endpoint: /api/nodes/reports/ai-baseline-medium
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_LOW
+    report_code: ai-baseline-low
+    display_name: Low Severity Deviations
+    endpoint: /api/nodes/reports/ai-baseline-low
+    request_dto: ReportRequest
+  - enum_name: AI_BASELINE_UNAVAILABLE
+    report_code: ai-baseline-unavailable
+    display_name: Baseline Not Available Audit
+    endpoint: /api/nodes/reports/ai-baseline-unavailable
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_MATCHED
+    report_code: ai-mw-deviation-matched
+    display_name: Matched MW Frequency Validation
+    endpoint: /api/nodes/reports/ai-mw-deviation-matched
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_DEVIATED
+    report_code: ai-mw-deviation-deviated
+    display_name: MW Frequency Deviations
+    endpoint: /api/nodes/reports/ai-mw-deviation-deviated
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_HIGH
+    report_code: ai-mw-deviation-high
+    display_name: High Severity MW Deviations
+    endpoint: /api/nodes/reports/ai-mw-deviation-high
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_MEDIUM
+    report_code: ai-mw-deviation-medium
+    display_name: Medium Severity MW Deviations
+    endpoint: /api/nodes/reports/ai-mw-deviation-medium
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_LOW
+    report_code: ai-mw-deviation-low
+    display_name: Low Severity MW Deviations
+    endpoint: /api/nodes/reports/ai-mw-deviation-low
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_INTERFERENCE
+    report_code: ai-mw-deviation-interference
+    display_name: MW Interference Review
+    endpoint: /api/nodes/reports/ai-mw-deviation-interference
+    request_dto: ReportRequest
+  - enum_name: AI_MW_DEVIATION_UNUSUAL
+    report_code: ai-mw-deviation-unusual
+    display_name: Unusual MW Validation Records
+    endpoint: /api/nodes/reports/ai-mw-deviation-unusual
+    request_dto: ReportRequest
+  unmapped_audit_codes:
+  - enum_name: MISSING_REMARKS
+    report_code: missing-remarks
+    display_name: Missing Remarks Report
+    endpoint_candidate: /api/v1/audit/reports/missing-remarks
+    request_dto: AuditReportRequest
+  - enum_name: MISSING_ATTRIBUTES
+    report_code: missing-attributes
+    display_name: Missing Field Detector
+    endpoint_candidate: /api/v1/audit/reports/missing-attributes
+    request_dto: AuditReportRequest
+  - enum_name: HARDWARE_CONSISTENCY
+    report_code: hardware-consistency
+    display_name: Hardware Health Check
+    endpoint_candidate: /api/v1/audit/reports/hardware-consistency
+    request_dto: AuditReportRequest
+  - enum_name: HARDWARE_DUPLICATE
+    report_code: hardware-duplicate
+    display_name: Duplicate Equipment Audit
+    endpoint_candidate: /api/v1/audit/reports/hardware-duplicate
+    request_dto: AuditReportRequest
+  - enum_name: SITE_ID_VALIDATION
+    report_code: site-id-validation
+    display_name: Site ID Integrity Check
+    endpoint_candidate: /api/v1/audit/reports/site-id-validation
+    request_dto: AuditReportRequest
+  - enum_name: CELL_RU_MAPPING
+    report_code: cell-ru-mapping
+    display_name: Cell to RU Link Audit
+    endpoint_candidate: /api/v1/audit/reports/cell-ru-mapping
+    request_dto: AuditReportRequest
+  - enum_name: IP_DATA_AUDIT_REPORT
+    report_code: ip-data-audit-report
+    display_name: IP Address Validator
+    endpoint_candidate: /api/v1/audit/reports/ip-data-audit-report
+    request_dto: AuditReportRequest
+  - enum_name: GPS_VALIDATION
+    report_code: gps-validation
+    display_name: GPS Accuracy Audit
+    endpoint_candidate: /api/v1/audit/reports/gps-validation
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_IP_DATA_AUDIT_REPORT
+    report_code: duplicate-ip-data-audit-report
+    display_name: Duplicate IP Finder
+    endpoint_candidate: /api/v1/audit/reports/duplicate-ip-data-audit-report
+    request_dto: AuditReportRequest
+  - enum_name: NOMENCLATURE
+    report_code: nomenclature
+    display_name: Nomenclature Audit
+    endpoint_candidate: /api/v1/audit/reports/nomenclature
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_NODE
+    report_code: duplicate-node
+    display_name: Duplicate Node Audit
+    endpoint_candidate: /api/v1/audit/reports/duplicate-node
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_4GCELL
+    report_code: duplicate-4g-cell
+    display_name: 4G Duplicate Cell Audit
+    endpoint_candidate: /api/v1/audit/reports/duplicate-4g-cell
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_5GCELL
+    report_code: duplicate-5g-cell
+    display_name: 5G Duplicate Cell Audit
+    endpoint_candidate: /api/v1/audit/reports/duplicate-5g-cell
+    request_dto: AuditReportRequest
+  - enum_name: IP_VALIDATION
+    report_code: ip-validation
+    display_name: IP Address Validator
+    endpoint_candidate: /api/v1/audit/reports/ip-validation
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_IP
+    report_code: duplicate-ip
+    display_name: Duplicate IP Finder
+    endpoint_candidate: /api/v1/audit/reports/duplicate-ip
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_IP_DATA
+    report_code: duplicate-ip-data
+    display_name: Duplicate IP Finder
+    endpoint_candidate: /api/v1/audit/reports/duplicate-ip-data
+    request_dto: AuditReportRequest
+  - enum_name: TXN_DUPLICATE_NODE
+    report_code: txn-duplicate-node
+    display_name: TXN Duplicate Node Audit
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-duplicate-node
+    request_dto: DataRequest
+  - enum_name: TXN_NON_MATCHED_FREQ
+    report_code: txn-non-matched-freq
+    display_name: Non-Matched Freq. HOP
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-non-matched-freq
+    request_dto: DataRequest
+  - enum_name: TXN_MISSING_TXN_LINKS
+    report_code: txn-missing-txn-links
+    display_name: Missing Txn Links
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-missing-txn-links
+    request_dto: DataRequest
+  - enum_name: TXN_ORPHAN_NODES
+    report_code: txn-orphan-nodes
+    display_name: Orphan Nodes
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-orphan-nodes
+    request_dto: DataRequest
+  - enum_name: TXN_ORPHAN_LINKS
+    report_code: txn-orphan-tnx-links
+    display_name: Orphan Tnx Links
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-orphan-tnx-links
+    request_dto: DataRequest
+  - enum_name: TXN_NON_MATCHED_HOP
+    report_code: txn-non-matched-hop-type
+    display_name: TXN Non Matched Hop
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-non-matched-hop-type
+    request_dto: DataRequest
+  - enum_name: TXN_NON_MATCHED_CHANNEL
+    report_code: txn-non-matched-channel-spacing
+    display_name: Non-Matched Channel BW. HOP
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-non-matched-channel-spacing
+    request_dto: DataRequest
+  - enum_name: TXN_ORPHAN_RAN_SITE
+    report_code: txn-orphan-ran-sites
+    display_name: Orphan RAN Site
+    endpoint_candidate: /api/v1/audit/reports/TXN/txn-orphan-ran-sites
+    request_dto: DataRequest
+  - enum_name: DUPLICATE_HARDWARE_DATA
+    report_code: duplicate-hardware-data
+    display_name: Duplicate Equipment Audit
+    endpoint_candidate: /api/v1/audit/reports/duplicate-hardware-data
+    request_dto: AuditReportRequest
+  - enum_name: DUPLICATE_2GCELL
+    report_code: duplicate-2g-cell
+    display_name: 2G Duplicate Cell Audit
+    endpoint_candidate: /api/v1/audit/reports/duplicate-2g-cell
+    request_dto: AuditReportRequest
+  - enum_name: COMPLIANCE
+    report_code: compliance
+    display_name: Mapping Rule Checker
+    endpoint_candidate: /api/v1/audit/reports/compliance
+    request_dto: AuditReportRequest

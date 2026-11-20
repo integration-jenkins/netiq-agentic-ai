@@ -1,0 +1,35 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for RAN Node Inventory (node-report). Demonstrates hypothetical pagination wrapper."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "nodeId": "ND_DEL_101",
+      "nodeName": "DEL_CENTRAL_01",
+      "circle": "DELHI",
+      "vendor": "ERICSSON",
+      "technology": "4G",
+      "siteId": "S_DEL_1001",
+      "ipAddress": "10.124.12.1"
+    },
+    {
+      "nodeId": "ND_DEL_102",
+      "nodeName": "DEL_NORTH_02",
+      "circle": "DELHI",
+      "vendor": "NOKIA",
+      "technology": "5G",
+      "siteId": "S_DEL_1002",
+      "ipAddress": "10.124.12.2"
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 2,
+    "hasNext": false
+  }
+}

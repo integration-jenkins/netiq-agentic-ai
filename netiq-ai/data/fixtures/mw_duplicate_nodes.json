@@ -1,0 +1,24 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for MW Duplicate Node Report (mw-duplicate-node)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "nodeName": "DUPLICATE_HUB_01",
+      "circle": "DELHI",
+      "duplicateCount": 2,
+      "ipList": "10.10.1.1, 10.10.1.2",
+      "resolutionStatus": "PENDING_AUDIT"
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

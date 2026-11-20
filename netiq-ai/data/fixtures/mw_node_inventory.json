@@ -1,0 +1,26 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for MW Node Inventory (mw-node)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "nodeId": "MW_PUN_01",
+      "nodeName": "PUN_PUNE_MW_01",
+      "circle": "PUNJAB",
+      "vendor": "HUAWEI",
+      "ipAddress": "192.168.10.4",
+      "softwareVersion": "V200R019",
+      "status": "ACTIVE"
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "_provenance": {
+    "fixture_type": "SYNTHETIC",
+    "verification_status": "UNVERIFIED",
+    "source_note": "Synthetic test fixture for Wireline Node Inventory (wireline-node)."
+  },
+  "success": true,
+  "message": "OK",
+  "data": [
+    {
+      "exchangeId": "EX_KOL_01",
+      "exchangeName": "KOLKATA_CENTRAL_EX",
+      "circle": "KOLKATA",
+      "switchType": "CISCO_ASR9K",
+      "totalCopperPorts": 240,
+      "utilizedCopperPorts": 180
+    }
+  ],
+  "pagination": {
+    "page": 0,
+    "size": 50,
+    "totalRecords": 1,
+    "hasNext": false
+  }
+}

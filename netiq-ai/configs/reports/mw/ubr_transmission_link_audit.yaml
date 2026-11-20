@@ -1,0 +1,243 @@
+id: UBR_TRANSMISSION_LINK_AUDIT
+name: UBR - Transmission Link Audit
+description: UBR transmission-link audit findings and issues.
+domain: UBR
+report_code: ubr-tr-audit
+file_path: configs/reports/mw/ubr_transmission_link_audit.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 20
+  source_evidence: AuditReportType enum + AuditReportController
+  notes: TXN specific DataRequest body
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/v1/audit/reports/TXN/ubr-tr-audit
+  path_template: /api/v1/audit/reports/TXN/{type}
+  request_dto: DataRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: AuditReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: Circle
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkId
+  ui_header: Transmission Link ID
+  dto_accessor: linkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkName
+  ui_header: Link Name
+  dto_accessor: linkName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Id
+  ui_header: Node 1 ID
+  dto_accessor: node1Id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Name
+  ui_header: Node 1 Name
+  dto_accessor: node1Name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: site1
+  ui_header: Site 1
+  dto_accessor: site1
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1CabinetIndex
+  ui_header: Node 1 Cabinet Index
+  dto_accessor: node1CabinetIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1ShelfIndex
+  ui_header: Node 1 Shelf Index
+  dto_accessor: node1ShelfIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Slot
+  ui_header: NODE 1 SLOT INDEX
+  dto_accessor: node1Slot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1IndexOnSlot
+  ui_header: NODE 1 INDEX ON SLOT
+  dto_accessor: node1IndexOnSlot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Port
+  ui_header: NODE 1 PORT INDEX
+  dto_accessor: node1Port
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Id
+  ui_header: Node 2 ID
+  dto_accessor: node2Id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Name
+  ui_header: Node 2 Name
+  dto_accessor: node2Name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: site2
+  ui_header: Site 2
+  dto_accessor: site2
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2CabinetIndex
+  ui_header: Node 2 Cabinet Index
+  dto_accessor: node2CabinetIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2ShelfIndex
+  ui_header: Node 2 Shelf Index
+  dto_accessor: node2ShelfIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Slot
+  ui_header: NODE 2  SLOT INDEX
+  dto_accessor: node2Slot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2IndexOnSlot
+  ui_header: NODE 2 INDEX ON SLOT
+  dto_accessor: node2IndexOnSlot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Port
+  ui_header: NODE 2 PORT INDEX
+  dto_accessor: node2Port
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: auditCategory
+  ui_header: AUDIT CATEGORY
+  dto_accessor: auditCategory
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: issueSubCategory
+  ui_header: ISSUE SUB CATEGORY
+  dto_accessor: issueSubCategory
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: issueCategory
+  ui_header: ISSUE CATEGORY
+  dto_accessor: issueCategory
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp1
+  ui_header: NMS IP 1
+  dto_accessor: nmsIp1
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp2
+  ui_header: NMS IP 2
+  dto_accessor: nmsIp2
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName1
+  ui_header: NMS Name 1
+  dto_accessor: nmsName1
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName2
+  ui_header: NMS Name 2
+  dto_accessor: nmsName2
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsIp
+  ui_header: LINK NMS Ip
+  dto_accessor: nmsIp
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: nmsName
+  ui_header: LINK NMS Name
+  dto_accessor: nmsName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: createdDate
+  ui_header: Insert Date
+  dto_accessor: createdDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: lastUpdateDate
+  ui_header: Updated Date
+  dto_accessor: lastUpdateDate
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+circle_scope: server_side
+empty_result_message: No Data Found!!

@@ -1,0 +1,245 @@
+id: MW_CAPACITY_HOP
+name: MW - Capacity Hop
+description: MW hop configuration and capacity classification.
+domain: MW
+report_code: mw-hop-config-report
+file_path: configs/reports/mw/mw_capacity_hop.yaml
+source_provenance:
+  worksheet: 57 UI Reports
+  row_number: 18
+  source_evidence: ReportRequestType enum + ReportController
+  notes: ''
+verification:
+  report_identity: SOURCE_DERIVED
+  api_method_path: SOURCE_DERIVED
+  field_mapping: SOURCE_DERIVED
+  request_parameters: SOURCE_DERIVED
+  response_schema: UNVERIFIED
+  pagination: UNVERIFIED
+  business_rules: UNVERIFIED
+  authorization: UNVERIFIED
+api:
+  method: POST
+  path: /api/nodes/reports/mw-hop-config-report
+  path_template: /api/nodes/reports/{reportType}
+  request_dto: ReportRequest
+  paged: true
+  page_size: 50
+  read_only: true
+  production_eligible: false
+  verification_status: UNVERIFIED
+  controller: ReportController.java
+columns:
+- ui_column_id: Circle
+  ui_header: CIRCLE
+  dto_accessor: circle
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkId
+  ui_header: LINK ID
+  dto_accessor: linkId
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkName
+  ui_header: LINK NAME
+  dto_accessor: linkName
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Type
+  ui_header: EQUIPMENT 1 MODEL
+  dto_accessor: node1Type
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Type
+  ui_header: EQUIPMENT 2 MODEL
+  dto_accessor: node2Type
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Name
+  ui_header: NODE NAME 1
+  dto_accessor: node1Name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Name
+  ui_header: NODE NAME 2
+  dto_accessor: node2Name
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Vendor
+  ui_header: VENDOR
+  dto_accessor: vendor
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: site1
+  ui_header: SITE 1
+  dto_accessor: site1
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: site2
+  ui_header: SITE 2
+  dto_accessor: site2
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Id
+  ui_header: NE ID 1
+  dto_accessor: node1Id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Id
+  ui_header: NE ID 2
+  dto_accessor: node2Id
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1CabinetIndex
+  ui_header: NE1 CABINET INDEX
+  dto_accessor: node1CabinetIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1ShelfIndex
+  ui_header: NE1 SHELF INDEX
+  dto_accessor: node1ShelfIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Slot
+  ui_header: NE1 SLOT
+  dto_accessor: node1Slot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1IndexOnSlot
+  ui_header: NE 1 INDEX ON SLOT
+  dto_accessor: node1IndexOnSlot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Port
+  ui_header: NE1 PORT
+  dto_accessor: node1Port
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node1Board
+  ui_header: IF BOARD 1
+  dto_accessor: node1Board
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2CabinetIndex
+  ui_header: NE2 CABINET INDEX
+  dto_accessor: node2CabinetIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2ShelfIndex
+  ui_header: NE2 SHELF INDEX
+  dto_accessor: node2ShelfIndex
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Slot
+  ui_header: NE2 SLOT
+  dto_accessor: node2Slot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2IndexOnSlot
+  ui_header: NE 2 INDEX ON SLOT
+  dto_accessor: node2IndexOnSlot
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Port
+  ui_header: NE2 PORT
+  dto_accessor: node2Port
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: node2Board
+  ui_header: IF BOARD 2
+  dto_accessor: node2Board
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: channelSpacing
+  ui_header: CHANNEL SPACING
+  dto_accessor: channelSpacing
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: linkConfiguration
+  ui_header: HOP TYPE
+  dto_accessor: linkConfiguration
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: freqBand
+  ui_header: FREQUENCY BAND
+  dto_accessor: freqBand
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: Modulation
+  ui_header: MODULATION
+  dto_accessor: modulation
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: maxCapacity
+  ui_header: CALCULATIVE MAX CAPACITY
+  dto_accessor: maxCapacity
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+- ui_column_id: hopCapacity
+  ui_header: CAPACITY RANGE
+  dto_accessor: hopCapacity
+  db_column_name: null
+  data_type: null
+  verification_status: SOURCE_DERIVED
+filters:
+- name: circle
+  type: string
+  required: false
+  guidance: Server-side circle scope
+- name: vendor
+  type: string
+  required: false
+  guidance: Vendor filter where applicable
+- name: technology
+  type: string
+  required: false
+  guidance: Technology (e.g. 2G, 4G, 5G)
+- name: date
+  type: date
+  required: false
+  guidance: Date filter where applicable
+response_mapping:
+  rows_path: data
+  total_path: pagination.totalRecords
+  page_path: pagination.page
+  size_path: pagination.size
+  has_next_path: hasNext
+  status_path: success
+  error_path: message
+  data_version_path: null
+  data_as_of_path: null
+  field_aliases:
+    circle: Circle
+    vendor: Vendor
+    modulation: Modulation
+circle_scope: server_side
+empty_result_message: No Data Found!!
