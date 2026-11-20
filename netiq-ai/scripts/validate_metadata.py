@@ -1,4 +1,23 @@
-"""Validate report metadata, catalog integrity, and API allowlist consistency."""
+"""Validate report metadata, catalog integrity, and API allowlist consistency.
+
+Architecture Role:
+------------------
+This script is the CI/CD and deployment verification gate for report configurations.
+It ensures that all YAML files in `configs/reports/` and `configs/allowed_apis.yaml`
+conform strictly to the Pydantic metadata schema (`ReportDefinition`), that no files
+are missing, that all verification statuses use approved enum values, and that no
+unauthorized wildcards or mutation routes exist in the allowlist.
+
+Validation Checks:
+------------------
+1. Catalog Completeness: Verifies `catalog.yaml` exists and contains registered reports.
+2. File Existence: Confirms every report listed in the catalog exists as a valid YAML file.
+3. Schema Conformance: Validates every YAML file against `src.schemas.metadata.ReportDefinition`.
+4. Verification Status Legality: Enforces that status values are strictly within:
+   `SOURCE_DERIVED`, `VERIFIED`, `UNVERIFIED`, `CONFLICT`, `NOT_AVAILABLE`.
+5. Allowlist Integrity: Rejects wildcards (`*`, `**`), verifies `read_only=True`, and
+   verifies that unverified contracts have `production_eligible=False`.
+"""
 
 import sys
 from pathlib import Path
@@ -13,7 +32,11 @@ from src.schemas.metadata import ReportDefinition, VerificationStatus
 
 
 def validate_catalog() -> list[str]:
-    """Validate configs/reports/catalog.yaml and all linked domain YAML files."""
+    """Validate configs/reports/catalog.yaml and all linked domain YAML files.
+    
+    Returns:
+        list[str]: List of error message strings (empty if validation succeeds).
+    """
     errors = []
     catalog_path = PROJECT_ROOT / "configs" / "reports" / "catalog.yaml"
     if not catalog_path.is_file():
@@ -47,10 +70,10 @@ def validate_catalog() -> list[str]:
             with open(file_path, "r", encoding="utf-8") as f:
                 rep_data = yaml.safe_load(f)
             
-            # Validate against Pydantic schema
+            # Validate complete report definition against Pydantic schema
             parsed = ReportDefinition.model_validate(rep_data)
 
-            # Validate verification statuses
+            # Validate verification statuses across all 8 dimensions
             v = parsed.verification
             for dim, status in [
                 ("report_identity", v.report_identity),
@@ -65,7 +88,7 @@ def validate_catalog() -> list[str]:
                 if status not in allowed_statuses:
                     errors.append(f"Report {rep_id} has invalid {dim} status: {status}")
 
-            # Column verification
+            # Validate column mapping verification statuses
             for col in parsed.columns:
                 if col.verification_status not in allowed_statuses:
                     errors.append(f"Report {rep_id} column {col.ui_column_id} has invalid status: {col.verification_status}")
@@ -79,7 +102,11 @@ def validate_catalog() -> list[str]:
 
 
 def validate_allowlist() -> list[str]:
-    """Validate configs/allowed_apis.yaml."""
+    """Validate configs/allowed_apis.yaml.
+    
+    Returns:
+        list[str]: List of error message strings (empty if validation succeeds).
+    """
     errors = []
     allowlist_path = PROJECT_ROOT / "configs" / "allowed_apis.yaml"
     if not allowlist_path.is_file():
@@ -106,13 +133,15 @@ def validate_allowlist() -> list[str]:
             errors.append(f"Malformed allowlist entry: {api}")
             continue
 
+        # Zero wildcard check
         if "**" in template or "*" in template:
             errors.append(f"Allowlist entry {api_id} contains forbidden wildcard in path_template: {template}")
 
+        # Read-only operation check
         if not read_only:
             errors.append(f"Allowlist entry {api_id} is not marked read_only: True")
 
-        # In Stage 1, all endpoints must be production_eligible: False
+        # Stage 1 fail-closed check: unverified contracts cannot be production_eligible
         if prod_eligible is True and api.get("contract_status") != "VERIFIED":
             errors.append(f"Allowlist entry {api_id} is marked production_eligible=True while contract is {api.get('contract_status')}")
 
@@ -120,6 +149,7 @@ def validate_allowlist() -> list[str]:
 
 
 def main() -> None:
+    """Run validation checks and exit 0 if all pass, 1 if any fail."""
     print("Validating report metadata catalog...")
     catalog_errors = validate_catalog()
     if catalog_errors:

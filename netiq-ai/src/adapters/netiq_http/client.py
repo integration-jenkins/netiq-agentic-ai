@@ -1,4 +1,26 @@
-"""Asynchronous HTTP client for approved NETIQ Java APIs with MOCK and LIVE support."""
+"""Asynchronous HTTP client for approved NETIQ Java APIs with MOCK and LIVE support.
+
+Architecture Role:
+------------------
+This client is the single gateway through which report data requests leave the Python
+application. It abstracts away the difference between local offline MOCK development
+and live integration with the NETIQ Java Spring Boot backend.
+
+Key Guarantees:
+---------------
+1. Dual-Mode Operation:
+   - MOCK Mode: Reads version-controlled synthetic test fixtures from `data/fixtures/`
+     without making any external network requests.
+   - LIVE Mode: Gated strictly behind contract verification and production eligibility.
+2. Perimeter Enforcement: Every call validates HTTP method and exact path against
+   the `AllowlistPolicy` before transmission.
+3. Multi-Tenant Circle Isolation: Validates that the requested circle matches the
+   user's authorized circle list via `CircleAccessPolicy`.
+4. Production-Ready Resilience: Includes reusable connection pooling (`httpx.AsyncClient`),
+   configurable timeouts, bounded idempotent retries, payload byte limits (5 MB default),
+   and correlation tracking (`X-Correlation-ID`).
+5. Provenance Integrity: Never silently substitutes MOCK data when a LIVE call fails.
+"""
 
 import json
 from pathlib import Path
@@ -27,22 +49,22 @@ from src.settings.loader import load_limits_config, load_report_definition
 
 
 class NetIQClientError(Exception):
-    """Base exception for NetIQ HTTP client."""
+    """Base exception for all NetIQ HTTP client failures."""
     pass
 
 
 class BackendUnavailableError(NetIQClientError):
-    """Raised when the backend API cannot be reached or returns 5xx."""
+    """Raised when backend gateway cannot be reached or returns HTTP 5xx."""
     pass
 
 
 class BackendTimeoutError(NetIQClientError):
-    """Raised when an API call times out."""
+    """Raised when a request times out during connect or socket read."""
     pass
 
 
 class NetIQHttpClient:
-    """Enterprise client for NETIQ backend integration."""
+    """Enterprise client for NETIQ telecom inventory integration."""
 
     def __init__(
         self,
@@ -51,19 +73,27 @@ class NetIQHttpClient:
         allowlist_policy: AllowlistPolicy | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
+        """Initialize the NetIQ HTTP client.
+        
+        Args:
+            base_url: Base URL for NETIQ Spring Boot backend (e.g. 'http://localhost:8080').
+            mode: ApiMode.MOCK or ApiMode.LIVE (defaults to settings.netiq_api_mode).
+            allowlist_policy: Policy enforcing endpoint whitelisting.
+            transport: Optional custom transport (e.g., `httpx.MockTransport` for testing).
+        """
         self.base_url = (base_url or settings.netiq_api_base_url).rstrip("/")
         self.mode = mode or settings.netiq_api_mode
         self.allowlist_policy = allowlist_policy or default_allowlist_policy
         self._limits = load_limits_config()
 
-        # HTTP limits
+        # Load HTTP operational limits
         http_cfg = self._limits.get("http", {})
         self.connect_timeout = float(http_cfg.get("connect_timeout_seconds", 5.0))
         self.read_timeout = float(http_cfg.get("read_timeout_seconds", 15.0))
         self.max_retries = int(http_cfg.get("max_retries", 2))
-        self.max_response_bytes = int(http_cfg.get("max_response_bytes", 5242880))
+        self.max_response_bytes = int(http_cfg.get("max_response_bytes", 5242880))  # 5 MB
 
-        # Reusable async client with connection pooling
+        # Reusable async HTTP client with connection pool
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=httpx.Timeout(self.read_timeout, connect=self.connect_timeout),
@@ -76,13 +106,18 @@ class NetIQHttpClient:
         await self._client.aclose()
 
     async def __aenter__(self) -> "NetIQHttpClient":
+        """Async context manager entry."""
         return self
 
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        """Async context manager exit."""
         await self.close()
 
     def _resolve_fixture_path(self, report_code: str, report_id: str) -> Path:
-        """Locate appropriate synthetic fixture on disk for MOCK mode."""
+        """Locate appropriate synthetic test fixture on disk for MOCK mode.
+        
+        Maps report codes and IDs to representative fixtures under `data/fixtures/`.
+        """
         clean_code = (report_code or "").lower().replace("-", "_")
         clean_id = (report_id or "").lower()
 
@@ -104,7 +139,7 @@ class NetIQHttpClient:
             if path.is_file():
                 return path
 
-        # Default fallback fixture
+        # Default fallback fixture for unmapped mock reports
         fallback = settings.fixtures_dir / "sample_report_response.json"
         if fallback.is_file():
             return fallback
@@ -116,10 +151,34 @@ class NetIQHttpClient:
         user_permitted_circles: list[str] | None = None,
         correlation_id: str | None = None,
     ) -> ReportPage:
-        """Execute a report query through MOCK fixtures or verified LIVE endpoint."""
+        """Execute a report query through MOCK fixtures or verified LIVE backend.
+        
+        Execution Pipeline:
+        1. Load version-controlled report metadata definition from catalog.
+        2. Validate multi-tenant circle boundaries against user's permitted circles.
+        3. Evaluate requested endpoint against strict API allowlist.
+        4. Mode Branch:
+           - In MOCK mode: Load synthetic fixture and normalize via response adapter.
+           - In LIVE mode: Enforce contract verification status. Transmit HTTP request,
+             handle timeouts, validate payload size, and normalize response.
+             
+        Args:
+            query: Normalized query parameters.
+            user_permitted_circles: Circles authorized for the caller.
+            correlation_id: Unique tracking ID for distributed logging.
+            
+        Returns:
+            ReportPage: Canonical standardized response.
+            
+        Raises:
+            UnauthorizedCircleError: If circle authorization fails.
+            SecurityViolationError: If endpoint is unapproved or hazardous.
+            UnverifiedContractError: If LIVE mode attempted on unverified contract.
+            NetIQClientError: If network or backend failure occurs.
+        """
         corr_id = correlation_id or str(uuid.uuid4())
 
-        # 1. Load report metadata
+        # Step 1: Load report metadata definition
         report_meta = load_report_definition(query.report_id)
         report_id = report_meta.get("id", query.report_id)
         domain = report_meta.get("domain", "RAN")
@@ -135,7 +194,7 @@ class NetIQHttpClient:
         path = api_meta.get("path", "")
         contract_status = api_meta.get("verification_status", "UNVERIFIED")
 
-        # 2. Circle authorization check
+        # Step 2: Multi-tenant circle authorization validation
         if user_permitted_circles is not None:
             effective_circle = CircleAccessPolicy.validate_circle_access(
                 user_permitted_circles=user_permitted_circles,
@@ -144,12 +203,11 @@ class NetIQHttpClient:
         else:
             effective_circle = query.circle
 
-        # 3. Security evaluation against allowlist
+        # Step 3: Perimeter security evaluation against allowlist
         self.allowlist_policy.evaluate(method=method, path=path, mode=self.mode.value)
 
-        # 4. Mode branch
+        # Step 4A: MOCK Execution Branch
         if self.mode == ApiMode.MOCK:
-            # Load local synthetic fixture
             fixture_path = self._resolve_fixture_path(rep_code, report_id)
             if not fixture_path.is_file():
                 raise NetIQClientError(f"Fixture file missing for MOCK execution: {fixture_path}")
@@ -176,8 +234,8 @@ class NetIQHttpClient:
             )
             return normalized_page
 
-        # LIVE Mode Execution
-        # If contract is not verified, fail closed
+        # Step 4B: LIVE Execution Branch (Gated)
+        # Stage 1 Security Gate: Fail closed if contract is unverified
         if contract_status != "VERIFIED" or not api_meta.get("production_eligible", False):
             raise UnverifiedContractError(
                 f"Refusing to execute LIVE query on unverified contract: [{method} {path}]. "
@@ -215,7 +273,7 @@ class NetIQHttpClient:
                 else:
                     raise SecurityViolationError(f"Unsupported HTTP method: {method}")
 
-                # Validate response size limit
+                # Enforce response payload size limit to prevent memory exhaustion
                 if len(resp.content) > self.max_response_bytes:
                     raise NetIQClientError(
                         f"Response payload exceeded max size limit of {self.max_response_bytes} bytes."

@@ -1,4 +1,16 @@
-"""Final deterministic response composition adhering to ChatResponse schema."""
+"""Final deterministic response composition adhering to ChatResponse schema.
+
+Architecture Role:
+------------------
+This module composes the final user-facing `ChatResponse` payload.
+It guarantees:
+1. Deterministic Answers: Response text is composed directly from validated data
+   models (`ReportPage`), avoiding LLM arithmetic errors or fabricated records.
+2. Mandatory Provenance Disclaimers: Prepend/append clear notices whenever responses
+   are generated in MOCK mode from offline synthetic fixtures.
+3. Clean Error Formatting: Converts exceptions into standardized `ChatResponse` objects
+   with `status="ERROR"` and structured error details.
+"""
 
 from typing import Any
 from app.orchestrator.verify import ResponseVerifier
@@ -18,15 +30,26 @@ class ChatComposer:
         applied_filters: dict[str, Any] | None = None,
         limitations: list[str] | None = None,
     ) -> ChatResponse:
-        """Compose standardized chat response from ReportPage."""
+        """Compose standardized chat response from ReportPage.
+        
+        Args:
+            request: Original user ChatRequest.
+            page: Normalized ReportPage resulting from query.
+            report_name: Human-friendly report name (e.g., 'RAN Node Inventory').
+            applied_filters: Normalized dictionary of filters applied during query.
+            limitations: Optional list of limitations or truncation notices.
+            
+        Returns:
+            ChatResponse: Canonical response payload.
+        """
         filters = applied_filters or {}
         limits = list(limitations or [])
 
-        # Generate evidence
+        # Generate verifiable evidence record
         evidence_item = ResponseVerifier.create_evidence_from_page(page)
         evidence_list = [evidence_item]
 
-        # Determine textual answer deterministically
+        # Determine textual answer deterministically from model data
         display_name = report_name or page.reportId
         circle_str = f" for circle '{page.circle}'" if page.circle else ""
 
@@ -49,12 +72,12 @@ class ChatComposer:
                 f"Successfully retrieved {page.pagination.returnedRecords} records for report '{display_name}'{circle_str}{total_str}."
             )
 
-        # MOCK provenance banner
+        # Append explicit MOCK mode provenance banner when running offline
         if page.source.mode.value == "MOCK":
             limits.append("Synthetic MOCK mode active: Data is generated from approved local test fixtures.")
             answer = f"[MOCK DATA] {answer}\n*Note: Live NETIQ Java API contract is unverified.*"
 
-        # Verify provenance honesty
+        # Verify provenance honesty before returning
         ResponseVerifier.verify_provenance_honesty(answer=answer, mode=page.source.mode.value)
 
         return ChatResponse(
@@ -82,7 +105,18 @@ class ChatComposer:
         details: dict[str, Any] | None = None,
         report_id: str | None = None,
     ) -> ChatResponse:
-        """Compose standardized error response."""
+        """Compose standardized error response from an exception or failure.
+        
+        Args:
+            request: Original user ChatRequest.
+            error_code: Machine-readable ErrorCode.
+            message: Descriptive error explanation.
+            details: Contextual error details or parameters.
+            report_id: Optional report ID attempted.
+            
+        Returns:
+            ChatResponse: Standardized response payload with status="ERROR".
+        """
         std_error = StandardError(
             code=error_code,
             message=message,

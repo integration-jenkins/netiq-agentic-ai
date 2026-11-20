@@ -1,4 +1,19 @@
-"""Generate comprehensive integration-readiness report for NETIQ Agentic AI."""
+"""Generate comprehensive integration-readiness report for NETIQ Agentic AI.
+
+Architecture Role:
+------------------
+This script compiles a comprehensive Markdown integration readiness report
+(`docs/integration_readiness.md`) by aggregating data from `configs/reports/catalog.yaml`
+and each individual domain report definition.
+
+Key Distinctions Enforced:
+--------------------------
+1. Implemented in Python: Code components built and functional in the application.
+2. Supported by Workbook & CSV: Fields, columns, and endpoints derived from source files.
+3. Verified by Offline Tests: Capabilities verified through automated unit/security tests.
+4. Requiring Live Java Evidence (Stage 2): Features pending actual backend JSON payloads,
+   server-side authentication, or live Oracle schema validation.
+"""
 
 import json
 from pathlib import Path
@@ -12,6 +27,7 @@ from src.settings.loader import load_catalog_config, load_report_definition
 
 
 def generate_readiness_markdown() -> str:
+    """Generate Markdown integration readiness documentation."""
     catalog = load_catalog_config()
     reports = catalog.get("reports", [])
     anomalies = catalog.get("reconciliation_anomalies", {})
@@ -119,6 +135,7 @@ def generate_readiness_markdown() -> str:
 
 
 def main() -> None:
+    """Generate docs/integration_readiness.md."""
     output_path = PROJECT_ROOT / "docs" / "integration_readiness.md"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     content = generate_readiness_markdown()

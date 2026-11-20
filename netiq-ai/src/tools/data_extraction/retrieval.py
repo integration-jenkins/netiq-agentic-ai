@@ -1,4 +1,23 @@
-"""Deterministic report data retrieval service consuming standardized responses."""
+"""Deterministic report data retrieval service consuming standardized responses.
+
+Architecture Role:
+------------------
+This service provides deterministic data extraction tools for AI agents and workflows.
+Instead of allowing agents or LLMs to construct arbitrary HTTP queries or parse raw JSON,
+they interact with this service.
+
+Key Guarantees:
+---------------
+1. Consumes Normalized Models: Operates exclusively on typed `ReportPage` models.
+2. Bounded Pagination: Enforces safety limits (`max_retrieval_pages`, `max_retrieval_records`)
+   from `configs/limits.yaml` to prevent runaway memory usage.
+3. Infinite Loop Prevention: Detects non-advancing page numbers and zero-record pages
+   with `hasNext=True`, terminating safely.
+4. Contradiction Rejection: Validates pagination math; rejects any backend response where
+   `returnedRecords != len(data)` or negative counts are present.
+5. Aggregate Optimization: Prefers backend total count calculations over downloading
+   millions of records to count them.
+"""
 
 import copy
 from typing import Any
@@ -14,12 +33,12 @@ class RetrievalError(Exception):
 
 
 class ContradictoryPaginationError(RetrievalError):
-    """Raised when pagination fields contradict each other."""
+    """Raised when backend pagination metadata contradicts the returned data array."""
     pass
 
 
 class PaginationLimitExceededError(RetrievalError):
-    """Raised when query exceeds configured retrieval ceilings."""
+    """Raised when a query attempts to retrieve data beyond configured safety ceilings."""
     pass
 
 
@@ -27,6 +46,11 @@ class ReportRetrievalService:
     """Consumes standardized ReportPage responses with deterministic pagination bounds."""
 
     def __init__(self, http_client: NetIQHttpClient | None = None) -> None:
+        """Initialize retrieval service with HTTP client and configured limits.
+        
+        Args:
+            http_client: NetIQ HTTP client instance (defaults to NetIQHttpClient).
+        """
         self.http_client = http_client or NetIQHttpClient()
         limits = load_limits_config().get("pagination", {})
         self.default_page_size = int(limits.get("default_page_size", 50))
@@ -40,8 +64,22 @@ class ReportRetrievalService:
         user_permitted_circles: list[str] | None = None,
         correlation_id: str | None = None,
     ) -> ReportPage:
-        """Fetch a single standardized page of report data."""
-        # Sanity check page size against limits
+        """Fetch a single standardized page of report data.
+        
+        Clamps requested page size to `max_page_size` and verifies pagination consistency.
+        
+        Args:
+            query: Normalized query parameters.
+            user_permitted_circles: Circles caller is authorized to view.
+            correlation_id: Tracking ID for request tracing.
+            
+        Returns:
+            ReportPage: Canonical standardized report page.
+            
+        Raises:
+            ContradictoryPaginationError: If backend pagination fields are contradictory.
+        """
+        # Clamp page size to configured safety ceiling
         if query.size > self.max_page_size:
             query = query.model_copy(update={"size": self.max_page_size})
 
@@ -61,7 +99,25 @@ class ReportRetrievalService:
         user_permitted_circles: list[str] | None = None,
         correlation_id: str | None = None,
     ) -> ReportPage:
-        """Retrieve multi-page results up to safe deterministic bounds."""
+        """Retrieve multi-page results up to safe deterministic bounds.
+        
+        Paginates sequentially while respecting safety ceilings:
+        - Stops if `hasNext` becomes False.
+        - Stops if `pages_retrieved >= max_pages`.
+        - Stops if `total_records >= max_records`.
+        - Stops if loop detects duplicate page or zero returned records.
+        - Marks `status=PARTIAL` if pagination was truncated by safety limits.
+        
+        Args:
+            query: Initial query specification.
+            max_pages: Maximum pages to retrieve (capped by system limit).
+            max_records: Maximum total rows to accumulate (capped by system limit).
+            user_permitted_circles: User's circle scope.
+            correlation_id: Request tracking ID.
+            
+        Returns:
+            ReportPage: Aggregated report page containing accumulated rows.
+        """
         effective_max_pages = min(max_pages or self.max_retrieval_pages, self.max_retrieval_pages)
         effective_max_records = min(max_records or self.max_retrieval_records, self.max_retrieval_records)
 
@@ -76,7 +132,7 @@ class ReportRetrievalService:
         current_page_obj = first_page
         pages_retrieved = 1
 
-        # Infinite loop prevention and bounded pagination
+        # Track visited page numbers to prevent infinite loops
         seen_pages = {first_page.pagination.page}
 
         while (
@@ -86,11 +142,11 @@ class ReportRetrievalService:
         ):
             next_page_num = current_page_obj.pagination.page + 1
             if next_page_num in seen_pages:
-                # Contradiction: page not advancing
+                # Contradiction: page number did not advance
                 break
             seen_pages.add(next_page_num)
 
-            # Prevent requesting further pages if current returned zero records
+            # Prevent requesting further pages if current page returned zero records
             if current_page_obj.pagination.returnedRecords == 0:
                 break
 
@@ -108,7 +164,7 @@ class ReportRetrievalService:
             current_page_obj = next_page
             pages_retrieved += 1
 
-        # If records exceed bound, trim to ceiling
+        # Check if dataset was truncated by safety bounds
         is_partial = current_page_obj.pagination.hasNext and (
             pages_retrieved >= effective_max_pages or len(all_rows) >= effective_max_records
         )
@@ -136,7 +192,11 @@ class ReportRetrievalService:
         )
 
     def _validate_pagination_consistency(self, p: ReportPagination, actual_count: int) -> None:
-        """Reject contradictory backend pagination metadata."""
+        """Reject contradictory backend pagination metadata.
+        
+        Guarantees that `returnedRecords` strictly equals the actual length of
+        the data array, and that page numbers and sizes are positive.
+        """
         if p.returnedRecords != actual_count:
             raise ContradictoryPaginationError(
                 f"Contradictory pagination: returnedRecords ({p.returnedRecords}) does not match "

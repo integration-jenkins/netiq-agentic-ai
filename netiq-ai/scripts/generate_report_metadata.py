@@ -1,13 +1,27 @@
 """Generate report metadata and API allowlist from approved source definitions.
 
-Reads:
-- NETIQ_AI_Report_Catalogue_and_API_Mapping.xlsx (all 5 sheets)
-- NETIQ_Java_API_Inventory.csv
+Architecture Role:
+------------------
+This script is the build-time metadata extraction pipeline. It bridges the gap
+between the business analyst reference files (the Excel workbook and the Java API CSV)
+and the version-controlled application configuration (`configs/reports/` and `configs/allowed_apis.yaml`).
 
-Outputs:
-- configs/reports/catalog.yaml
-- configs/reports/<domain>/<report_id>.yaml
-- configs/allowed_apis.yaml
+Inputs Processed:
+-----------------
+1. `NETIQ_AI_Report_Catalogue_and_API_Mapping.xlsx`:
+   - `57 UI Reports`: Report names, domains, report codes, API candidates, and filter guidance.
+   - `64 Inventory Codes`: Inventory and AI enum codes from `ReportRequestType.java`.
+   - `32 Audit Codes`: Audit enum codes from `AuditReportType.java`.
+   - `1233 Column Mappings`: UI column IDs, business display headers, and Java DTO accessors.
+   - `Read Me`: Guidance on read-only POST retrieval and overlapping presentation groups.
+2. `NETIQ_Java_API_Inventory.csv`:
+   - 201 controller route definitions extracted from Java Spring Boot source code.
+
+Outputs Generated:
+------------------
+- `configs/reports/catalog.yaml`: Master index of all 57 reports and reconciliation anomalies.
+- `configs/reports/<domain>/<report_id>.yaml`: Individual version-controlled report definitions.
+- `configs/allowed_apis.yaml`: Strict method and exact path-template allowlist.
 """
 
 import argparse
@@ -25,13 +39,25 @@ DEFAULT_CSV_PATH = Path(r"D:\PROJECTS\Other\NETIQ_AGENTIC_AI\DOCUMENTS\New folde
 
 
 def sanitize_id(name: str) -> str:
-    """Produce deterministic uppercase identifier from name."""
+    """Produce deterministic uppercase identifier from report display name.
+    
+    Example: 'RAN - Cell 4G' -> 'RAN_CELL_4G'
+    """
     clean = re.sub(r"[^a-zA-Z0-9]+", "_", name).strip("_").upper()
     return clean
 
 
 def normalize_domain_folder(domain: str) -> str:
-    """Map domain name to config subfolder."""
+    """Map report domain names to standard configuration subdirectories.
+    
+    Subdirectories:
+    - 'ran' for RAN reports
+    - 'mw' for Microwave, UBR, and Transmission link reports
+    - 'ftth' for FTTH and Fiber reports
+    - 'wireline' for Wireline and Exchange reports
+    - 'audit' for Audit reports
+    - 'ai' for AI, Stitching, and Network Change reports
+    """
     dom = (domain or "").strip().lower()
     if "ran" in dom:
         return "ran"
@@ -49,21 +75,21 @@ def normalize_domain_folder(domain: str) -> str:
 
 
 def parse_filter_guidance(guidance: str | None) -> list[dict[str, Any]]:
-    """Extract preliminary filter metadata from DTO and filter descriptions."""
+    """Extract standard query filter parameters from DTO guidance text."""
     if not guidance:
         return []
-    # Common filters known from ReportRequest and AuditReportRequest DTOs
+    # Standard filter parameters supported across ReportRequest and AuditReportRequest DTOs
     standard_filters = [
         {"name": "circle", "type": "string", "required": False, "guidance": "Server-side circle scope"},
         {"name": "vendor", "type": "string", "required": False, "guidance": "Vendor filter where applicable"},
-        {"name": "technology", "type": "string", "required": False, "guidance": "Technology (e.g. 2G, 4G, 5G)"},
+        {"name": "technology", "type": "string", "required": False, "guidance": "Technology filter (e.g. 2G, 4G, 5G)"},
         {"name": "date", "type": "date", "required": False, "guidance": "Date filter where applicable"},
     ]
     return standard_filters
 
 
 def load_csv_inventory(csv_path: Path) -> dict[tuple[str, str], dict[str, str]]:
-    """Load Java API inventory CSV indexed by (Method, Path)."""
+    """Load Java API inventory CSV into a lookup table keyed by (Method, Path)."""
     endpoints = {}
     with open(csv_path, "r", encoding="utf-8", errors="replace") as f:
         reader = csv.DictReader(f)
@@ -75,13 +101,18 @@ def load_csv_inventory(csv_path: Path) -> dict[tuple[str, str], dict[str, str]]:
 
 
 def match_endpoint_in_csv(method: str, path: str, csv_endpoints: dict) -> tuple[bool, str | None, str | None]:
-    """Check if (method, path) matches directly or matches a path template in the CSV."""
+    """Check whether candidate (method, path) matches a route or template in the CSV.
+    
+    Returns:
+        tuple[bool, str | None, str | None]: (is_matched, matched_template, controller_name)
+    """
+    # Direct exact path match
     if (method, path) in csv_endpoints:
         return True, path, csv_endpoints[(method, path)].get("Controller")
 
+    # Path template match (e.g., matching /api/nodes/reports/4g against /api/nodes/reports/{reportType})
     for (cm, cp), crow in csv_endpoints.items():
         if cm == method:
-            # Match template e.g. /api/nodes/reports/{reportType}
             regex = "^" + re.sub(r"\{[^}]+\}", r"[^/]+", cp) + "$"
             if re.match(regex, path):
                 return True, cp, crow.get("Controller")
@@ -90,6 +121,7 @@ def match_endpoint_in_csv(method: str, path: str, csv_endpoints: dict) -> tuple[
 
 
 def main() -> None:
+    """Main metadata extraction and YAML generation routine."""
     parser = argparse.ArgumentParser(description="Generate NETIQ report metadata and API allowlist.")
     parser.add_argument("--excel", type=Path, default=DEFAULT_EXCEL_PATH, help="Path to Report Catalogue Excel")
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV_PATH, help="Path to Java API Inventory CSV")
@@ -109,7 +141,9 @@ def main() -> None:
     print(f"Loading CSV inventory: {csv_path}")
     csv_endpoints = load_csv_inventory(csv_path)
 
-    # 1. Read 1233 Column Mappings
+    # -------------------------------------------------------------
+    # Step 1: Read '1233 Column Mappings'
+    # -------------------------------------------------------------
     ws_cols = wb["1233 Column Mappings"]
     rows_cols = list(ws_cols.iter_rows(values_only=True))
     cols_by_report_num = defaultdict(list)
@@ -123,12 +157,14 @@ def main() -> None:
                 "ui_column_id": ui_col_id,
                 "ui_header": ui_header,
                 "dto_accessor": dto_acc,
-                "db_column_name": None,  # Not verified in source
-                "data_type": None,       # Never silently inferred
+                "db_column_name": None,  # Not verified in source workbook
+                "data_type": None,       # Never silently inferred from name
                 "verification_status": "SOURCE_DERIVED",
             })
 
-    # 2. Read 57 UI Reports
+    # -------------------------------------------------------------
+    # Step 2: Read '57 UI Reports' & Generate Individual Domain YAMLs
+    # -------------------------------------------------------------
     ws_ui = wb["57 UI Reports"]
     rows_ui = list(ws_ui.iter_rows(values_only=True))
     hdr_ui = rows_ui[3]
@@ -143,7 +179,7 @@ def main() -> None:
         "unmapped_audit_codes": [],
     }
 
-    # Group UI reports by report code to find shared codes
+    # Identify codes shared across multiple reports (e.g. node-report, planned-vs-configured-audit)
     code_to_reports = defaultdict(list)
     for r in ui_reports_raw:
         code = str(r["Report Code"] or "").strip()
@@ -153,7 +189,6 @@ def main() -> None:
         if len(rep_names) > 1 and code != "Not established":
             reconciliation_anomalies["shared_report_codes"][code] = rep_names
 
-    # Track unique report codes processed
     processed_report_codes = set()
 
     for r in ui_reports_raw:
@@ -172,7 +207,7 @@ def main() -> None:
         folder = normalize_domain_folder(domain)
         columns = cols_by_report_num.get(rep_num, [])
 
-        # Parse API candidate
+        # Parse API candidates and cross-check against CSV
         api_meta = None
         api_method = None
         api_path = None
@@ -184,32 +219,18 @@ def main() -> None:
             if len(parts) == 2:
                 api_method, api_path = parts[0].strip().upper(), parts[1].strip()
                 matched, matched_template, controller = match_endpoint_in_csv(api_method, api_path, csv_endpoints)
-                if matched:
-                    api_meta = {
-                        "method": api_method,
-                        "path": api_path,
-                        "path_template": matched_template or api_path,
-                        "request_dto": dto_family if dto_family else None,
-                        "paged": True,
-                        "page_size": 50,
-                        "read_only": True,
-                        "production_eligible": False,  # Blocked until verified
-                        "verification_status": "UNVERIFIED",
-                        "controller": controller,
-                    }
-                else:
-                    api_meta = {
-                        "method": api_method,
-                        "path": api_path,
-                        "path_template": None,
-                        "request_dto": dto_family,
-                        "paged": True,
-                        "page_size": 50,
-                        "read_only": True,
-                        "production_eligible": False,
-                        "verification_status": "UNVERIFIED",
-                        "controller": None,
-                    }
+                api_meta = {
+                    "method": api_method,
+                    "path": api_path,
+                    "path_template": matched_template or api_path,
+                    "request_dto": dto_family if dto_family else None,
+                    "paged": True,
+                    "page_size": 50,
+                    "read_only": True,
+                    "production_eligible": False,  # Gated: False in Stage 1
+                    "verification_status": "UNVERIFIED",
+                    "controller": controller,
+                }
         else:
             reconciliation_anomalies["missing_api_mappings"].append({
                 "report_number": rep_num,
@@ -218,7 +239,7 @@ def main() -> None:
                 "note": "AI site/node/cell inference UI group lacks confirmed distinct read API mapping.",
             })
 
-        # Verification statuses
+        # 8-dimensional verification matrix
         verification = {
             "report_identity": "SOURCE_DERIVED",
             "api_method_path": "SOURCE_DERIVED" if api_meta else "NOT_AVAILABLE",
@@ -230,7 +251,7 @@ def main() -> None:
             "authorization": "UNVERIFIED",
         }
 
-        # Dotted path response mapping configuration
+        # Response adapter configuration
         response_mapping = {
             "rows_path": "data",
             "total_path": "pagination.totalRecords",
@@ -269,12 +290,12 @@ def main() -> None:
             "empty_result_message": "No Data Found!!",
         }
 
-        # Ensure directory exists and write individual domain YAML
+        # Write individual domain YAML
         full_file_path.parent.mkdir(parents=True, exist_ok=True)
         with open(full_file_path, "w", encoding="utf-8") as f:
             yaml.dump(report_def, f, sort_keys=False)
 
-        # Master catalog summary
+        # Append to catalog summary list
         reports_catalog.append({
             "id": report_id,
             "name": rep_name,
@@ -291,7 +312,9 @@ def main() -> None:
         if rep_code and rep_code != "Not established":
             processed_report_codes.add(rep_code)
 
-    # 3. Read 64 Inventory Codes
+    # -------------------------------------------------------------
+    # Step 3: Reconcile '64 Inventory Codes'
+    # -------------------------------------------------------------
     ws_inv = wb["64 Inventory Codes"]
     rows_inv = list(ws_inv.iter_rows(values_only=True))
     inv_codes_raw = [dict(zip(rows_inv[3], r)) for r in rows_inv[4:] if any(r)]
@@ -306,7 +329,9 @@ def main() -> None:
                 "request_dto": str(r["Request DTO"] or "").strip(),
             })
 
-    # 4. Read 32 Audit Codes
+    # -------------------------------------------------------------
+    # Step 4: Reconcile '32 Audit Codes'
+    # -------------------------------------------------------------
     ws_aud = wb["32 Audit Codes"]
     rows_aud = list(ws_aud.iter_rows(values_only=True))
     aud_codes_raw = [dict(zip(rows_aud[3], r)) for r in rows_aud[4:] if any(r)]
@@ -328,7 +353,6 @@ def main() -> None:
                 "request_dto": str(r["Request DTO"] or "").strip(),
             })
 
-    # Convert defaultdicts to regular dicts for clean YAML serialization
     reconciliation_anomalies["shared_report_codes"] = dict(reconciliation_anomalies["shared_report_codes"])
 
     # Write configs/reports/catalog.yaml
@@ -344,7 +368,9 @@ def main() -> None:
         yaml.dump(catalog_data, f, sort_keys=False)
     print(f"Master catalog written: {catalog_yaml_path} ({len(reports_catalog)} reports)")
 
-    # 5. Build configs/allowed_apis.yaml
+    # -------------------------------------------------------------
+    # Step 5: Build configs/allowed_apis.yaml
+    # -------------------------------------------------------------
     allowed_apis = [
         {
             "id": "netiq_inventory_reports",
