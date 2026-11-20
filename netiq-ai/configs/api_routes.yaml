@@ -1,0 +1,72 @@
+# Registry of this service's own HTTP APIs (what the UI / Java gateway can call).
+# NOT to be confused with:
+#   configs/allowed_apis.yaml - Java NETIQ backend endpoints this service may call
+#   configs/routing.yaml      - agent / intent routing inside the orchestrator
+#
+# To add an API: write the handler function, then add an entry here.
+#   handler : "module.path:function_name"
+#   status  : implemented | stub   (stubs show "[not implemented]" in /docs)
+api_routes:
+  - id: main_page
+    method: GET
+    path: /
+    tag: ui
+    summary: Main page
+    description: Serves ui/web/index.html (the local UI). Shows a placeholder until the UI is built.
+    status: implemented
+    in_schema: false
+    handler: src.api.routes.ui:main_page
+
+  - id: health
+    method: GET
+    path: /health
+    tag: health
+    summary: Health check
+    description: Liveness check. Returns service status and the active backend mode (MOCK or LIVE).
+    status: implemented
+    handler: src.api.routes.health:health
+
+  - id: chat
+    method: POST
+    path: /v1/chat
+    tag: chat
+    summary: Ask a question
+    description: Takes a user question (ChatRequest) and returns an answer with evidence (ChatResponse).
+    status: stub
+    handler: src.api.routes.chat:chat
+
+  - id: reports_query
+    method: POST
+    path: /v1/reports/query
+    tag: reports
+    summary: Query a report
+    description: Fetches one page of a NETIQ report (ReportQuery in, ReportPage out).
+    status: stub
+    handler: src.api.routes.reports:query_report
+
+  - id: metadata_reports_list
+    method: GET
+    path: /v1/metadata/reports
+    tag: metadata
+    summary: List reports
+    description: Lists the reports in the catalog (configs/reports/catalog.yaml).
+    status: stub
+    handler: src.api.routes.metadata:list_reports
+
+  - id: metadata_report_get
+    method: GET
+    path: /v1/metadata/reports/{report_id}
+    tag: metadata
+    summary: Get report definition
+    description: Returns one report's definition - columns, filters and API mapping.
+    status: stub
+    handler: src.api.routes.metadata:get_report
+
+  - id: export
+    method: POST
+    path: /v1/export
+    tag: export
+    summary: Export a report
+    description: Downloads report data as a file.
+    status: stub
+    handler: src.api.routes.export:export_report

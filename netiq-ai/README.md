@@ -21,3 +21,23 @@ Starter project structure for the NetIQ Agentic AI chatbot.
 5. Keep secrets out of version-controlled YAML; use environment variables or an approved secret provider.
 
 This archive is a scaffold: implementation files are placeholders, not working application logic.
+
+---
+## Python service setup update - FastAPI skeleton, config, health endpoint.
+What I added or changed
+
+- `app/main.py`: creates the app. Start it with uvicorn app.main:app --reload --port 8000.
+- `src/api/app.py`: builds the app, includes the routers, and serves /.
+- `src/api/routes/`: health.py, chat.py, reports.py, metadata.py and export.py, each a few lines.
+- `ui/web/`: an empty folder for the UI. If it contains an index.html, / serves it. Otherwise / shows a one-line - placeholder.
+- `requirements.txt`: now lists the dependencies.
+- `tests/unit/test_api_smoke.py`: one small test file that checks the routes are wired.
+
+What each route does today
+
+- `GET /` serves the UI placeholder.
+- `GET /` health returns {"status": "ok", "mode": "MOCK"}.
+- `POST /v1/chat` returns a placeholder answer, using your existing ChatRequest and ChatResponse.
+- `GET /v1/metadata/reports` and `/v1/metadata/reports/{id}`, `POST /v1/reports/query` and `POST /v1/export` return 501. 
+Each has a TODO naming the existing code to wire it to.
+
