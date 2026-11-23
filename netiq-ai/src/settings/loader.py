@@ -89,6 +89,20 @@ def load_catalog_config() -> dict[str, Any]:
     return data
 
 
+# Alias for compatibility
+load_report_catalog = load_catalog_config
+
+
+@lru_cache(maxsize=1)
+def load_models_config() -> dict[str, Any]:
+    """Load model configuration from `configs/models.yaml`."""
+    path = settings.config_dir / "models.yaml"
+    data = load_yaml_file(path)
+    if not isinstance(data, dict) or "models" not in data:
+        raise ConfigurationError(f"Malformed models configuration in {path}: 'models' key missing")
+    return data["models"]
+
+
 def load_report_definition(report_id: str) -> dict[str, Any]:
     """Load an individual report definition by report ID or report code.
     
@@ -120,3 +134,4 @@ def clear_config_cache() -> None:
     load_limits_config.cache_clear()
     load_allowed_apis_config.cache_clear()
     load_catalog_config.cache_clear()
+    load_models_config.cache_clear()

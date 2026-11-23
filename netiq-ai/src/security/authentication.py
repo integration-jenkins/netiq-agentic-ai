@@ -16,7 +16,8 @@ Key Guarantees:
 """
 
 from typing import Any
-from src.settings.env import settings
+from src.schemas.user import UserContext
+from src.settings.env import AppEnvironment, settings
 
 
 class AuthenticationError(Exception):
@@ -25,7 +26,7 @@ class AuthenticationError(Exception):
 
 
 class AuthManager:
-    """Manages authentication headers for outgoing NETIQ backend requests."""
+    """Manages authentication headers for outgoing NETIQ backend requests and incoming API auth."""
 
     @staticmethod
     def get_auth_headers(token: str | None = None) -> dict[str, str]:
@@ -48,3 +49,56 @@ class AuthManager:
             return {}
 
         return {"Authorization": f"Bearer {effective_token}"}
+
+    @staticmethod
+    def authenticate_incoming_request(
+        authorization: str | None = None,
+        api_key: str | None = None,
+        enforce: bool | None = None,
+    ) -> UserContext:
+        """Authenticate incoming API request and return verified UserContext.
+        
+        Args:
+            authorization: Raw Authorization header (e.g. 'Bearer <token>').
+            api_key: Optional X-NETIQ-API-KEY header.
+            enforce: Whether to enforce token check (defaults to settings.enforce_api_auth or PROD).
+            
+        Returns:
+            UserContext: Authenticated user context.
+            
+        Raises:
+            AuthenticationError: If enforcement is active and credentials are invalid or missing.
+        """
+        should_enforce = (
+            enforce 
+            if enforce is not None 
+            else (settings.enforce_api_auth or settings.app_env in (AppEnvironment.PRODUCTION, AppEnvironment.STAGING))
+        )
+
+        extracted_token = None
+        if authorization:
+            parts = authorization.strip().split()
+            if len(parts) == 2 and parts[0].lower() == "bearer":
+                extracted_token = parts[1]
+            elif len(parts) == 1:
+                extracted_token = parts[0]
+        elif api_key:
+            extracted_token = api_key.strip()
+
+        if should_enforce:
+            if not extracted_token:
+                raise AuthenticationError("Missing required authentication token in Authorization or X-NETIQ-API-KEY header.")
+            if extracted_token != settings.api_auth_token:
+                raise AuthenticationError("Invalid or expired authentication credentials.")
+
+        # If token matches admin token or contains admin tag
+        is_admin = extracted_token is not None and "admin" in extracted_token.lower()
+        roles = ["admin"] if is_admin else ["telecom_analyst"]
+
+        return UserContext(
+            username="admin_user" if is_admin else "analyst_user",
+            roles=roles,
+            permitted_circles=["*"] if is_admin else ["DL", "MH", "PUNJAB", "BIHAR", "BR"],
+            is_admin=is_admin,
+            token=extracted_token,
+        )

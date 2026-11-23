@@ -12,6 +12,9 @@ Key Settings:
 - `NETIQ_API_MODE`: MOCK vs LIVE mode. Defaults to MOCK to guarantee offline safety.
 - `NETIQ_API_BASE_URL`: Base URL for the Java Spring Boot backend service.
 - `NETIQ_API_TIMEOUT_SECONDS`: Default socket timeout.
+- `OLLAMA_BASE_URL`: Base URL for Ollama local inference server.
+- `DEFAULT_LLM_MODEL`: Default LLM model name (configurable).
+- `LLM_TIMEOUT_SECONDS`: Timeout for LLM generation requests.
 - Project paths: Deterministic path anchors pointing to `configs/`, `data/fixtures/`,
   and `configs/reports/`.
 """
@@ -78,6 +81,60 @@ class Settings(BaseSettings):
         default=None,
         alias="NETIQ_API_AUTH_TOKEN",
         description="Bearer authentication token for backend integration"
+    )
+
+    # Security & Execution Governance Settings
+    enforce_api_auth: bool = Field(
+        default=False,
+        alias="ENFORCE_API_AUTH",
+        description="Whether to enforce API authentication token verification on all routes"
+    )
+    api_auth_token: str = Field(
+        default="netiq-secure-token-2026",
+        alias="NETIQ_APP_AUTH_TOKEN",
+        description="Shared secret or bearer token accepted for client API requests"
+    )
+    max_prompt_chars: int = Field(
+        default=8000,
+        alias="MAX_PROMPT_CHARS",
+        description="Maximum permissible prompt length in characters to prevent buffer exhaustion"
+    )
+    max_generation_tokens: int = Field(
+        default=2048,
+        alias="MAX_GENERATION_TOKENS",
+        description="Maximum permissible token output count for LLM completions"
+    )
+    llm_max_concurrency: int = Field(
+        default=4,
+        alias="LLM_MAX_CONCURRENCY",
+        description="Maximum concurrent LLM inference tasks allowed simultaneously"
+    )
+    live_sql_execution_enabled: bool = Field(
+        default=False,
+        alias="LIVE_SQL_EXECUTION_ENABLED",
+        description="Strict safety gate: Live SQL execution against database is disabled by default"
+    )
+    vram_budget_gb: float = Field(
+        default=8.0,
+        alias="VRAM_BUDGET_GB",
+        description="GPU VRAM budget for model allocation (RTX 5050 target: ~8 GB)"
+    )
+
+    # LLM and Ollama Settings (Configurable)
+    ollama_base_url: str = Field(
+        default="http://127.0.0.1:11434",
+        alias="OLLAMA_BASE_URL",
+        description="Base URL for local Ollama daemon"
+    )
+    default_llm_model: str = Field(
+        default="qwen3:4b-instruct-2507",
+        alias="DEFAULT_LLM_MODEL",
+        description="Configurable default LLM model name for local inference"
+    )
+    llm_timeout_seconds: float = Field(
+        default=30.0,
+        alias="LLM_TIMEOUT_SECONDS",
+        description="Timeout for LLM inference requests in seconds"
     )
     
     # Filesystem Paths Anchor Points

@@ -1,2 +1,43 @@
 # Offline model and embedding configuration.
-models: {}
+# Configurable model names, Ollama integration, and role-specific configurations.
+models:
+  default_model: "qwen3:4b-instruct-2507"
+  ollama_base_url: "http://127.0.0.1:11434"
+  timeout_seconds: 30.0
+
+  # Role-specific model assignments mapping to Agent Architecture
+  roles:
+    intent_classifier:
+      model: "qwen3:4b-instruct-2507"
+      display_name: "Qwen3 4B Instruct 2507"
+      temperature: 0.0
+      max_tokens: 128
+      purpose: "Better candidate for interpreting varied questions"
+    report_selector:
+      model: "qwen3:4b-instruct-2507"
+      display_name: "Qwen3 4B Instruct 2507"
+      temperature: 0.0
+      max_tokens: 256
+      purpose: "Match questions to NETIQ report metadata"
+    orchestrator_planner:
+      model: "qwen3:4b-instruct-2507"
+      display_name: "Qwen3 4B Instruct 2507"
+      temperature: 0.1
+      max_tokens: 1024
+      purpose: "Structured plans and tool selection"
+    knowledge_agent:
+      model: "qwen3:4b-instruct-2507"
+      display_name: "Qwen3 4B Instruct 2507"
+      temperature: 0.2
+      max_tokens: 1024
+      purpose: "Explain retrieved telecom documentation"
+    knowledge_retriever:
+      model: "qwen3-embedding:0.6b"
+      display_name: "Qwen3 Embedding 0.6B"
+      purpose: "Strong candidate for multilingual semantic retrieval"
+    sql_agent:
+      model: "qwen2.5-coder:7b"
+      display_name: "Qwen2.5-Coder 7B (optional)"
+      temperature: 0.0
+      max_tokens: 512
+      purpose: "SQL-focused benchmark"

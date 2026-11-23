@@ -26,6 +26,15 @@ api_routes:
     status: implemented
     handler: src.api.routes.health:health
 
+  - id: inference
+    method: POST
+    path: /v1/inference
+    tag: inference
+    summary: Local LLM inference endpoint
+    description: Executes prompt completion using local Ollama model with speed and quality metrics. Model name is configurable.
+    status: implemented
+    handler: src.api.routes.inference:inference_endpoint
+
   - id: chat
     method: POST
     path: /v1/chat
