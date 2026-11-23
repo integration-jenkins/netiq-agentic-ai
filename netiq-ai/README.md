@@ -41,3 +41,9 @@ What each route does today
 - `GET /v1/metadata/reports` and `/v1/metadata/reports/{id}`, `POST /v1/reports/query` and `POST /v1/export` return 501. 
 Each has a TODO naming the existing code to wire it to.
 
+## NETIQ Login Integration
+
+- Added `src/security/netiq_login.py` to call the NETIQ login API, store each session's user JSON, and expose login/session routes.
+- Updated `src/settings/env.py` with the NETIQ backend defaults: `NETIQ_API_BASE_URL=http://localhost:6061`, `NETIQ_LOGIN_PATH=/api/login`, and `NETIQ_LOGIN_METHOD=GET`.
+- Updated `app/main.py` to add the project root to Python's import path before creating the app. Start the service with `uvicorn app.main:app --reload --port 8000`.
+- Updated `src/api/app.py` to register the NETIQ authentication router with the application.

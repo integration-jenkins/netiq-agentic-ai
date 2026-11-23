@@ -68,9 +68,19 @@ class Settings(BaseSettings):
         description="API execution mode: MOCK (offline fixtures) or LIVE (backend HTTP)"
     )
     netiq_api_base_url: str = Field(
-        default="http://localhost:8080",
+        default="http://localhost:6061",
         alias="NETIQ_API_BASE_URL",
-        description="Base URL of the NETIQ Java Spring Boot backend"
+        description="Base URL of the NETIQ Tomcat backend"
+    )
+    netiq_login_path: str = Field(
+        default="/api/login",
+        alias="NETIQ_LOGIN_PATH",
+        description="NETIQ login API path"
+    )
+    netiq_login_method: str = Field(
+        default="GET",
+        alias="NETIQ_LOGIN_METHOD",
+        description="NETIQ login HTTP method"
     )
     netiq_api_timeout_seconds: float = Field(
         default=10.0,

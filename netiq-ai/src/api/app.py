@@ -7,6 +7,7 @@ from importlib import import_module
 
 from fastapi import FastAPI
 
+from src.security.netiq_login import router as netiq_auth_router
 from src.settings.env import settings
 from src.settings.loader import ConfigurationError, load_yaml_file
 
@@ -48,4 +49,8 @@ def create_app() -> FastAPI:
             include_in_schema=route.get("in_schema", True),
             name=route["id"],
         )
+
+    if netiq_auth_router is not None:
+        app.include_router(netiq_auth_router)
+
     return app
