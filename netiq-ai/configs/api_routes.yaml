@@ -79,3 +79,50 @@ api_routes:
     description: Downloads report data as a file.
     status: stub
     handler: src.api.routes.export:export_report
+
+  # Session management (task 1.6): each logged-in user's own chats. Needs the NETIQ login session.
+  - id: conversations_list
+    method: GET
+    path: /v1/conversations
+    tag: conversations
+    summary: List my chats
+    description: Lists the logged-in user's own chats, most recently used first.
+    status: implemented
+    handler: src.api.routes.conversations:list_conversations
+
+  - id: conversations_create
+    method: POST
+    path: /v1/conversations
+    tag: conversations
+    summary: Start a new chat
+    description: Creates a new chat for the logged-in user and returns its conversation_id.
+    status: implemented
+    handler: src.api.routes.conversations:create_conversation
+
+  - id: conversations_get
+    method: GET
+    path: /v1/conversations/{conversation_id}
+    tag: conversations
+    summary: Open a chat
+    description: Returns the messages and state (last report, filters) of one of the user's own chats.
+    status: implemented
+    handler: src.api.routes.conversations:get_conversation
+
+  - id: conversations_message
+    method: POST
+    path: /v1/conversations/{conversation_id}/messages
+    tag: conversations
+    summary: Send a message in a chat
+    description: Stores the question and answer in the chat; follow-up questions get the recent chat history.
+    status: implemented
+    handler: src.api.routes.conversations:send_message
+
+  - id: chat_demo
+    method: GET
+    path: /chat-demo
+    tag: ui
+    summary: Chat demo page
+    description: Serves ui/web/chat_demo.html - log in, open your chats, see when history is sent for follow-ups.
+    status: implemented
+    in_schema: false
+    handler: src.api.routes.conversations:chat_demo_page

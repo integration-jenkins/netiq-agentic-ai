@@ -1,0 +1,5219 @@
+{
+ "source": "Team mapping NETIQ_RAN_MW_FTTH_Wireline_Mappings (23 Nov 2026); report sources, view base tables and query rules from the updated NETIQ Java code (received 23 Nov 2026, last commit 20 Nov 2026)",
+ "object_counts": {
+  "Table": 62,
+  "View": 41,
+  "Materialized view": 36
+ },
+ "areas": {
+  "AI outputs": 16,
+  "System and reference": 12,
+  "RAN": 31,
+  "Microwave (MW)": 32,
+  "MW planning (MIDS)": 7,
+  "IP (RAN)": 23,
+  "FTTH": 5,
+  "Dashboard summaries": 5,
+  "Stitching": 2,
+  "Wireline": 6
+ },
+ "sql_rules": [
+  {
+   "rule": "Use current rows only",
+   "why": "Leave out removed rows with STATUS IS NULL OR STATUS <> 'DELETE', the same filter the NETIQ screens use. Do not rely on IS_ACTIVE = 1 alone: the code saves new MW links, cabinets and IP rows with IS_ACTIVE = 0, and BOARD_MW_DATA has no IS_ACTIVE column.",
+   "example": "WHERE (n.STATUS IS NULL OR n.STATUS <> 'DELETE')"
+  },
+  {
+   "rule": "Join through ID links",
+   "why": "Use parent.ID = child.<link column> from the Relationships sheet. Names and text IDs repeat, so joining on them can multiply rows.",
+   "example": "JOIN NODE_DATA n ON n.ID = c.ENODEB_CELL"
+  },
+  {
+   "rule": "Link columns are named after the parent",
+   "why": "NODE_DATA, BOARD_DATA, SITE_FOR_NODE, ENODEB_CELL and similar columns hold the parent's ID, not a name.",
+   "example": "JOIN SITE_DATA s ON s.ID = n.SITE_FOR_NODE"
+  },
+  {
+   "rule": "Import run is not the 'current' flag",
+   "why": "VERSION_ID points to the import run (CIRCLE_DATA_VERSION). Use it to show when data was loaded, not to filter current rows.",
+   "example": "JOIN CIRCLE_DATA_VERSION v ON v.ID = n.VERSION_ID"
+  },
+  {
+   "rule": "Count sites with DISTINCT",
+   "why": "SITE_DATA keeps one row per site per NMS, so the same SITE_ID can appear more than once.",
+   "example": "COUNT(DISTINCT SITE_ID)"
+  },
+  {
+   "rule": "A node is CIRCLE + NODE_ID + NODE_TYPE",
+   "why": "NODE_DATA holds SRANBS, ENODEB, GNODEB, BTS and GHOST rows. Node IDs are unique only within a circle.",
+   "example": "WHERE n.CIRCLE = 'MH' AND n.NODE_TYPE = 'ENODEB'"
+  },
+  {
+   "rule": "Circle column names differ",
+   "why": "Data tables use CIRCLE; CIRCLE_DATA_VERSION and summary views use CIRCLE_ID; MIDS tables use 3-letter codes (convert with CIRCLE_MAP).",
+   "example": "WHERE n.CIRCLE IN ('MH','GJ')"
+  },
+  {
+   "rule": "Always apply the user's circles",
+   "why": "Every query must be limited to the user's circles. NETIQ takes them from the login response (circleList). ALL, PAN INDIA or an empty list means all circles, the same as NETIQ (confirmed by the team); if NETIQ changes this rule, follow it. Circle names are turned into 2-letter codes first (see Circles).",
+   "example": "AND x.CIRCLE IN (:allowed_circles)"
+  },
+  {
+   "rule": "Clean text before comparing",
+   "why": "NETIQ's own views compare names and settings with UPPER(TRIM(...)).",
+   "example": "WHERE UPPER(TRIM(l.LINK_CONFIGURATION)) = '1+0'"
+  },
+  {
+   "rule": "Prefer the report view",
+   "why": "When a NETIQ report covers the question, read its view so the numbers match the screen.",
+   "example": "SELECT ... FROM VW_MW_TR_LINK_REPORT WHERE CIRCLE = 'MH'"
+  },
+  {
+   "rule": "Use database column names",
+   "why": "Where the team mapping and the deployed database spell a column differently, use the database name (see Open Questions).",
+   "example": "MISSINGERFCN, not MISSING_ERFCN"
+  },
+  {
+   "rule": "Count nodes per technology",
+   "why": "NETIQ counts nodes by NODE_TYPE. For 2G / 4G / 5G counts use SUPPORTED_TECHNOLOGY: a node that supports 2G/4G/5G is counted under each one, and the total is the number of distinct nodes.",
+   "example": "WHERE INSTR(n.SUPPORTED_TECHNOLOGY, '4G') > 0"
+  },
+  {
+   "rule": "Link MW links to MW nodes on NODE1_ID / NODE2_ID",
+   "why": "NODE1_DATA and NODE2_DATA are mostly empty because the import builds link and node keys differently. Join on the node ID in the same circle and keep one row per node.",
+   "example": "JOIN NODE_MW_DATA m ON m.NODE_ID = l.NODE1_ID AND m.CIRCLE = l.CIRCLE"
+  },
+  {
+   "rule": "Wireline circle comes from SITE_ID",
+   "why": "Wireline rows carry no real circle. Where SITE_ID ends with _<circle code> (for example ..._MH), use that code.",
+   "example": "REGEXP_SUBSTR(w.SITE_ID, '[^_]+$')"
+  },
+  {
+   "rule": "Never use system objects or procedures",
+   "why": "Only objects marked Allow. Never run procedures or functions.",
+   "example": "-"
+  }
+ ],
+ "objects": [
+  {
+   "name": "AI_CELL_RU_MAPPING_OUTPUT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "CellToRuMappingRecord"
+   ],
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "columns": 35,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "54. AI - Cell-to-RU Link Audit"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_DAILY_NETWORK_CHANGE",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "DailyNetworkChangeRecord"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 25,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "57. AI - Daily Network Change Summary"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_MW_DEGRADATION_SCORE",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 40,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+   "built_from": [],
+   "in_deployed_schema": false,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_MW_FREQUENCY_DEVIATION",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "MwFrequencyDeviation"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 27,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "4. AI - MW Frequency Deviation"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\AI_MW_FREQUENCY_DEVIATION.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_MW_LINK_REPORT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "MwLinkReport"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 81,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_MW_LINK_SNAPSHOT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 11,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+   "built_from": [],
+   "in_deployed_schema": false,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "AI_RAN_DISMANTLED_HARDWARE",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "DismantledHardwareRecord"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 26,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "3. AI - Dismantled Hardware Intelligence"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\AI_RAN_DISMANTLED_HARDWARE.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_RAN_DUPLICATE_RECORD",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "RanDuplicateRecord"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 25,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_RAN_GPS_IMPUTATION_OUTPUT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "RanGpsImputationRecord"
+   ],
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "columns": 25,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "56. AI - RAN GPS Imputation"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AI_RAN_UPGRADE_AUDIT_OUTPUT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "RanUpgradeRecord"
+   ],
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "columns": 35,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "55. AI - RAN Upgrade and Location Intelligence"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "AUDIT_STREAKS",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "AuditStreak"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "BOARD_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Board"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 37,
+   "links_out": [
+    "NODE_DATA -> NODE_DATA.ID",
+    "CABINET_DATA_ID -> CABINET_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "ETHERNET_PORT.BOARD_ID"
+   ],
+   "used_by_reports": [
+    "33. RAN - Board Hardware"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "BOARD_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwBoard"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 47,
+   "links_out": [
+    "NODE_DATA -> NODE_MW_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "ETHERNET_PORT_MW_DATA.BOARD_DATA",
+    "PORT_MW_DATA.BOARD_DATA",
+    "TR_LINK_MW_DATA.NODE1_BOARD_DATA",
+    "TR_LINK_MW_DATA.NODE2_BOARD_DATA"
+   ],
+   "used_by_reports": [
+    "35. MW / UBR - Board Hardware"
+   ],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "BOARD_VIEW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "BoardView"
+   ],
+   "primary_key": [],
+   "columns": 32,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+   "built_from": [
+    "BOARD_DATA",
+    "CABINET_DATA",
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CABINET_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Cabinet"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 31,
+   "links_out": [
+    "NODE_DATA -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "BOARD_DATA.CABINET_DATA_ID"
+   ],
+   "used_by_reports": [
+    "34. RAN - Cabinet Hardware"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "CELL2G_DUPLICATE_SUMMARY",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "Duplicate2gSummary"
+   ],
+   "primary_key": [],
+   "columns": 19,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+   "built_from": [
+    "CELLS_2G",
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CELL4G_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Cell4g"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 48,
+   "links_out": [
+    "ENODEB_CELL -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "27. RAN - Cell 4G"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "CELL4G_DUPLICATE_SUMMARY",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "Duplicate4gSummary"
+   ],
+   "primary_key": [],
+   "columns": 17,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CELL5G_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Cell5g"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 48,
+   "links_out": [
+    "GNODEB_CELL -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "28. RAN - Cell 5G"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "CELL5G_DUPLICATE_SUMMARY",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "Duplicate5gSummary"
+   ],
+   "primary_key": [],
+   "columns": 17,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+   "built_from": [
+    "CELL5G_DATA",
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CELLS_2G",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Cells2G"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 48,
+   "links_out": [
+    "BTS_CELL -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "CELL_AUDIT_BASELINE",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "CellAuditBaseline"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 29,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "2. AI - Baseline Audit"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_AUDIT_BASELINE.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "CELL_INVENTORY_VIEW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "CellInventoryView"
+   ],
+   "primary_key": [],
+   "columns": 36,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CELL_RU_MAPPING_VALIDATION_VIEW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "CellRuMappingValidationView"
+   ],
+   "primary_key": [],
+   "columns": 19,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": false,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "CELL_VALUE_TRACKER",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "CellValueTracker"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 12,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "CIRCLE_DATA_VERSION",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "CircleDataVersion"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [
+    "BOARD_DATA.VERSION_ID",
+    "BOARD_MW_DATA.VERSION_ID",
+    "CABINET_DATA.VERSION_ID",
+    "CELL4G_DATA.VERSION_ID",
+    "CELL5G_DATA.VERSION_ID",
+    "CELLS_2G.VERSION_ID",
+    "CORE_IP_DATA.VERSION_ID",
+    "DISCOVERY.VERSION_ID",
+    "ETHERNET_PORT_MW_DATA.VERSION_ID",
+    "FTTH_HARDWARE.VERSION_ID",
+    "FTTH_LINK.VERSION_ID",
+    "FTTH_NODE.VERSION_ID",
+    "FTTH_PORT.VERSION_ID",
+    "INVENTORY_METRICS.VERSION_ID",
+    "IP_DATA.VERSION_ID",
+    "IP_MW_DATA.VERSION_ID",
+    "MW_TRANSCEIVER_REPORT.VERSION_ID",
+    "NMS_RECORD.VERSION_ID",
+    "NODE_DATA.VERSION_ID",
+    "NODE_MW_DATA.VERSION_ID",
+    "PORT_MW_DATA.VERSION_ID",
+    "SITE_DATA.VERSION_ID",
+    "TR_LINK_MW_DATA.VERSION_ID",
+    "WIRELINE_BOARD.VERSION_ID",
+    "WIRELINE_LINK.VERSION_ID",
+    "WIRELINE_LOGICAL_INTERFACE.VERSION_ID",
+    "WIRELINE_NODE.VERSION_ID",
+    "WIRELINE_PORT.VERSION_ID",
+    "WIRELINE_VLANIP.VERSION_ID"
+   ],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow (reference)",
+   "access_reason": "Lookup table."
+  },
+  {
+   "name": "CIRCLE_MAP",
+   "type": "Table",
+   "area": "MW planning (MIDS)",
+   "entities": [],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 3,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\20260204_MidsNETIQCircleMap.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow (reference)",
+   "access_reason": "Lookup table."
+  },
+  {
+   "name": "CORE_IP_DATA",
+   "type": "Table",
+   "area": "IP (RAN)",
+   "entities": [
+    "CoreIpData"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 34,
+   "links_out": [
+    "NODE_DATA -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "32. RAN - Core IP"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "DISCOVERY",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "Discovery"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 8,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "Import discovery log."
+  },
+  {
+   "name": "ETHERNET_PORT",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "EthernetPort"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 15,
+   "links_out": [
+    "BOARD_ID -> BOARD_DATA.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "ETHERNET_PORT_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwEthernetPort"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 51,
+   "links_out": [
+    "BOARD_DATA -> BOARD_MW_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "EXPORT_JOB",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "ExportJob"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 12,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_EXPORT_JOB.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "Export job queue."
+  },
+  {
+   "name": "FREQUENCY_TABLE",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "FrequencyEntity"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 13,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\14_01_2026_FREQUENCY_TABLE.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow (reference)",
+   "access_reason": "Lookup table."
+  },
+  {
+   "name": "FTTH_HARDWARE",
+   "type": "Table",
+   "area": "FTTH",
+   "entities": [
+    "FtthHardware"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 26,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "44. FTTH - Hardware"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "FTTH_LINK",
+   "type": "Table",
+   "area": "FTTH",
+   "entities": [
+    "FtthLink"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 22,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "45. FTTH - Link Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "FTTH_NODE",
+   "type": "Table",
+   "area": "FTTH",
+   "entities": [
+    "FtthNode"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 18,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "42. FTTH - Node Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "FTTH_PORT",
+   "type": "Table",
+   "area": "FTTH",
+   "entities": [
+    "FtthPort"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 23,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "43. FTTH - Port Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "FTTH_TOPIC_IMPORT_STATE",
+   "type": "Table",
+   "area": "FTTH",
+   "entities": [
+    "FtthTopicImportState"
+   ],
+   "primary_key": [
+    "CIRCLE_ID",
+    "TOPIC_NAME"
+   ],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\ftth_topic_import_state.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "FTTH import progress."
+  },
+  {
+   "name": "HARDWARE_DUPLICATE_NODE_MV",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "HardwareDuplicateDto"
+   ],
+   "primary_key": [],
+   "columns": 20,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+   "built_from": [
+    "HARDWARE_DUPLICATE_VW"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "HARDWARE_DUPLICATE_VW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [],
+   "primary_key": [],
+   "columns": 19,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+   "built_from": [
+    "BOARD_DATA",
+    "CABINET_DATA",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "HARDWARE_VALIDATION_BASE",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 12,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql",
+   "built_from": [
+    "BOARD_DATA",
+    "CABINET_DATA",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "HARDWARE_VALIDATION_NODE_MV",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "HardwareValidationReportDto"
+   ],
+   "primary_key": [],
+   "columns": 20,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql",
+   "built_from": [
+    "HARDWARE_VALIDATION_BASE"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "HOP_CAPACITY_CONFIG",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 6,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLE_HOP_CAPACITY_CONFIG_11-03-2026.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow (reference)",
+   "access_reason": "Lookup table."
+  },
+  {
+   "name": "IMPORT_EXECUTION_LOG",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "ImportExecutionLog"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 11,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "Import job log."
+  },
+  {
+   "name": "INVENTORY_ANOMALY",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "InventoryAnomaly"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "INVENTORY_METRICS",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "InventoryMetric"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 87,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "IP_AUDIT_CONFIG",
+   "type": "Table",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpAuditConfig"
+   ],
+   "primary_key": [
+    "CONFIG_KEY"
+   ],
+   "columns": 3,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "IP_AUDIT_REPORT_MV",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpDataAuditDto"
+   ],
+   "primary_key": [],
+   "columns": 23,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_IP_AUDIT_REPORT_07_04_2026.sql",
+   "built_from": [
+    "CORE_IP_DATA",
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "IP_DATA",
+   "type": "Table",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpData"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 42,
+   "links_out": [
+    "NODE_DATA -> NODE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "30. RAN - IP Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "IP_ISSUES_VIEW",
+   "type": "View",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpAudit"
+   ],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "IP_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwIPData"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 26,
+   "links_out": [
+    "NODE_DATA -> NODE_MW_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "11. MW / UBR - IP Inventory"
+   ],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\18_01_202_ALTER_TABLE_PORT.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "IP_PLANE_SNAPSHOT",
+   "type": "Table",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpPlaneSnapshot"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 11,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "MIDS_SITES",
+   "type": "Table",
+   "area": "MW planning (MIDS)",
+   "entities": [
+    "MidsSites"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 6,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\procedure_for_Mids_site_insert_30_01_2026.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "MIDS_TRLINK",
+   "type": "Table",
+   "area": "MW planning (MIDS)",
+   "entities": [
+    "MidsTrlink"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 24,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "MISSING_PARAMETER_REPORT",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [
+    "MissingParameterReport"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 29,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "1. AI - Missing Parameter Predictions"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_MISSING_PARAMETER_REPORT.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "MV_ABIS_IP",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 2,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_AVAILABLE_IPS",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_CORE_IPS",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 3,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "CORE_IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_CORE_IP_SUMMARY",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [
+    "CoreSummary"
+   ],
+   "primary_key": [],
+   "columns": 3,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_CORE_MISSING",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "MV_CORE_IP_SUMMARY",
+    "MV_CPLANE_IP",
+    "MV_UPLANE_IP",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_CORE_SUMMARY",
+   "type": "View",
+   "area": "Dashboard summaries",
+   "entities": [],
+   "primary_key": [],
+   "columns": 5,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "CORE_IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_CPLANE_IP",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 2,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_DUPLICATE_IP",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MISSING_ATTRIBUTES",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [],
+   "primary_key": [],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\MissingAttributeMaterialisedView.sql",
+   "built_from": [
+    "BOARD_DATA",
+    "CABINET_DATA",
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "CORE_IP_DATA",
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": false,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MISSING_BOTH_IPS",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "MV_ABIS_IP",
+    "MV_CPLANE_IP",
+    "MV_UPLANE_IP",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MISSING_GATEWAY",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MISSING_PLANES",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "MV_ABIS_IP",
+    "MV_CPLANE_IP",
+    "MV_MPLANE_IP",
+    "MV_UPLANE_IP",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": false,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MISSING_VLAN",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_MPLANE_IP",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 2,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MV_UPLANE_IP",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 2,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MW_HARDWARE_DUPLICATE_VW",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwHardwareDuplicate"
+   ],
+   "primary_key": [],
+   "columns": 23,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\MW_HARDWARE_DUPLICATE_VW.sql",
+   "built_from": [
+    "BOARD_MW_DATA",
+    "NODE_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MW_HARDWARE_VALIDATION",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwHardwareCabinateValidation"
+   ],
+   "primary_key": [],
+   "columns": 22,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "26. MW - Hardware Validation"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_HARDWARE_VALIDATION.sql",
+   "built_from": [
+    "BOARD_MW_DATA",
+    "NODE_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "MW_INVENTORY_LOCK",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [],
+   "primary_key": [
+    "LOCK_ID"
+   ],
+   "columns": 1,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_INVENTORY_LOCK.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "Import lock flag."
+  },
+  {
+   "name": "MW_NODE_DUPLICATE_SUMMARY",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwDuplicateNodeViewSummary"
+   ],
+   "primary_key": [],
+   "columns": 19,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "6. MW / UBR - Duplicate Nodes (MwDuplicateNodes)",
+    "18. MW - Duplicate Node Audit"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_DUPLICATE_SUMMARY_25-02-2026 2.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "MW_NODE_VIEW",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwNodeView"
+   ],
+   "primary_key": [],
+   "columns": 25,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_NODE_VIEW_26-02-2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "MW_TRANSCEIVER_REPORT",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwTransceiverReport"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 34,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "36. MW / UBR - Transceiver"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "NMS_CONFIG",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "NmsConfig"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 9,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NMS_CONFIG_SCRIPT\\nms_config_table.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Deny",
+   "access_reason": "NMS server connection settings."
+  },
+  {
+   "name": "NMS_RECORD",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [
+    "NmsRecord"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 21,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "NMS_RECORD_VIEW",
+   "type": "View",
+   "area": "System and reference",
+   "entities": [
+    "NmsRecordView"
+   ],
+   "primary_key": [],
+   "columns": 22,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\09042026_nms_record_view.sql",
+   "built_from": [
+    "NMS_RECORD"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "NODE_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "BtsData",
+    "Enodeb",
+    "GhostNode",
+    "Gnodeb",
+    "Node",
+    "Sranbs"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 58,
+   "links_out": [
+    "SITE_FOR_NODE -> SITE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "BOARD_DATA.NODE_DATA",
+    "CABINET_DATA.NODE_DATA",
+    "CELL4G_DATA.ENODEB_CELL",
+    "CELL5G_DATA.GNODEB_CELL",
+    "CELLS_2G.BTS_CELL",
+    "CORE_IP_DATA.NODE_DATA",
+    "IP_DATA.NODE_DATA"
+   ],
+   "used_by_reports": [
+    "20. RAN - Node Inventory",
+    "21. RAN - Ghost Node",
+    "22. RAN - eNodeB",
+    "23. RAN - gNodeB",
+    "24. RAN - BTS",
+    "25. RAN - SRAN",
+    "36. MW / UBR - Transceiver"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "NODE_DUPLICATE_SUMMARY",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "DuplicateNodeSummary"
+   ],
+   "primary_key": [],
+   "columns": 18,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "NODE_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwNode"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 34,
+   "links_out": [
+    "SITE_FOR_NODE -> SITE_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "BOARD_MW_DATA.NODE_DATA",
+    "IP_MW_DATA.NODE_DATA",
+    "TR_LINK_MW_DATA.NODE1_DATA",
+    "TR_LINK_MW_DATA.NODE2_DATA"
+   ],
+   "used_by_reports": [
+    "5. MW / UBR - Node Inventory",
+    "36. MW / UBR - Transceiver"
+   ],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "NODE_VALUE_TRACKER",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "NodeValueTracker"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 11,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "NODE_VIEW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "NodeView"
+   ],
+   "primary_key": [],
+   "columns": 33,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "PORT_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwPort"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 41,
+   "links_out": [
+    "BOARD_DATA -> BOARD_MW_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "TR_LINK_MW_DATA.NODE1_PORT_DATA",
+    "TR_LINK_MW_DATA.NODE2_PORT_DATA"
+   ],
+   "used_by_reports": [
+    "7. MW / UBR - Port Inventory",
+    "8. MW / UBR - VLAN Inventory"
+   ],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "SITE_DATA",
+   "type": "Table",
+   "area": "RAN",
+   "entities": [
+    "Site"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 27,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [
+    "NODE_DATA.SITE_FOR_NODE",
+    "NODE_MW_DATA.SITE_FOR_NODE"
+   ],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "SITE_ID_VALIDATION_VIEW",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "SiteIdValidationReportView"
+   ],
+   "primary_key": [],
+   "columns": 16,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\SITE_ID_VALIDATION_VIEW.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "CELLS_2G",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "SITE_PREDICTION_RESULTS",
+   "type": "Table",
+   "area": "AI outputs",
+   "entities": [],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 10,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "SITE_PREDICTION_VIEW",
+   "type": "View",
+   "area": "AI outputs",
+   "entities": [
+    "SitePredictionView"
+   ],
+   "primary_key": [],
+   "columns": 16,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "51. AI - Site Inference"
+   ],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql",
+   "built_from": [
+    "NODE_DATA",
+    "SITE_DATA",
+    "SITE_PREDICTION_RESULTS"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "SITE_REPORT_MW_VIEW",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "SiteReportMWView"
+   ],
+   "primary_key": [],
+   "columns": 17,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "10. MW / UBR - Site Inventory"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+   "built_from": [
+    "SITE_VIEW_MW_1"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "SITE_VIEW",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "SiteView"
+   ],
+   "primary_key": [],
+   "columns": 24,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "58. RAN - Site Report"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "SITE_VIEW_MW",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "SiteReport"
+   ],
+   "primary_key": [],
+   "columns": 17,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+   "built_from": [
+    "SITE_VIEW_MW_1"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "SITE_VIEW_MW_1",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 17,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA",
+    "NODE_MW_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Not needed",
+   "access_reason": "Internal working table or helper view; no user question needs it."
+  },
+  {
+   "name": "STABLE_DETAIL_VIEW",
+   "type": "View",
+   "area": "Dashboard summaries",
+   "entities": [
+    "StableDetailView"
+   ],
+   "primary_key": [],
+   "columns": 12,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "50. Network - Change Details"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": false,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "STITCHING_DATA",
+   "type": "Table",
+   "area": "Stitching",
+   "entities": [
+    "StitchingData"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 39,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data."
+  },
+  {
+   "name": "TMP_NMS_LIST",
+   "type": "Table",
+   "area": "System and reference",
+   "entities": [],
+   "primary_key": [
+    "NMS_IP"
+   ],
+   "columns": 1,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\Delete Query's\\tmp_delete_nms_ip_table.sql",
+   "built_from": [],
+   "in_deployed_schema": false,
+   "access": "Deny",
+   "access_reason": "Temporary table used by a delete script."
+  },
+  {
+   "name": "TR_LINK_DASH_COUNT",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "TrLinkDashboardCountView"
+   ],
+   "primary_key": [],
+   "columns": 58,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\TR_LINK_DASH_COUNT.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "HOP_CAPACITY_CONFIG",
+    "NODE_MW_DATA",
+    "PORT_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "TR_LINK_MW_DATA",
+   "type": "Table",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwTrLink"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 117,
+   "links_out": [
+    "NODE1_DATA -> NODE_MW_DATA.ID",
+    "NODE2_DATA -> NODE_MW_DATA.ID",
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID",
+    "NODE1_PORT_DATA -> PORT_MW_DATA.ID",
+    "NODE1_BOARD_DATA -> BOARD_MW_DATA.ID",
+    "NODE2_PORT_DATA -> PORT_MW_DATA.ID",
+    "NODE2_BOARD_DATA -> BOARD_MW_DATA.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "TR_LINK_REPORT_VIEW",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "TrLinkReportView"
+   ],
+   "primary_key": [],
+   "columns": 59,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Create_TR_LINK_REPORT_VIEW.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "HOP_CAPACITY_CONFIG",
+    "NODE_MW_DATA",
+    "PORT_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_ALL_LINKED_NODES",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "VwAllLinkedNodes"
+   ],
+   "primary_key": [],
+   "columns": 2,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_VIEW_25-02-2026 3.sql",
+   "built_from": [
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_CELL4G_COMPLETE",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "Cell4gCompleteView"
+   ],
+   "primary_key": [],
+   "columns": 48,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "27. RAN - Cell 4G"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_CELL5G_COMPLETE",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "Cell5gCompleteView"
+   ],
+   "primary_key": [],
+   "columns": 44,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "28. RAN - Cell 5G"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+   "built_from": [
+    "CELL5G_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_CELL_RU_MAPPING_AUDIT",
+   "type": "View",
+   "area": "RAN",
+   "entities": [],
+   "primary_key": [],
+   "columns": 19,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\VW_CELL_RU_MAPPING_AUDIT.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": false,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_DEPLOYED_NOT_PLANNED",
+   "type": "View",
+   "area": "MW planning (MIDS)",
+   "entities": [
+    "DeployedNotPlanned"
+   ],
+   "primary_key": [],
+   "columns": 118,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\vw_deployed_not_planed.sql",
+   "built_from": [
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA",
+    "VW_PLAN_VS_CONFIG_TRLINK"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_LINK_CONFIGURATION_SUMMARY",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "LinkConfigurationSummary"
+   ],
+   "primary_key": [],
+   "columns": 6,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\Create_Link_Configuration_summary_view_13_02_2026.sql",
+   "built_from": [
+    "VW_MW_TR_LINK_REPORT",
+    "VW_UBR_TR_LINK_REPORT"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_LINK_CONFIG_COMBINED",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "TrlinkReportCombined"
+   ],
+   "primary_key": [],
+   "columns": 60,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "14. MW - Capacity Hop",
+    "37. MW - Transmission Link (TXN variant)"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\26_02_2026_vw_link_configuration_comb.sql",
+   "built_from": [
+    "VW_MW_TR_LINK_REPORT",
+    "VW_UBR_TR_LINK_REPORT"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_MW_IP_DATA_RESPONSE",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwIpDataResponseView"
+   ],
+   "primary_key": [],
+   "columns": 29,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_IP_DATA_RESPONSE.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "IP_MW_DATA",
+    "NODE_MW_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_MW_NODE_AUDIT_REPORT",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwNodeAuditView"
+   ],
+   "primary_key": [],
+   "columns": 18,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "12. MW / UBR - Node Validation"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Node_MW_AUDIT_VIEW.sql",
+   "built_from": [
+    "BOARD_MW_DATA",
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_MW_TR_LINK_AUDIT_REPORT",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwLinkAuditReportView"
+   ],
+   "primary_key": [],
+   "columns": 32,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "19. MW - Link Audit"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_TR_LINK_AUDIT_REPORT_17-03-2026.sql",
+   "built_from": [
+    "BOARD_MW_DATA",
+    "CIRCLE_DATA_VERSION",
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_MW_TR_LINK_REPORT",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "MwTrLinkReportView"
+   ],
+   "primary_key": [],
+   "columns": 77,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "13. MW - Transmission Link Inventory"
+   ],
+   "sql_source": "VW_MW_TR_LINK_REPORT_fixed.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "HOP_CAPACITY_CONFIG",
+    "NODE_MW_DATA",
+    "PORT_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_NEW_CELL_2G",
+   "type": "View",
+   "area": "RAN",
+   "entities": [
+    "NewCell2gView"
+   ],
+   "primary_key": [],
+   "columns": 35,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "29. RAN - Cell 2G"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+   "built_from": [
+    "CELLS_2G",
+    "NODE_DATA",
+    "SITE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_PLANNED_VS_CONFIGURED_TRLINK",
+   "type": "Materialized view",
+   "area": "MW planning (MIDS)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql",
+   "built_from": [
+    "MIDS_TRLINK",
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": false,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "VW_PLAN_VS_CONFIG_TRLINK",
+   "type": "Materialized view",
+   "area": "MW planning (MIDS)",
+   "entities": [
+    "PlannedVsConfiguredTrLink"
+   ],
+   "primary_key": [],
+   "columns": 29,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "17. MW - Planned vs Configured",
+    "31. MW - Configuration Validation",
+    "38. MW - Planned vs Configured (All Validation)",
+    "46. MW - MIDS Validation"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_PLAN_VS_CONFIG_TRLINK.sql",
+   "built_from": [
+    "MIDS_TRLINK",
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_RAN_CHANGE_DETAILS",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "ChangeDetailView"
+   ],
+   "primary_key": [],
+   "columns": 13,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "50. Network - Change Details"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\VW_RAN_CHANGE_DETAILS.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "CELLS_2G",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_UBR_TR_LINK_AUDIT_REPORT",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "UbrTrLinkAuditReportView"
+   ],
+   "primary_key": [],
+   "columns": 32,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "16. UBR - Transmission Link Audit"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_UBR_TR_LINK_AUDIT_REPORT.sql",
+   "built_from": [
+    "BOARD_MW_DATA",
+    "CIRCLE_DATA_VERSION",
+    "NODE_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "VW_UBR_TR_LINK_REPORT",
+   "type": "Materialized view",
+   "area": "Microwave (MW)",
+   "entities": [
+    "UbrTrLinkReportView"
+   ],
+   "primary_key": [],
+   "columns": 69,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "15. UBR - Transmission Link Inventory"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\UpdatedUbrTrLink_11_03_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "HOP_CAPACITY_CONFIG",
+    "NODE_MW_DATA",
+    "PORT_MW_DATA",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "V_CAPACITY_COMPLIANCE_DETAIL",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "CapacityComplianceDetailView"
+   ],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+   "built_from": [
+    "V_CAPACITY_DEVIATION_DETAIL"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_CAPACITY_COMPLIANCE_KPI",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 8,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+   "built_from": [
+    "V_CAPACITY_COMPLIANCE_DETAIL"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_CAPACITY_DEVIATION_DETAIL",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [],
+   "primary_key": [],
+   "columns": 26,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+   "built_from": [
+    "MIDS_TRLINK",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_CELL_INFERENCE",
+   "type": "Materialized view",
+   "area": "AI outputs",
+   "entities": [
+    "CellInferenceView"
+   ],
+   "primary_key": [],
+   "columns": 16,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "53. AI - Cell Inference"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "NODE_DATA",
+    "SITE_PREDICTION_VIEW"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "V_CELL_RU_MAPPING",
+   "type": "View",
+   "area": "RAN",
+   "entities": [],
+   "primary_key": [],
+   "columns": 28,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_DUPLICATE_IP_AUDIT",
+   "type": "Materialized view",
+   "area": "IP (RAN)",
+   "entities": [
+    "DuplicateIpDataView"
+   ],
+   "primary_key": [],
+   "columns": 21,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateIpView_31-03-2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_IP_PLANE_SUMMARY",
+   "type": "View",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpPlaneSummaryView"
+   ],
+   "primary_key": [],
+   "columns": 8,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_IP_SUMMARY",
+   "type": "View",
+   "area": "IP (RAN)",
+   "entities": [
+    "NetworkAuditSummary"
+   ],
+   "primary_key": [],
+   "columns": 6,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+   "built_from": [
+    "IP_ISSUES_VIEW"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_IP_TRUE_HEALTH",
+   "type": "View",
+   "area": "IP (RAN)",
+   "entities": [
+    "IpTrueHealthView"
+   ],
+   "primary_key": [],
+   "columns": 7,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": null,
+   "built_from": [
+    "IP_ISSUES_VIEW"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_MISSING_ATTRIBUTES",
+   "type": "Materialized view",
+   "area": "RAN",
+   "entities": [
+    "MissingAttributesView"
+   ],
+   "primary_key": [],
+   "columns": 14,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\V_MISSING_ATTRIBUTE.sql",
+   "built_from": [
+    "BOARD_DATA",
+    "CABINET_DATA",
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "CIRCLE_DATA_VERSION",
+    "CORE_IP_DATA",
+    "IP_DATA",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_NETWORK_DASHBOARD_SUMMARY",
+   "type": "View",
+   "area": "Dashboard summaries",
+   "entities": [],
+   "primary_key": [],
+   "columns": 18,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "MV_CORE_SUMMARY",
+    "V_RAN_SUMMARY",
+    "V_TRANSPORT_SUMMARY"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_NODE_INFERENCE",
+   "type": "Materialized view",
+   "area": "AI outputs",
+   "entities": [
+    "NodeInferenceView"
+   ],
+   "primary_key": [],
+   "columns": 16,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "52. AI - Node Inference"
+   ],
+   "sql_source": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+   "built_from": [
+    "NODE_DATA",
+    "SITE_PREDICTION_VIEW"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "V_PLANNED_NOT_DEPLOYED",
+   "type": "View",
+   "area": "MW planning (MIDS)",
+   "entities": [
+    "PlannedNotDeployed"
+   ],
+   "primary_key": [],
+   "columns": 24,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\V_Planned_Not_Deployed.sql",
+   "built_from": [
+    "MIDS_TRLINK",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_RAN_SUMMARY",
+   "type": "View",
+   "area": "Dashboard summaries",
+   "entities": [],
+   "primary_key": [],
+   "columns": 8,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+   "built_from": [
+    "CELL4G_DATA",
+    "CELL5G_DATA",
+    "CELLS_2G",
+    "CIRCLE_DATA_VERSION",
+    "NODE_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_STITCHING_REPORT",
+   "type": "View",
+   "area": "Stitching",
+   "entities": [
+    "StitchingReportView"
+   ],
+   "primary_key": [],
+   "columns": 39,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [
+    "49. Stitching - End-to-End Service Report"
+   ],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\ADD_REMARKS_TO_STITCHING.sql",
+   "built_from": [
+    "STITCHING_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Allow (report view)",
+   "access_reason": "Gives the same numbers as the NETIQ screen."
+  },
+  {
+   "name": "V_TRANSPORT_SUMMARY",
+   "type": "View",
+   "area": "Dashboard summaries",
+   "entities": [],
+   "primary_key": [],
+   "columns": 7,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+   "built_from": [
+    "CIRCLE_DATA_VERSION",
+    "FTTH_NODE",
+    "NODE_MW_DATA",
+    "WIRELINE_NODE"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "V_VALIDATION_RECORD_DETAIL",
+   "type": "View",
+   "area": "Microwave (MW)",
+   "entities": [
+    "ConfigurationValidationView"
+   ],
+   "primary_key": [],
+   "columns": 28,
+   "links_out": [],
+   "links_in": [],
+   "used_by_reports": [],
+   "sql_source": "SQL_SCRIPTS\\OLD_SCRIPT\\Configuration_validation_view.sql",
+   "built_from": [
+    "MIDS_TRLINK",
+    "TR_LINK_MW_DATA"
+   ],
+   "in_deployed_schema": true,
+   "access": "Review",
+   "access_reason": "No screen report reads it. Allow only if a question needs it."
+  },
+  {
+   "name": "WIRELINE_BOARD",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WirelineBoard"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 23,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "39. Wireline - Hardware"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "WIRELINE_LINK",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WirelineLink"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 26,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "48. Wireline - Link Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "WIRELINE_LOGICAL_INTERFACE",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WireLineLogicalInterface"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 29,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "40. Wireline - Logical Interface"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "WIRELINE_NODE",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WirelineNode"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 20,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "9. Wireline - Node Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "WIRELINE_PORT",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WirelinePort"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 30,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "47. Wireline - Port Inventory"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  },
+  {
+   "name": "WIRELINE_VLANIP",
+   "type": "Table",
+   "area": "Wireline",
+   "entities": [
+    "WirelineVlanIp"
+   ],
+   "primary_key": [
+    "ID"
+   ],
+   "columns": 25,
+   "links_out": [
+    "VERSION_ID -> CIRCLE_DATA_VERSION.ID"
+   ],
+   "links_in": [],
+   "used_by_reports": [
+    "41. Wireline - VLAN IP"
+   ],
+   "sql_source": null,
+   "built_from": [],
+   "in_deployed_schema": true,
+   "access": "Allow",
+   "access_reason": "Core data. Leave out rows with STATUS = 'DELETE'."
+  }
+ ],
+ "keys": [
+  {
+   "table": "AI_CELL_RU_MAPPING_OUTPUT",
+   "area": "AI outputs",
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "business_key": "UNIQUE_ID (built by the AI job); natural key CIRCLE + CELL_ID + NODE_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_DAILY_NETWORK_CHANGE",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "BATCH_ID + CIRCLE + ENTITY_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_MW_DEGRADATION_SCORE",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "UPLOAD_BATCH_ID + LINK_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_MW_FREQUENCY_DEVIATION",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + HOP_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_MW_LINK_REPORT",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "UPLOAD_BATCH_ID + LINK_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_MW_LINK_SNAPSHOT",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "LINK_ID + SNAPSHOT_DATE",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_RAN_DISMANTLED_HARDWARE",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + NE_ID + SERIAL_NUMBER",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_RAN_DUPLICATE_RECORD",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "BATCH_ID + CIRCLE + NODE_ID (+ CELL_ID or BOARD_SERIAL_NUMBER)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_RAN_GPS_IMPUTATION_OUTPUT",
+   "area": "AI outputs",
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "business_key": "UNIQUE_ID; natural key CIRCLE + SITE_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AI_RAN_UPGRADE_AUDIT_OUTPUT",
+   "area": "AI outputs",
+   "primary_key": [
+    "UNIQUE_ID"
+   ],
+   "business_key": "UNIQUE_ID; natural key CIRCLE + NODE_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "AUDIT_STREAKS",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + ISSUE_KEY",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "BOARD_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 3,
+   "links_in": 1
+  },
+  {
+   "table": "BOARD_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 4
+  },
+  {
+   "table": "CABINET_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 1
+  },
+  {
+   "table": "CELL4G_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "CELL5G_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "CELLS_2G",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "CELL_AUDIT_BASELINE",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + CELL_ID + NODE_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "CELL_VALUE_TRACKER",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + CELL_ID + ATTRIBUTE_NAME",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "CIRCLE_DATA_VERSION",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID (import run name)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 29
+  },
+  {
+   "table": "CIRCLE_MAP",
+   "area": "MW planning (MIDS)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "MIDS_CIRCLE",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "CORE_IP_DATA",
+   "area": "IP (RAN)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "DISCOVERY",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID (internal)",
+   "current_rows": "",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "ETHERNET_PORT",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "BOARD_ID + PORT_NAME",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "ETHERNET_PORT_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "EXPORT_JOB",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "ID (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "FREQUENCY_TABLE",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "UNIQUE_KEY",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "FTTH_HARDWARE",
+   "area": "FTTH",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "FTTH_LINK",
+   "area": "FTTH",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "FTTH_NODE",
+   "area": "FTTH",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "FTTH_PORT",
+   "area": "FTTH",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "FTTH_TOPIC_IMPORT_STATE",
+   "area": "FTTH",
+   "primary_key": [
+    "CIRCLE_ID",
+    "TOPIC_NAME"
+   ],
+   "business_key": "CIRCLE_ID + TOPIC_NAME (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "HOP_CAPACITY_CONFIG",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "LINK_CONFIGURATION + CHANNEL_SPACING + MODULATION",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "IMPORT_EXECUTION_LOG",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "ID (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "INVENTORY_ANOMALY",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID + CIRCLE (internal)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "INVENTORY_METRICS",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID + CIRCLE + VENDOR",
+   "current_rows": "",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "IP_AUDIT_CONFIG",
+   "area": "IP (RAN)",
+   "primary_key": [
+    "CONFIG_KEY"
+   ],
+   "business_key": "CONFIG_KEY",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "IP_DATA",
+   "area": "IP (RAN)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "IP_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 0
+  },
+  {
+   "table": "IP_PLANE_SNAPSHOT",
+   "area": "IP (RAN)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID + CIRCLE + SNAPSHOT_DATE",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "MIDS_SITES",
+   "area": "MW planning (MIDS)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + SITE_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "MIDS_TRLINK",
+   "area": "MW planning (MIDS)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "PLAN_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "MISSING_PARAMETER_REPORT",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "VERSION_ID + CIRCLE + CELL_ID",
+   "current_rows": "IS_ACTIVE = 1",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "MW_INVENTORY_LOCK",
+   "area": "System and reference",
+   "primary_key": [
+    "LOCK_ID"
+   ],
+   "business_key": "LOCK_ID (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "MW_TRANSCEIVER_REPORT",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "NMS_CONFIG",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "ID (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "NMS_RECORD",
+   "area": "System and reference",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "NODE_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + NODE_ID + NODE_TYPE",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 7
+  },
+  {
+   "table": "NODE_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + NODE_ID + NODE_TYPE",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 4
+  },
+  {
+   "table": "NODE_VALUE_TRACKER",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "NODE_ID + ATTRIBUTE_NAME",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "PORT_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + NODE_ID + CABINET_INDEX + SHELF_INDEX + SLOT_INDEX + INDEX_ON_SLOT + PORT_INDEX (or COMPOSITE_KEY)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 2,
+   "links_in": 2
+  },
+  {
+   "table": "SITE_DATA",
+   "area": "RAN",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + SITE_ID + NMS_NAME (a site is stored once per NMS; count DISTINCT SITE_ID)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 2
+  },
+  {
+   "table": "SITE_PREDICTION_RESULTS",
+   "area": "AI outputs",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "CIRCLE + CELL_ID",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "STITCHING_DATA",
+   "area": "Stitching",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "UNIQUE_SERVICE_ID + SEQ_NO",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "TMP_NMS_LIST",
+   "area": "System and reference",
+   "primary_key": [
+    "NMS_IP"
+   ],
+   "business_key": "NMS_IP (system table)",
+   "current_rows": "",
+   "links_out": 0,
+   "links_in": 0
+  },
+  {
+   "table": "TR_LINK_MW_DATA",
+   "area": "Microwave (MW)",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "LINK_ID",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 7,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_BOARD",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_LINK",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_LOGICAL_INTERFACE",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_NODE",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_PORT",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  },
+  {
+   "table": "WIRELINE_VLANIP",
+   "area": "Wireline",
+   "primary_key": [
+    "ID"
+   ],
+   "business_key": "COMPOSITE_KEY (key text built by the import)",
+   "current_rows": "STATUS <> 'DELETE'",
+   "links_out": 1,
+   "links_in": 0
+  }
+ ],
+ "relationships": [
+  {
+   "from_table": "BOARD_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "BOARD_DATA",
+   "from_column": "CABINET_DATA_ID",
+   "to_table": "CABINET_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CABINET_DATA p ON p.ID = c.CABINET_DATA_ID",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "BOARD_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "BOARD_MW_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_MW_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "BOARD_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "CABINET_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "CABINET_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "CELL4G_DATA",
+   "from_column": "ENODEB_CELL",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.ENODEB_CELL",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "CELL4G_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "CELL5G_DATA",
+   "from_column": "GNODEB_CELL",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.GNODEB_CELL",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "CELL5G_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "CELLS_2G",
+   "from_column": "BTS_CELL",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.BTS_CELL",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "CELLS_2G",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "CORE_IP_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "CORE_IP_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "DISCOVERY",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "ETHERNET_PORT",
+   "from_column": "BOARD_ID",
+   "to_table": "BOARD_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN BOARD_DATA p ON p.ID = c.BOARD_ID",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "ETHERNET_PORT_MW_DATA",
+   "from_column": "BOARD_DATA",
+   "to_table": "BOARD_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN BOARD_MW_DATA p ON p.ID = c.BOARD_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "ETHERNET_PORT_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "FTTH_HARDWARE",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "FTTH_LINK",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "FTTH_NODE",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "FTTH_PORT",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "INVENTORY_METRICS",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "IP_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "IP_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "IP_MW_DATA",
+   "from_column": "NODE_DATA",
+   "to_table": "NODE_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_MW_DATA p ON p.ID = c.NODE_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "IP_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "MW_TRANSCEIVER_REPORT",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "NMS_RECORD",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "NODE_DATA",
+   "from_column": "SITE_FOR_NODE",
+   "to_table": "SITE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN SITE_DATA p ON p.ID = c.SITE_FOR_NODE",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "NODE_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "NODE_MW_DATA",
+   "from_column": "SITE_FOR_NODE",
+   "to_table": "SITE_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN SITE_DATA p ON p.ID = c.SITE_FOR_NODE",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "NODE_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "PORT_MW_DATA",
+   "from_column": "BOARD_DATA",
+   "to_table": "BOARD_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN BOARD_MW_DATA p ON p.ID = c.BOARD_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "PORT_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "SITE_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE1_DATA",
+   "to_table": "NODE_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_MW_DATA p ON p.ID = c.NODE1_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE2_DATA",
+   "to_table": "NODE_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN NODE_MW_DATA p ON p.ID = c.NODE2_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE1_PORT_DATA",
+   "to_table": "PORT_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN PORT_MW_DATA p ON p.ID = c.NODE1_PORT_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE1_BOARD_DATA",
+   "to_table": "BOARD_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN BOARD_MW_DATA p ON p.ID = c.NODE1_BOARD_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE2_PORT_DATA",
+   "to_table": "PORT_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN PORT_MW_DATA p ON p.ID = c.NODE2_PORT_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE2_BOARD_DATA",
+   "to_table": "BOARD_MW_DATA",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN BOARD_MW_DATA p ON p.ID = c.NODE2_BOARD_DATA",
+   "source": "Team mapping",
+   "note": ""
+  },
+  {
+   "from_table": "WIRELINE_BOARD",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "WIRELINE_LINK",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "WIRELINE_LOGICAL_INTERFACE",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "WIRELINE_NODE",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "WIRELINE_PORT",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "WIRELINE_VLANIP",
+   "from_column": "VERSION_ID",
+   "to_table": "CIRCLE_DATA_VERSION",
+   "to_column": "ID",
+   "kind": "ID link (JPA)",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_DATA_VERSION p ON p.ID = c.VERSION_ID",
+   "source": "Team mapping",
+   "note": "Import run that loaded the row. Use to show when data was loaded, not to decide what is current."
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "NODE1_ID / NODE2_ID",
+   "to_table": "NODE_MW_DATA",
+   "to_column": "NODE_ID",
+   "kind": "Text match",
+   "cardinality": "many to 1 (each end)",
+   "join": "LEFT JOIN NODE_MW_DATA m1 ON m1.NODE_ID = l.NODE1_ID AND m1.CIRCLE = l.CIRCLE AND m1.IS_ACTIVE = 1",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "Used by the MW link views. Pick one node row when an ID repeats."
+  },
+  {
+   "from_table": "TR_LINK_MW_DATA",
+   "from_column": "LINK_CONFIGURATION + CHANNEL_SPACING + MODULATION",
+   "to_table": "HOP_CAPACITY_CONFIG",
+   "to_column": "same 3 columns",
+   "kind": "Rule match",
+   "cardinality": "many to 1",
+   "join": "ON UPPER(TRIM(h.LINK_CONFIGURATION)) = UPPER(TRIM(l.LINK_CONFIGURATION)) AND ...",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "Expected capacity. Keep the highest MAX_CAPACITY if several rows match."
+  },
+  {
+   "from_table": "MIDS_TRLINK",
+   "from_column": "NORM_SITE_KEY",
+   "to_table": "TR_LINK_MW_DATA",
+   "to_column": "NORM_SITE_KEY",
+   "kind": "Text match",
+   "cardinality": "many to many",
+   "join": "ON p.NORM_SITE_KEY = l.NORM_SITE_KEY",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "Planned vs configured. NORM_SITE_KEY is not in the team mapping for either table: to confirm."
+  },
+  {
+   "from_table": "MIDS_SITES / MIDS_TRLINK",
+   "from_column": "CIRCLE",
+   "to_table": "CIRCLE_MAP",
+   "to_column": "MIDS circle code",
+   "kind": "Code lookup",
+   "cardinality": "many to 1",
+   "join": "JOIN CIRCLE_MAP m ON m.<mids code> = p.CIRCLE",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "MIDS uses 3-letter circle codes; CIRCLE_MAP converts them to NETIQ codes."
+  },
+  {
+   "from_table": "CELLS_2G / CELL4G_DATA / CELL5G_DATA",
+   "from_column": "NODE_ID",
+   "to_table": "NODE_DATA",
+   "to_column": "NODE_ID",
+   "kind": "Text match",
+   "cardinality": "many to 1",
+   "join": "ON n.NODE_ID = c.NODE_ID AND n.CIRCLE = c.CIRCLE",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "Use the ID link (BTS_CELL / ENODEB_CELL / GNODEB_CELL) first; the mapping lists NODEID, the database NODE_ID."
+  },
+  {
+   "from_table": "FTTH_* tables",
+   "from_column": "SITE_ID / COMPOSITE_KEY",
+   "to_table": "FTTH_NODE",
+   "to_column": "SITE_ID / COMPOSITE_KEY",
+   "kind": "Not defined",
+   "cardinality": "-",
+   "join": "-",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "The team mapping has no link between FTTH tables: to confirm."
+  },
+  {
+   "from_table": "WIRELINE_* tables",
+   "from_column": "NE_ID / NODE_ID + shelf / slot / port",
+   "to_table": "WIRELINE_NODE",
+   "to_column": "NE_ID",
+   "kind": "Not defined",
+   "cardinality": "-",
+   "join": "-",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "The team mapping has no link between wireline tables: to confirm."
+  },
+  {
+   "from_table": "Any network table",
+   "from_column": "SITE_ID",
+   "to_table": "SITE_DATA",
+   "to_column": "SITE_ID",
+   "kind": "Text match",
+   "cardinality": "many to many",
+   "join": "ON s.SITE_ID = x.SITE_ID AND s.CIRCLE = x.CIRCLE",
+   "source": "Reports and NETIQ views (not in team mapping)",
+   "note": "Cross-area questions (RAN, MW, FTTH, wireline on one site). Count DISTINCT SITE_ID."
+  }
+ ],
+ "entities": [
+  {
+   "id": "circle",
+   "name": "Circle",
+   "what": "24 NETIQ circles",
+   "tables": "CIRCLE column on data tables; CIRCLE_ID in CIRCLE_DATA_VERSION",
+   "key": "CIRCLE code (2 letters)"
+  },
+  {
+   "id": "import",
+   "name": "Import run",
+   "what": "One data load per circle and technology",
+   "tables": "CIRCLE_DATA_VERSION",
+   "key": "ID"
+  },
+  {
+   "id": "site",
+   "name": "Site",
+   "what": "Physical location shared by RAN and MW",
+   "tables": "SITE_DATA",
+   "key": "CIRCLE + SITE_ID (one row per NMS)"
+  },
+  {
+   "id": "ran_node",
+   "name": "RAN node",
+   "what": "SRANBS, eNodeB (4G), gNodeB (5G), BTS (2G), Ghost",
+   "tables": "NODE_DATA",
+   "key": "CIRCLE + NODE_ID + NODE_TYPE"
+  },
+  {
+   "id": "cell",
+   "name": "Cell",
+   "what": "2G, 4G and 5G cells",
+   "tables": "CELLS_2G, CELL4G_DATA, CELL5G_DATA",
+   "key": "CIRCLE + CELL_ID + CELL_NAME"
+  },
+  {
+   "id": "cabinet",
+   "name": "RAN cabinet",
+   "what": "Hardware cabinet",
+   "tables": "CABINET_DATA",
+   "key": "ID"
+  },
+  {
+   "id": "board",
+   "name": "RAN board",
+   "what": "Hardware board",
+   "tables": "BOARD_DATA",
+   "key": "Serial number + board name"
+  },
+  {
+   "id": "eth_port",
+   "name": "RAN Ethernet port",
+   "what": "Port on a RAN board",
+   "tables": "ETHERNET_PORT",
+   "key": "BOARD_ID + PORT_NAME"
+  },
+  {
+   "id": "ip",
+   "name": "IP address",
+   "what": "RAN node and core IP addresses",
+   "tables": "IP_DATA, CORE_IP_DATA",
+   "key": "CIRCLE + IP_ADDRESS"
+  },
+  {
+   "id": "mw_node",
+   "name": "MW node",
+   "what": "Microwave equipment",
+   "tables": "NODE_MW_DATA",
+   "key": "CIRCLE + NODE_ID + NODE_TYPE"
+  },
+  {
+   "id": "mw_board",
+   "name": "MW board",
+   "what": "Board in MW equipment",
+   "tables": "BOARD_MW_DATA",
+   "key": "ID"
+  },
+  {
+   "id": "mw_port",
+   "name": "MW port",
+   "what": "MW and Ethernet ports",
+   "tables": "PORT_MW_DATA, ETHERNET_PORT_MW_DATA",
+   "key": "ID"
+  },
+  {
+   "id": "mw_ip",
+   "name": "MW IP address",
+   "what": "IP addresses on MW nodes",
+   "tables": "IP_MW_DATA",
+   "key": "ID"
+  },
+  {
+   "id": "mw_link",
+   "name": "MW link (hop)",
+   "what": "Link between two MW nodes",
+   "tables": "TR_LINK_MW_DATA",
+   "key": "LINK_ID"
+  },
+  {
+   "id": "capacity",
+   "name": "Hop capacity rule",
+   "what": "Expected capacity per configuration",
+   "tables": "HOP_CAPACITY_CONFIG",
+   "key": "LINK_CONFIGURATION + CHANNEL_SPACING + MODULATION"
+  },
+  {
+   "id": "plan",
+   "name": "Planned link and site (MIDS)",
+   "what": "From the planning system",
+   "tables": "MIDS_TRLINK, MIDS_SITES",
+   "key": "PLAN_ID"
+  },
+  {
+   "id": "ftth",
+   "name": "FTTH node, hardware, port, link",
+   "what": "Fibre network",
+   "tables": "FTTH_NODE, FTTH_HARDWARE, FTTH_PORT, FTTH_LINK",
+   "key": "to confirm"
+  },
+  {
+   "id": "wireline",
+   "name": "Wireline node, board, port, link",
+   "what": "Wireline network",
+   "tables": "WIRELINE_* (6 tables)",
+   "key": "to confirm"
+  },
+  {
+   "id": "ai",
+   "name": "AI outputs",
+   "what": "Predictions and audits about nodes, cells, sites and MW links",
+   "tables": "AI_* tables and others",
+   "key": "per table"
+  }
+ ],
+ "entity_relationships": [
+  {
+   "parent": "circle",
+   "child": "site",
+   "cardinality": "1 to many",
+   "how": "SITE_DATA.CIRCLE",
+   "source": "Rule"
+  },
+  {
+   "parent": "circle",
+   "child": "import",
+   "cardinality": "1 to many",
+   "how": "CIRCLE_DATA_VERSION.CIRCLE_ID",
+   "source": "Rule"
+  },
+  {
+   "parent": "import",
+   "child": "site",
+   "cardinality": "1 to many",
+   "how": "VERSION_ID -> CIRCLE_DATA_VERSION.ID (on every inventory table)",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "site",
+   "child": "ran_node",
+   "cardinality": "1 to many",
+   "how": "NODE_DATA.SITE_FOR_NODE -> SITE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "ran_node",
+   "child": "cell",
+   "cardinality": "1 to many",
+   "how": "BTS_CELL / ENODEB_CELL / GNODEB_CELL -> NODE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "ran_node",
+   "child": "cabinet",
+   "cardinality": "1 to many",
+   "how": "CABINET_DATA.NODE_DATA -> NODE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "cabinet",
+   "child": "board",
+   "cardinality": "1 to many",
+   "how": "BOARD_DATA.CABINET_DATA_ID -> CABINET_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "ran_node",
+   "child": "board",
+   "cardinality": "1 to many",
+   "how": "BOARD_DATA.NODE_DATA -> NODE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "board",
+   "child": "eth_port",
+   "cardinality": "1 to many",
+   "how": "ETHERNET_PORT.BOARD_ID -> BOARD_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "ran_node",
+   "child": "ip",
+   "cardinality": "1 to many",
+   "how": "IP_DATA.NODE_DATA / CORE_IP_DATA.NODE_DATA -> NODE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "site",
+   "child": "mw_node",
+   "cardinality": "1 to many",
+   "how": "NODE_MW_DATA.SITE_FOR_NODE -> SITE_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_node",
+   "child": "mw_board",
+   "cardinality": "1 to many",
+   "how": "BOARD_MW_DATA.NODE_DATA -> NODE_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_board",
+   "child": "mw_port",
+   "cardinality": "1 to many",
+   "how": "PORT_MW_DATA.BOARD_DATA / ETHERNET_PORT_MW_DATA.BOARD_DATA -> BOARD_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_node",
+   "child": "mw_ip",
+   "cardinality": "1 to many",
+   "how": "IP_MW_DATA.NODE_DATA -> NODE_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_node",
+   "child": "mw_link",
+   "cardinality": "1 to many (each end)",
+   "how": "TR_LINK_MW_DATA.NODE1_DATA / NODE2_DATA -> NODE_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_port",
+   "child": "mw_link",
+   "cardinality": "1 to many (each end)",
+   "how": "NODE1_PORT_DATA / NODE2_PORT_DATA -> PORT_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "mw_board",
+   "child": "mw_link",
+   "cardinality": "1 to many (each end)",
+   "how": "NODE1_BOARD_DATA / NODE2_BOARD_DATA -> BOARD_MW_DATA.ID",
+   "source": "Team mapping"
+  },
+  {
+   "parent": "capacity",
+   "child": "mw_link",
+   "cardinality": "1 to many",
+   "how": "3-column match (see Relationships)",
+   "source": "Rule"
+  },
+  {
+   "parent": "plan",
+   "child": "mw_link",
+   "cardinality": "many to many",
+   "how": "NORM_SITE_KEY (planned vs configured)",
+   "source": "To confirm"
+  },
+  {
+   "parent": "site",
+   "child": "ftth",
+   "cardinality": "1 to many",
+   "how": "SITE_ID text",
+   "source": "To confirm"
+  },
+  {
+   "parent": "site",
+   "child": "wireline",
+   "cardinality": "1 to many",
+   "how": "SITE_ID text",
+   "source": "To confirm"
+  },
+  {
+   "parent": "ran_node",
+   "child": "ai",
+   "cardinality": "1 to many",
+   "how": "NODE_ID / CELL_ID / SITE_ID text in AI tables",
+   "source": "Text match"
+  }
+ ],
+ "duplicate_rules": [
+  {
+   "entity": "RAN node",
+   "netiq_view": "NODE_DUPLICATE_SUMMARY",
+   "table": "NODE_DATA",
+   "rule": "Same node ID within the same circle, vendor, ID source and BTS/non-BTS group; also same node name, and same ID + name."
+  },
+  {
+   "entity": "2G cell",
+   "netiq_view": "CELL2G_DUPLICATE_SUMMARY",
+   "table": "CELLS_2G",
+   "rule": "Same cell ID + cell name within circle and vendor; also ID only and name only."
+  },
+  {
+   "entity": "4G cell",
+   "netiq_view": "CELL4G_DUPLICATE_SUMMARY",
+   "table": "CELL4G_DATA",
+   "rule": "Same cleaned cell ID + cleaned cell name within the circle (vendor not used); also ID only and name only."
+  },
+  {
+   "entity": "5G cell",
+   "netiq_view": "CELL5G_DUPLICATE_SUMMARY",
+   "table": "CELL5G_DATA",
+   "rule": "Same as 4G."
+  },
+  {
+   "entity": "MW node",
+   "netiq_view": "MW_NODE_DUPLICATE_SUMMARY",
+   "table": "NODE_MW_DATA",
+   "rule": "Same node ID + node name + node type (trimmed, upper case) within circle and vendor; also node ID only across NMS sources."
+  },
+  {
+   "entity": "RAN board",
+   "netiq_view": "HARDWARE_DUPLICATE_VW / HARDWARE_DUPLICATE_NODE_MV",
+   "table": "BOARD_DATA",
+   "rule": "Same board serial number + board name more than once (latest per node kept)."
+  },
+  {
+   "entity": "MW hardware",
+   "netiq_view": "MW_HARDWARE_DUPLICATE_VW",
+   "table": "BOARD_MW_DATA",
+   "rule": "Same serial number on more than one MW board."
+  },
+  {
+   "entity": "RAN IP address",
+   "netiq_view": "V_DUPLICATE_IP_AUDIT / MV_DUPLICATE_IP",
+   "table": "IP_DATA",
+   "rule": "Same IP address on more than one node within a circle."
+  }
+ ],
+ "circles": [
+  {
+   "code": "AP",
+   "name": "Andhra Pradesh",
+   "other_spellings": [
+    "ANDHRA PRADESH"
+   ]
+  },
+  {
+   "code": "AS",
+   "name": "Assam",
+   "other_spellings": [
+    "ASM",
+    "ASSAM"
+   ]
+  },
+  {
+   "code": "BR",
+   "name": "Bihar",
+   "other_spellings": [
+    "BIH",
+    "BIHAR"
+   ]
+  },
+  {
+   "code": "CN",
+   "name": "Chennai",
+   "other_spellings": [
+    "CH",
+    "CHN",
+    "CHENNAI"
+   ]
+  },
+  {
+   "code": "DL",
+   "name": "Delhi",
+   "other_spellings": [
+    "DEL",
+    "DELHI"
+   ]
+  },
+  {
+   "code": "GJ",
+   "name": "Gujarat",
+   "other_spellings": [
+    "GUJ",
+    "GUJARAT"
+   ]
+  },
+  {
+   "code": "HP",
+   "name": "Himachal Pradesh",
+   "other_spellings": [
+    "HIMACHAL PRADESH"
+   ]
+  },
+  {
+   "code": "HR",
+   "name": "Haryana",
+   "other_spellings": [
+    "HAR",
+    "HARYANA"
+   ]
+  },
+  {
+   "code": "JH",
+   "name": "Jharkhand",
+   "other_spellings": []
+  },
+  {
+   "code": "JK",
+   "name": "Jammu & Kashmir",
+   "other_spellings": [
+    "J&K",
+    "JAMMU AND KASHMIR",
+    "JAMMU & KASHMIR"
+   ]
+  },
+  {
+   "code": "KK",
+   "name": "Karnataka",
+   "other_spellings": [
+    "KA",
+    "KAR",
+    "KARNATAKA"
+   ]
+  },
+  {
+   "code": "KL",
+   "name": "Kerala",
+   "other_spellings": [
+    "KER",
+    "KERALA"
+   ]
+  },
+  {
+   "code": "KO",
+   "name": "Kolkata",
+   "other_spellings": [
+    "KOL",
+    "CAL",
+    "KOLKATA"
+   ]
+  },
+  {
+   "code": "MH",
+   "name": "Maharashtra",
+   "other_spellings": [
+    "ROM",
+    "MAH",
+    "MAHARASHTRA"
+   ]
+  },
+  {
+   "code": "MP",
+   "name": "Madhya Pradesh",
+   "other_spellings": [
+    "MPCG",
+    "MADHYA PRADESH"
+   ]
+  },
+  {
+   "code": "MU",
+   "name": "Mumbai",
+   "other_spellings": [
+    "MUM",
+    "MUMBAI"
+   ]
+  },
+  {
+   "code": "NE",
+   "name": "North East",
+   "other_spellings": [
+    "NESA",
+    "NORTH EAST"
+   ]
+  },
+  {
+   "code": "OR",
+   "name": "Odisha",
+   "other_spellings": [
+    "OD",
+    "ORI",
+    "ORISSA",
+    "ODISHA"
+   ]
+  },
+  {
+   "code": "PB",
+   "name": "Punjab",
+   "other_spellings": [
+    "PUN",
+    "PUNJAB"
+   ]
+  },
+  {
+   "code": "RJ",
+   "name": "Rajasthan",
+   "other_spellings": [
+    "RAJ",
+    "RAJASTHAN"
+   ]
+  },
+  {
+   "code": "TN",
+   "name": "Tamil Nadu",
+   "other_spellings": [
+    "TAM",
+    "TAMIL NADU"
+   ]
+  },
+  {
+   "code": "UE",
+   "name": "Uttar Pradesh (East)",
+   "other_spellings": [
+    "UPE",
+    "UP-E",
+    "UP EAST",
+    "UTTAR PRADESH EAST",
+    "UTTAR PRADESH (EAST)"
+   ]
+  },
+  {
+   "code": "UW",
+   "name": "Uttar Pradesh (West)",
+   "other_spellings": [
+    "UPW",
+    "UP-W",
+    "UP WEST",
+    "UTTAR PRADESH WEST",
+    "UTTAR PRADESH (WEST)"
+   ]
+  },
+  {
+   "code": "WB",
+   "name": "West Bengal",
+   "other_spellings": [
+    "WBG",
+    "WEST BENGAL"
+   ]
+  }
+ ],
+ "questions_and_answers": [
+  {
+   "topic": "Mapping",
+   "question": "What do the columns and code values mean?",
+   "answer": "The team's descriptions only repeat the column name. Screen labels are shown for 1,026 columns (from the NETIQ reports). Code values from the NETIQ code: STATUS is NEW, UPDATE or DELETE; NODE_TYPE is SRANBS, ENODEB, GNODEB, BTS or GHOST.",
+   "status": "Partly answered",
+   "why": "The SQL Agent needs meanings to pick the right column."
+  },
+  {
+   "topic": "Mapping",
+   "question": "Which tables is each view built from?",
+   "answer": "Read from the NETIQ SQL scripts and code for 75 of 77 views (see 'Built from' in the Tables and views sheet). No SQL exists anywhere for: CELL_RU_MAPPING_VALIDATION_VIEW, STABLE_DETAIL_VIEW.",
+   "status": "Partly answered",
+   "why": "Needed to trace a report number back to its tables."
+  },
+  {
+   "topic": "Mapping",
+   "question": "Do STABLE_DETAIL_VIEW and CELL_RU_MAPPING_VALIDATION_VIEW exist on production?",
+   "answer": "The Change Details report and the Cell-RU mapping audit read them, but there is no SQL for them in the NETIQ code and they are not in our database copy.",
+   "status": "Open - ask the team",
+   "why": "Those two reports may not work without them."
+  },
+  {
+   "topic": "Mapping",
+   "question": "The updated code has 2 views that are not in the mapping (VW_ERROR_REPORT_WITHOUT_SUGGESTION, VW_ERROR_REPORT_WITH_SUGGESTION).",
+   "answer": "They feed the two new Error Reports. Their SQL is in the NETIQ code, so we can add them ourselves.",
+   "status": "Handled by us",
+   "why": "The SQL Agent can only use objects it knows."
+  },
+  {
+   "topic": "Mapping",
+   "question": "9 objects are in the mapping but not in our database copy.",
+   "answer": "Most are created by newer NETIQ scripts that have not been run on our copy. VW_PLANNED_VS_CONFIGURED_TRLINK appears only in old scripts; the reports use VW_PLAN_VS_CONFIG_TRLINK.",
+   "status": "Answered",
+   "why": "The SQL Agent must not use objects that do not exist."
+  },
+  {
+   "topic": "Mapping",
+   "question": "10 objects are in our database copy but not in the mapping.",
+   "answer": "None of them is used by the NETIQ code. They are leftovers, and the SQL Agent will ignore them.",
+   "status": "Answered",
+   "why": "Keeps the SQL Agent away from old objects."
+  },
+  {
+   "topic": "Mapping",
+   "question": "23 objects spell some column names differently from the database.",
+   "answer": "The NETIQ code's naming rule gives the database spelling (for example MISSINGERFCN, NODE_ID). SQL uses the database spelling.",
+   "status": "Answered",
+   "why": "SQL fails if a column name is wrong."
+  },
+  {
+   "topic": "Mapping",
+   "question": "5 objects have a different type (view or materialized view), and many view columns have no data type.",
+   "answer": "Not needed for now: the SQL Agent reads views and materialized views the same way. Refresh timing of materialized views is to be checked with the DBA.",
+   "status": "Answered",
+   "why": "Affects how fresh the numbers are."
+  },
+  {
+   "topic": "Mapping",
+   "question": "Are any columns personal data?",
+   "answer": "No column is marked as personal data, and no column name looks like a password, phone number or e-mail.",
+   "status": "Answered",
+   "why": "Decides what the chatbot may show."
+  },
+  {
+   "topic": "Data",
+   "question": "How are the FTTH tables, and the Wireline tables, linked to each other?",
+   "answer": "The NETIQ code never joins them, and our database copy has no FTTH or Wireline data to test. Likely links by column name: link NODE_A_ID / NODE_B_ID and port or hardware NODE_ID point to the node's NE_ID.",
+   "status": "Open - ask the team",
+   "why": "FTTH and Wireline questions cannot join tables until this is known."
+  },
+  {
+   "topic": "Data",
+   "question": "Is IS_ACTIVE = 1 the right way to find current rows?",
+   "answer": "No. Use STATUS <> 'DELETE', the same filter the NETIQ screens use. The import saves new MW links, cabinets and IP rows with IS_ACTIVE = 0 (an import issue), and BOARD_MW_DATA has no IS_ACTIVE column.",
+   "status": "Answered",
+   "why": "Wrong filter hides new records."
+  },
+  {
+   "topic": "Data",
+   "question": "Why are NODE1_DATA / NODE2_DATA mostly empty on MW links?",
+   "answer": "The import builds the link's node key differently from the node's own key, so most never match. Join on NODE1_ID / NODE2_ID = NODE_ID in the same circle instead.",
+   "status": "Answered",
+   "why": "Needed to join MW links to their nodes."
+  },
+  {
+   "topic": "Data",
+   "question": "Where does the circle come from for FTTH and Wireline?",
+   "answer": "They are loaded as fixed circles (FTTH, WIRELINE). For Wireline, the circle can be read from the end of SITE_ID (for example ..._MH) where it is present.",
+   "status": "Answered",
+   "why": "Circle filters must work on every area."
+  },
+  {
+   "topic": "Data",
+   "question": "Do these fields hold the same ID: neId / nodeId, btsId / nodeId, hopId / linkId?",
+   "answer": "btsId and nodeId are different (2G cells link to the node by BTS_ID). hopId is the planned hop; the live link is in LIVE_LINK_ID. neId / nodeId in Wireline look the same but are part of the FTTH/Wireline question.",
+   "status": "Partly answered",
+   "why": "Wrong ID gives wrong joins."
+  },
+  {
+   "topic": "Data",
+   "question": "Which filters does each report API support?",
+   "answer": "Circle, vendor, type, node type, technology, search, sorting, paging, and column filters with 20 operators (equals, contains, between, in and so on). Unknown filter names are ignored without an error.",
+   "status": "Answered",
+   "why": "The chatbot must send filters the API understands."
+  },
+  {
+   "topic": "Data",
+   "question": "Where do the dashboard numbers come from?",
+   "answer": "They are counted live from SITE_VIEW, NODE_VIEW, CELL_INVENTORY_VIEW and BOARD_VIEW, not from INVENTORY_METRICS.",
+   "status": "Answered",
+   "why": "Chatbot numbers should match the dashboard."
+  },
+  {
+   "topic": "Data",
+   "question": "How should sites be counted?",
+   "answer": "One row per SITE_ID (the latest), across circles. Use COUNT(DISTINCT SITE_ID).",
+   "status": "Answered",
+   "why": "Avoids counting a site twice."
+  },
+  {
+   "topic": "Data",
+   "question": "How should nodes be counted per technology?",
+   "answer": "NETIQ counts by node type. For technology, use SUPPORTED_TECHNOLOGY and count a node under each technology it supports (see SQL rules).",
+   "status": "Answered",
+   "why": "An SRAN node can serve 2G, 4G and 5G."
+  },
+  {
+   "topic": "Data",
+   "question": "Should the chatbot show removed records?",
+   "answer": "Yes. NETIQ already has a Deleted Reports page, so the chatbot can answer questions like 'what was removed last week'.",
+   "status": "Answered",
+   "why": "Users ask about changes."
+  },
+  {
+   "topic": "Access",
+   "question": "Which read-only database user will the SQL Agent use?",
+   "answer": "NETIQ_DEV (confirmed by the team). It must only read the allowed tables and views; the SQL Agent also checks every query before it runs.",
+   "status": "Answered",
+   "why": "The SQL Agent must only read allowed tables."
+  },
+  {
+   "topic": "Access",
+   "question": "Where do each user's allowed circles come from?",
+   "answer": "From the NETIQ login: it returns the user's circle list. ALL or PAN INDIA means all circles. Confirmed by the team: the chatbot follows NETIQ, so a user with no circles assigned sees all circles; if NETIQ changes this rule, the chatbot must follow it.",
+   "status": "Answered",
+   "why": "Every query must be limited to the user's circles."
+  }
+ ]
+}

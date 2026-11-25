@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NETIQ chat memory demo</title>
+<style>
+  :root {
+    --paper: #E9EEF3; --panel: #FFFFFF; --ink: #132030; --muted: #5A6B7E; --line: #CBD5E0;
+    --cobalt: #1E4FCF; --on-cobalt: #FFFFFF; --amber: #B87503; --amber-soft: #FCF1DA; --bad: #B3261E;
+    --display: "Bahnschrift", "DIN Alternate", "Arial Narrow", sans-serif;
+    --body: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    --code: "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0F1722; --panel: #172231; --ink: #E4EBF3; --muted: #93A3B6; --line: #2A3A4E;
+      --cobalt: #5B84F0; --on-cobalt: #0F1722; --amber: #F0B13A; --amber-soft: #33291A; --bad: #F2867E;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body); display: flex; flex-direction: column; }
+  h1, h2 { font-family: var(--display); font-weight: 600; margin: 0; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; border-radius: 6px; padding: 8px 14px; background: var(--cobalt); color: var(--on-cobalt); font-weight: 600; }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  input, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
+  :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+         padding: 10px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand h1 { font-size: 21px; letter-spacing: .01em; }
+  .brand svg { width: 22px; height: 22px; color: var(--cobalt); }
+  .who { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+  .who strong { color: var(--ink); }
+
+  .login { flex: 1; display: grid; place-items: center; padding: 24px 16px; }
+  .login-card { width: min(380px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                padding: 28px; display: grid; gap: 14px; }
+  .login-card h2 { font-size: 22px; }
+  .login-card label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+  .hint { margin: 0; color: var(--muted); font-size: 14px; }
+  .note { margin: 0; padding: 10px 12px; border-radius: 6px; background: var(--amber-soft); font-size: 14px; }
+  .err { margin: 0; color: var(--bad); font-size: 14px; min-height: 1.5em; }
+
+  .app { flex: 1; min-height: 0; display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+  .chats { min-height: 0; overflow-y: auto; padding: 16px; background: var(--panel); border-right: 1px solid var(--line); }
+  .chats button { width: 100%; margin-bottom: 12px; }
+  .chats ul { list-style: none; margin: 0; padding: 0; }
+  .chats li button { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+  .chats li button:hover { background: var(--paper); }
+  .chats li button[aria-current="true"] { background: var(--paper); box-shadow: inset 3px 0 var(--cobalt); }
+  .chats li button:focus-visible { outline: 2px solid var(--cobalt); }
+  .chats .title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chats .summary { display: block; margin: 2px 0; padding-left: 8px; border-left: 2px solid var(--amber);
+                    font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+  .chats time { font-size: 12px; color: var(--muted); }
+  .empty { color: var(--muted); font-size: 14px; }
+
+  .chat { min-height: 0; display: flex; flex-direction: column; }
+  .messages { flex: 1; overflow-y: auto; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 14px; }
+  .messages .empty { max-width: 46ch; margin: auto; text-align: center; }
+  .msg { max-width: 68ch; padding: 10px 14px; border-radius: 10px; }
+  .msg p { margin: 0; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--cobalt); color: var(--on-cobalt); border-bottom-right-radius: 3px; }
+  .msg.assistant { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); border-bottom-left-radius: 3px; }
+  .tag { display: inline-block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .tag.used { color: var(--amber); font-weight: 600; }
+  .msg.sent { outline: 2px solid var(--amber); outline-offset: 3px; }
+  .msg.sent::after { content: "Sent to AI as history"; display: block; margin-top: 6px; font-size: 12px; font-weight: 600;
+                     color: var(--amber); }
+  .msg.user.sent::after { color: var(--on-cobalt); opacity: .85; }
+  .received { align-self: stretch; border-left: 3px solid var(--amber); background: var(--amber-soft); padding: 10px 14px; border-radius: 0 8px 8px 0; }
+  .received h2 { font-size: 15px; margin-bottom: 4px; }
+  .received pre { margin: 0; white-space: pre-wrap; font: 13px/1.5 var(--code); }
+  @media (prefers-reduced-motion: no-preference) {
+    .msg.sent, .received { animation: trace 1.4s ease-out 1; }
+    @keyframes trace { 0% { outline-color: transparent; border-left-color: transparent; } 40% { outline-color: var(--amber); } }
+  }
+
+  .ask { display: grid; grid-template-columns: 1fr 170px auto; gap: 10px; padding: 14px clamp(16px, 4vw, 48px);
+         border-top: 1px solid var(--line); background: var(--panel); align-items: end; }
+  .ask textarea { resize: vertical; min-height: 44px; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: auto minmax(360px, 1fr); }
+    .chats { border-right: 0; border-bottom: 1px solid var(--line); max-height: 180px; }
+    .ask { grid-template-columns: 1fr auto; }
+    .ask textarea { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="15" width="4" height="7" rx="1" fill="currentColor"/><rect x="10" y="9" width="4" height="13" rx="1" fill="currentColor"/><rect x="18" y="3" width="4" height="19" rx="1" fill="currentColor"/></svg>
+    <h1>NETIQ chat memory</h1>
+  </div>
+  <div id="who" class="who" hidden>
+    <span>Signed in as <strong id="whoName"></strong></span>
+    <span id="whoCircles"></span>
+    <span>Session ends after 30 minutes idle</span>
+    <button id="logout" class="ghost" type="button">Log out</button>
+  </div>
+</header>
+
+<main id="login" class="login">
+  <form id="loginForm" class="login-card">
+    <h2>Log in with your NETIQ account</h2>
+    <p class="hint">Use your NETIQ username and password. Each user sees only their own chats.</p>
+    <p id="loginNote" class="note" hidden></p>
+    <label>Username <input id="u" autocomplete="username" required></label>
+    <label>Password <input id="p" type="password" autocomplete="current-password" required></label>
+    <button id="loginBtn" type="submit">Log in</button>
+    <p id="loginErr" class="err" role="alert"></p>
+  </form>
+</main>
+
+<main id="app" class="app" hidden>
+  <aside class="chats" aria-label="My chats">
+    <button id="newChat" type="button">New chat</button>
+    <ul id="chatList"></ul>
+  </aside>
+  <section class="chat" aria-label="Chat">
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <form id="askForm" class="ask">
+      <textarea id="q" rows="2" required placeholder="Ask about cells, sites or circles. Then try a follow-up like “and 5G?”"></textarea>
+      <input id="circle" placeholder="Circle (optional)" aria-label="Circle (optional)">
+      <button type="submit">Send</button>
+    </form>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const flat = (s) => String(s).replace(/\s+/g, " ").trim();
+const ENDED = "Your session ended: you logged out, or 30 minutes passed without activity. Log in again; your chats are saved.";
+let current = null;
+
+async function api(method, path, body) {
+  const opts = { method, credentials: "same-origin" };
+  if (body) { opts.headers = { "Content-Type": "application/json" }; opts.body = JSON.stringify(body); }
+  const r = await fetch(path, opts);
+  let data = null;
+  try { data = await r.json(); } catch (e) { /* empty body */ }
+  return { status: r.status, data };
+}
+
+// A chat call that answers 401 means the login session is gone; other errors are shown in the chat.
+async function chatApi(method, path, body) {
+  const res = await api(method, path, body);
+  if (res.status === 401) { showLogin(ENDED); throw new Error("session ended"); }
+  if (res.status >= 400) {
+    const detail = (res.data && res.data.detail) || "HTTP " + res.status;
+    $("messages").insertAdjacentHTML("beforeend", `<p class="err">Something went wrong: ${esc(detail)}</p>`);
+    throw new Error(detail);
+  }
+  return res.data;
+}
+
+function showLogin(note) {
+  current = null;
+  $("app").hidden = true; $("who").hidden = true; $("login").hidden = false;
+  $("loginNote").hidden = !note; $("loginNote").textContent = note || "";
+  $("p").value = ""; $("u").focus();
+}
+
+async function enterApp(user) {
+  $("whoName").textContent = user.username || user.id || "unknown";
+  const circles = user.circleList || [];
+  $("whoCircles").textContent = circles.length ? "Circles: " + circles.join(", ") : "Circles: all (none set)";
+  $("login").hidden = true; $("app").hidden = false; $("who").hidden = false;
+  current = null;
+  renderMessages([]);
+  await loadChats();
+}
+
+async function loadChats() {
+  const data = await chatApi("GET", "/v1/conversations");
+  const list = $("chatList");
+  list.innerHTML = data.conversations.length ? "" : '<li class="empty">No chats yet. Start one with New chat.</li>';
+  for (const c of data.conversations) {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.id = c.conversation_id;
+    b.setAttribute("aria-current", String(c.conversation_id === current));
+    b.innerHTML = `<span class="title">${esc(c.title || "Untitled chat")}</span>`
+      + (c.summary ? `<span class="summary">${esc(c.summary)}</span>` : "")
+      + `<time>${new Date(c.updated_at).toLocaleString()}</time>`;
+    b.onclick = () => openChat(c.conversation_id).catch(() => {});  // errors are shown by chatApi
+    li.append(b); list.append(li);
+  }
+}
+
+async function openChat(id, trace) {
+  const data = await chatApi("GET", `/v1/conversations/${id}`);
+  current = id;
+  renderMessages(data.messages, trace);
+  document.querySelectorAll("#chatList button[data-id]").forEach((b) => b.setAttribute("aria-current", String(b.dataset.id === id)));
+}
+
+function renderMessages(messages, trace) {
+  const box = $("messages");
+  box.innerHTML = "";
+  if (!current) { box.innerHTML = '<p class="empty">Type a question to start a new chat, or pick a saved chat on the left.</p>'; return; }
+  if (!messages.length) {
+    box.innerHTML = '<p class="empty">Ask your first question. A new question goes to the AI on its own; a follow-up also carries the last few messages.</p>';
+    return;
+  }
+  const lastUser = messages.map((m) => m.role).lastIndexOf("user");
+  messages.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.className = "msg " + m.role;
+    const line = (m.role === "user" ? "User: " : "Assistant: ") + flat(m.content).slice(0, 60);
+    if (trace && i < lastUser && trace.includes(line)) div.classList.add("sent");
+    div.innerHTML = `<p>${esc(m.content)}</p>`;
+    if (m.role === "assistant" && m.meta && "history_used" in m.meta) {
+      div.innerHTML += m.meta.history_used
+        ? '<span class="tag used">Follow-up, so chat history was sent</span>'
+        : '<span class="tag">New question, no history sent</span>';
+    }
+    box.append(div);
+  });
+  if (trace) {
+    const r = document.createElement("div");
+    r.className = "received";
+    r.innerHTML = `<h2>What the AI received as history with this question</h2><pre>${esc(trace)}</pre>`;
+    box.append(r);
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+function newChat() {  // no API call: the chat is saved only when its first question is sent
+  current = null;
+  renderMessages([]);
+  document.querySelectorAll("#chatList button[data-id]").forEach((b) => b.setAttribute("aria-current", "false"));
+  $("q").focus();
+}
+
+$("loginForm").onsubmit = async (e) => {
+  e.preventDefault();
+  $("loginErr").textContent = ""; $("loginBtn").disabled = true;
+  try {
+    const res = await api("POST", "/auth/loginApi", { username: $("u").value.trim(), password: $("p").value });
+    if (res.status === 200) return await enterApp(res.data.user);
+    $("loginErr").textContent = res.status === 401 ? "Wrong username or password."
+      : "NETIQ login did not work: " + ((res.data && res.data.detail) || "HTTP " + res.status);
+  } catch (err) {
+    $("loginErr").textContent = "Could not reach this service: " + err.message;
+  } finally { $("loginBtn").disabled = false; }
+};
+
+$("logout").onclick = async () => {
+  await api("POST", "/auth/logout");
+  showLogin("You logged out. Your chats are saved; log in again to see them.");
+};
+
+$("newChat").onclick = newChat;
+
+$("askForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const question = $("q").value.trim();
+  if (!question) return;
+  try {
+    if (!current) {
+      current = (await chatApi("POST", "/v1/conversations")).conversation_id;
+    }
+    const body = { question, circle: $("circle").value.trim() || null };
+    const res = await chatApi("POST", `/v1/conversations/${current}/messages`, body);
+    $("q").value = ""; $("circle").value = "";  // a circle counts only for the question it was typed for
+    await openChat(current, res.history || "");
+    await loadChats();  // title and order change after a message
+  } catch (err) { /* already shown by chatApi or the login screen */ }
+};
+
+$("q").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("askForm").requestSubmit(); }
+});
+
+// Already logged in (cookie still valid)? Go straight to the chats.
+(async () => {
+  const res = await api("GET", "/auth/me");
+  if (res.status === 200) enterApp(res.data); else showLogin();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1634 @@
+{
+  "AI_CELL_RU_MAPPING_OUTPUT": {
+    "object_type": "table",
+    "entities": [
+      "CellToRuMappingRecord"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\CellToRuMappingRecord.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql",
+    "column_count": 35
+  },
+  "AI_DAILY_NETWORK_CHANGE": {
+    "object_type": "table",
+    "entities": [
+      "DailyNetworkChangeRecord"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\DailyNetworkChangeRecord.java"
+    ],
+    "selected_sql": null,
+    "column_count": 25
+  },
+  "AI_MW_DEGRADATION_SCORE": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+    "column_count": 40
+  },
+  "AI_MW_FREQUENCY_DEVIATION": {
+    "object_type": "table",
+    "entities": [
+      "MwFrequencyDeviation"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\AI_MW_FREQUENCY_DEVIATION.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\MwFrequencyDeviation.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\AI_MW_FREQUENCY_DEVIATION.sql",
+    "column_count": 27
+  },
+  "AI_MW_LINK_REPORT": {
+    "object_type": "table",
+    "entities": [
+      "MwLinkReport"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\MwLinkReport.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+    "column_count": 81
+  },
+  "AI_MW_LINK_SNAPSHOT": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLES_AI_MW_DEGRADATION.sql",
+    "column_count": 11
+  },
+  "AI_RAN_DISMANTLED_HARDWARE": {
+    "object_type": "table",
+    "entities": [
+      "DismantledHardwareRecord"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\AI_RAN_DISMANTLED_HARDWARE.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\DismantledHardwareRecord.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\AI_RAN_DISMANTLED_HARDWARE.sql",
+    "column_count": 26
+  },
+  "AI_RAN_DUPLICATE_RECORD": {
+    "object_type": "table",
+    "entities": [
+      "RanDuplicateRecord"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\RanDuplicateRecord.java"
+    ],
+    "selected_sql": null,
+    "column_count": 25
+  },
+  "AI_RAN_GPS_IMPUTATION_OUTPUT": {
+    "object_type": "table",
+    "entities": [
+      "RanGpsImputationRecord"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\RanGpsImputationRecord.java"
+    ],
+    "selected_sql": null,
+    "column_count": 25
+  },
+  "AI_RAN_UPGRADE_AUDIT_OUTPUT": {
+    "object_type": "table",
+    "entities": [
+      "RanUpgradeRecord"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\RanUpgradeRecord.java"
+    ],
+    "selected_sql": null,
+    "column_count": 35
+  },
+  "AUDIT_STREAKS": {
+    "object_type": "table",
+    "entities": [
+      "AuditStreak"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\AuditStreak.java"
+    ],
+    "selected_sql": null,
+    "column_count": 9
+  },
+  "BOARD_DATA": {
+    "object_type": "table",
+    "entities": [
+      "Board"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Board.java"
+    ],
+    "selected_sql": null,
+    "column_count": 37
+  },
+  "BOARD_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwBoard"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwBoard.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+    "column_count": 47
+  },
+  "BOARD_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "BoardView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_views_for_KPI_14-11-2025.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_VIEWS_FOR_KPI.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\BoardView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+    "column_count": 32
+  },
+  "CABINET_DATA": {
+    "object_type": "table",
+    "entities": [
+      "Cabinet"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Cabinet.java"
+    ],
+    "selected_sql": null,
+    "column_count": 31
+  },
+  "CELL2G_DUPLICATE_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "Duplicate2gSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\DUPLICATE_VIEW_CREATON_NODE_CELLS.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\Duplicate2gSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+    "column_count": 19
+  },
+  "CELL4G_DATA": {
+    "object_type": "table",
+    "entities": [
+      "Cell4g"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Cell4g.java"
+    ],
+    "selected_sql": null,
+    "column_count": 48
+  },
+  "CELL4G_DUPLICATE_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "Duplicate4gSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Duplicate_view_creation_ran13-03-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\11_11_2025_duplicate_view_creation.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\DUPLICATE_VIEW_CREATON_NODE_CELLS.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\Duplicate4gSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+    "column_count": 17
+  },
+  "CELL5G_DATA": {
+    "object_type": "table",
+    "entities": [
+      "Cell5g"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Cell5g.java"
+    ],
+    "selected_sql": null,
+    "column_count": 48
+  },
+  "CELL5G_DUPLICATE_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "Duplicate5gSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Duplicate_view_creation_ran13-03-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\11_11_2025_duplicate_view_creation.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\DUPLICATE_VIEW_CREATON_NODE_CELLS.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\Duplicate5gSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_DUPLICATE_CELL4G_5G_VIEW_03_04_2026.sql",
+    "column_count": 17
+  },
+  "CELLS_2G": {
+    "object_type": "table",
+    "entities": [
+      "Cells2G"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Cells2G.java"
+    ],
+    "selected_sql": null,
+    "column_count": 48
+  },
+  "CELL_AUDIT_BASELINE": {
+    "object_type": "table",
+    "entities": [
+      "CellAuditBaseline"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_AUDIT_BASELINE.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\CellAuditBaseline.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_AUDIT_BASELINE.sql",
+    "column_count": 29
+  },
+  "CELL_INVENTORY_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "CellInventoryView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_cell_inventory_view_14_11_2025.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_views_for_KPI_14-11-2025.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_VIEWS_FOR_KPI.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\CellInventoryView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+    "column_count": 36
+  },
+  "CELL_RU_MAPPING_VALIDATION_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "CellRuMappingValidationView"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\views\\CellRuMappingValidationView.java"
+    ],
+    "selected_sql": null,
+    "column_count": 19
+  },
+  "CELL_VALUE_TRACKER": {
+    "object_type": "table",
+    "entities": [
+      "CellValueTracker"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\CellValueTracker.java"
+    ],
+    "selected_sql": null,
+    "column_count": 12
+  },
+  "CIRCLE_DATA_VERSION": {
+    "object_type": "table",
+    "entities": [
+      "CircleDataVersion"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\CircleDataVersion.java"
+    ],
+    "selected_sql": null,
+    "column_count": 9
+  },
+  "CIRCLE_MAP": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\20260204_MidsNETIQCircleMap.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\20260204_MidsNETIQCircleMap.sql",
+    "column_count": 3
+  },
+  "CORE_IP_DATA": {
+    "object_type": "table",
+    "entities": [
+      "CoreIpData"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\CoreIpData.java"
+    ],
+    "selected_sql": null,
+    "column_count": 34
+  },
+  "DISCOVERY": {
+    "object_type": "table",
+    "entities": [
+      "Discovery"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\Discovery.java"
+    ],
+    "selected_sql": null,
+    "column_count": 8
+  },
+  "ETHERNET_PORT": {
+    "object_type": "table",
+    "entities": [
+      "EthernetPort"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\EthernetPort.java"
+    ],
+    "selected_sql": null,
+    "column_count": 15
+  },
+  "ETHERNET_PORT_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwEthernetPort"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwEthernetPort.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+    "column_count": 51
+  },
+  "EXPORT_JOB": {
+    "object_type": "table",
+    "entities": [
+      "ExportJob"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_EXPORT_JOB.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\ExportJob.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_EXPORT_JOB.sql",
+    "column_count": 12
+  },
+  "FREQUENCY_TABLE": {
+    "object_type": "table",
+    "entities": [
+      "FrequencyEntity"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\14_01_2026_FREQUENCY_TABLE.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\FrequencyEntity.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\14_01_2026_FREQUENCY_TABLE.sql",
+    "column_count": 13
+  },
+  "FTTH_HARDWARE": {
+    "object_type": "table",
+    "entities": [
+      "FtthHardware"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\FtthHardware.java"
+    ],
+    "selected_sql": null,
+    "column_count": 26
+  },
+  "FTTH_LINK": {
+    "object_type": "table",
+    "entities": [
+      "FtthLink"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\FtthLink.java"
+    ],
+    "selected_sql": null,
+    "column_count": 22
+  },
+  "FTTH_NODE": {
+    "object_type": "table",
+    "entities": [
+      "FtthNode"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\FtthNode.java"
+    ],
+    "selected_sql": null,
+    "column_count": 18
+  },
+  "FTTH_PORT": {
+    "object_type": "table",
+    "entities": [
+      "FtthPort"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\FtthPort.java"
+    ],
+    "selected_sql": null,
+    "column_count": 23
+  },
+  "FTTH_TOPIC_IMPORT_STATE": {
+    "object_type": "table",
+    "entities": [
+      "FtthTopicImportState"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\ftth_topic_import_state.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\FtthTopicImportState.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\ftth_topic_import_state.sql",
+    "column_count": 9
+  },
+  "HARDWARE_DUPLICATE_NODE_MV": {
+    "object_type": "materialized_view",
+    "entities": [
+      "HardwareDuplicateDto"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\HARDWARE_DUPLICATE_NODE_MV_28-03-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_duplicate_mv.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\HARDWARE_DUPLICATE_VW.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\dto\\audit\\HardwareDuplicateDto.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+    "column_count": 20
+  },
+  "HARDWARE_DUPLICATE_VW": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\HARDWARE_DUPLICATE_NODE_MV_28-03-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_duplicate_mv.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\HARDWARE_DUPLICATE_VW.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateHardwareView_07-04-2026.sql",
+    "column_count": 19
+  },
+  "HARDWARE_VALIDATION_BASE": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql",
+    "column_count": 12
+  },
+  "HARDWARE_VALIDATION_NODE_MV": {
+    "object_type": "materialized_view",
+    "entities": [
+      "HardwareValidationReportDto"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\dto\\audit\\HardwareValidationReportDto.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\hardware_validation_mw.sql",
+    "column_count": 20
+  },
+  "HOP_CAPACITY_CONFIG": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_Table_HOP_CAPACITY_CONFIG.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLE_HOP_CAPACITY_CONFIG_11-03-2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_TABLE_HOP_CAPACITY_CONFIG_11-03-2026.sql",
+    "column_count": 6
+  },
+  "IMPORT_EXECUTION_LOG": {
+    "object_type": "table",
+    "entities": [
+      "ImportExecutionLog"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\importer\\ImportExecutionLog.java"
+    ],
+    "selected_sql": null,
+    "column_count": 11
+  },
+  "INVENTORY_ANOMALY": {
+    "object_type": "table",
+    "entities": [
+      "InventoryAnomaly"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\InventoryAnomaly.java"
+    ],
+    "selected_sql": null,
+    "column_count": 9
+  },
+  "INVENTORY_METRICS": {
+    "object_type": "table",
+    "entities": [
+      "InventoryMetric"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\InventoryMetric.java"
+    ],
+    "selected_sql": null,
+    "column_count": 87
+  },
+  "IP_AUDIT_CONFIG": {
+    "object_type": "table",
+    "entities": [
+      "IpAuditConfig"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\IpAuditConfig.java"
+    ],
+    "selected_sql": null,
+    "column_count": 3
+  },
+  "IP_AUDIT_REPORT_MV": {
+    "object_type": "materialized_view",
+    "entities": [
+      "IpDataAuditDto"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_IP_AUDIT_REPORT_07_04_2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\CREATE_IP_AUDIT_REPORT_MV.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\IP_AUDIT_REPORT_MV.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\IpDataAuditDto.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_IP_AUDIT_REPORT_07_04_2026.sql",
+    "column_count": 23
+  },
+  "IP_DATA": {
+    "object_type": "table",
+    "entities": [
+      "IpData"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\IpData.java"
+    ],
+    "selected_sql": null,
+    "column_count": 42
+  },
+  "IP_ISSUES_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "IpAudit"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_issue_summary_view_detailed.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_CORE_IP_DATA_VIEW.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\IpAudit.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "IP_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwIPData"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\18_01_202_ALTER_TABLE_PORT.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwIPData.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\18_01_202_ALTER_TABLE_PORT.sql",
+    "column_count": 26
+  },
+  "IP_PLANE_SNAPSHOT": {
+    "object_type": "table",
+    "entities": [
+      "IpPlaneSnapshot"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\IpPlaneSnapshot.java"
+    ],
+    "selected_sql": null,
+    "column_count": 11
+  },
+  "MIDS_SITES": {
+    "object_type": "table",
+    "entities": [
+      "MidsSites"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\procedure_for_Mids_site_insert_30_01_2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MidsSites.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\procedure_for_Mids_site_insert_30_01_2026.sql",
+    "column_count": 6
+  },
+  "MIDS_TRLINK": {
+    "object_type": "table",
+    "entities": [
+      "MidsTrlink"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260127_plannedvsConfigured_trLink.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MidsTrlink.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql",
+    "column_count": 24
+  },
+  "MISSING_PARAMETER_REPORT": {
+    "object_type": "table",
+    "entities": [
+      "MissingParameterReport"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_MISSING_PARAMETER_REPORT.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\ai\\model\\MissingParameterReport.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_MISSING_PARAMETER_REPORT.sql",
+    "column_count": 29
+  },
+  "MV_ABIS_IP": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 2
+  },
+  "MV_AVAILABLE_IPS": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_CORE_IPS": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+    "column_count": 3
+  },
+  "MV_CORE_IP_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "CoreSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_issue_summary_view_detailed.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_CORE_IP_DATA_VIEW.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\CoreSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 3
+  },
+  "MV_CORE_MISSING": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_CORE_SUMMARY": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+    "column_count": 5
+  },
+  "MV_CPLANE_IP": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 2
+  },
+  "MV_DUPLICATE_IP": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_MISSING_ATTRIBUTES": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\MissingAttributeMaterialisedView.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\MissingAttributeMaterialisedView.sql",
+    "column_count": 9
+  },
+  "MV_MISSING_BOTH_IPS": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_MISSING_GATEWAY": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_MISSING_PLANES": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_MISSING_VLAN": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 21
+  },
+  "MV_MPLANE_IP": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 2
+  },
+  "MV_UPLANE_IP": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_VIEW_FOR_NETIQ_IP_AUDIT.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\ip_audit_matarialized_view.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 2
+  },
+  "MW_HARDWARE_DUPLICATE_VW": {
+    "object_type": "view",
+    "entities": [
+      "MwHardwareDuplicate"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\MW_HARDWARE_DUPLICATE_VW.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\MwHardwareDuplicate.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\MW_HARDWARE_DUPLICATE_VW.sql",
+    "column_count": 23
+  },
+  "MW_HARDWARE_VALIDATION": {
+    "object_type": "view",
+    "entities": [
+      "MwHardwareCabinateValidation"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260210_hardware_validation_report.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260220_hardware_validation_report.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\CREATE_HARDWARE_CABINATE_VIEW.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_HARDWARE_VALIDATION.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwHardwareCabinateValidation.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_HARDWARE_VALIDATION.sql",
+    "column_count": 22
+  },
+  "MW_INVENTORY_LOCK": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_INVENTORY_LOCK.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_INVENTORY_LOCK.sql",
+    "column_count": 1
+  },
+  "MW_NODE_DUPLICATE_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "MwDuplicateNodeViewSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Duplicate_view_summary_MW_25-02-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\MW_NODE_DUPLICATE_SUMMARY.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_DUPLICATE_SUMMARY_25-02-2026 2.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwDuplicateNodeViewSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_DUPLICATE_SUMMARY_25-02-2026 2.sql",
+    "column_count": 19
+  },
+  "MW_NODE_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "MwNodeView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_VIEW_25-02-2026 3.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_NODE_VIEW_26-02-2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\MwNodeView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\MW_NODE_VIEW_26-02-2026.sql",
+    "column_count": 25
+  },
+  "MW_TRANSCEIVER_REPORT": {
+    "object_type": "table",
+    "entities": [
+      "MwTransceiverReport"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwTransceiverReport.java"
+    ],
+    "selected_sql": null,
+    "column_count": 34
+  },
+  "NMS_CONFIG": {
+    "object_type": "table",
+    "entities": [
+      "NmsConfig"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NMS_CONFIG_SCRIPT\\nms_config_table.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\NmsConfig.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NMS_CONFIG_SCRIPT\\nms_config_table.sql",
+    "column_count": 9
+  },
+  "NMS_RECORD": {
+    "object_type": "table",
+    "entities": [
+      "NmsRecord"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\NmsRecord.java"
+    ],
+    "selected_sql": null,
+    "column_count": 21
+  },
+  "NMS_RECORD_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "NmsRecordView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\09042026_nms_record_view.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\NmsRecordView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\09042026_nms_record_view.sql",
+    "column_count": 22
+  },
+  "NODE_DATA": {
+    "object_type": "table",
+    "entities": [
+      "BtsData",
+      "Enodeb",
+      "GhostNode",
+      "Gnodeb",
+      "Node",
+      "Sranbs"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\BtsData.java",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Enodeb.java",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\GhostNode.java",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Gnodeb.java",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Node.java",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Sranbs.java"
+    ],
+    "selected_sql": null,
+    "column_count": 58
+  },
+  "NODE_DUPLICATE_SUMMARY": {
+    "object_type": "materialized_view",
+    "entities": [
+      "DuplicateNodeSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Duplicate_view_creation_ran13-03-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\11_11_2025_duplicate_view_creation.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\DUPLICATE_VIEW_CREATON_NODE_CELLS.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\DuplicateNodeSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CELL4G_DUPLICATE_SUMMARY_30_03_2026.sql",
+    "column_count": 18
+  },
+  "NODE_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwNode"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwNode.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+    "column_count": 34
+  },
+  "NODE_VALUE_TRACKER": {
+    "object_type": "table",
+    "entities": [
+      "NodeValueTracker"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\NodeValueTracker.java"
+    ],
+    "selected_sql": null,
+    "column_count": 11
+  },
+  "NODE_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "NodeView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_views_for_KPI_14-11-2025.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_VIEWS_FOR_KPI.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\NodeView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+    "column_count": 33
+  },
+  "PORT_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwPort"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwPort.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+    "column_count": 41
+  },
+  "SITE_DATA": {
+    "object_type": "table",
+    "entities": [
+      "Site"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\Site.java"
+    ],
+    "selected_sql": null,
+    "column_count": 27
+  },
+  "SITE_ID_VALIDATION_VIEW": {
+    "object_type": "materialized_view",
+    "entities": [
+      "SiteIdValidationReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\SITE_ID_VALIDATION_VIEW.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\SITE_ID_VALIDATION_VIEW.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\SiteIdValidationReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\SITE_ID_VALIDATION_VIEW.sql",
+    "column_count": 16
+  },
+  "SITE_PREDICTION_RESULTS": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql",
+    "column_count": 10
+  },
+  "SITE_PREDICTION_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "SitePredictionView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\SitePredictionView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\21_11_2025_SITE_PREDICTION_VIEW_CREATION.sql",
+    "column_count": 16
+  },
+  "SITE_REPORT_MW_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "SiteReportMWView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\SiteReportMWView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+    "column_count": 17
+  },
+  "SITE_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "SiteView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+      "SQL_SCRIPTS\\NEW_SCRIPT\\SITE_VIEW_RAN_ONLY.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_views_for_KPI_14-11-2025.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\site_view_ran_updated.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\SiteView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Create_views_for_kpi_06-04-2026.sql",
+    "column_count": 24
+  },
+  "SITE_VIEW_MW": {
+    "object_type": "view",
+    "entities": [
+      "SiteReport"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\SiteReport.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+    "column_count": 17
+  },
+  "SITE_VIEW_MW_1": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\SITE_VIEW_RAN_ONLY.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\mw_site_view_creation.sql",
+    "column_count": 17
+  },
+  "STABLE_DETAIL_VIEW": {
+    "object_type": "view",
+    "entities": [
+      "StableDetailView"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\views\\StableDetailView.java"
+    ],
+    "selected_sql": null,
+    "column_count": 12
+  },
+  "STITCHING_DATA": {
+    "object_type": "table",
+    "entities": [
+      "StitchingData"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\stitching\\StitchingData.java"
+    ],
+    "selected_sql": null,
+    "column_count": 39
+  },
+  "TMP_NMS_LIST": {
+    "object_type": "table",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\Delete Query's\\tmp_delete_nms_ip_table.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\Delete Query's\\tmp_delete_nms_ip_table.sql",
+    "column_count": 1
+  },
+  "TR_LINK_DASH_COUNT": {
+    "object_type": "view",
+    "entities": [
+      "TrLinkDashboardCountView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\TR_LINK_DASH_COUNT.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\TrLinkDashboardCountView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\TR_LINK_DASH_COUNT.sql",
+    "column_count": 58
+  },
+  "TR_LINK_MW_DATA": {
+    "object_type": "table",
+    "entities": [
+      "MwTrLink"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwTrLink.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\16_01_2026_CREATE_MW_TABLES.sql",
+    "column_count": 117
+  },
+  "TR_LINK_REPORT_VIEW": {
+    "object_type": "materialized_view",
+    "entities": [
+      "TrLinkReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Create_TR_LINK_REPORT_VIEW.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\TrLinkReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Create_TR_LINK_REPORT_VIEW.sql",
+    "column_count": 59
+  },
+  "VW_ALL_LINKED_NODES": {
+    "object_type": "view",
+    "entities": [
+      "VwAllLinkedNodes"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_VIEW_25-02-2026 3.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\VwAllLinkedNodes.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\CREATE_MW_NODE_VIEW_25-02-2026 3.sql",
+    "column_count": 2
+  },
+  "VW_CELL4G_COMPLETE": {
+    "object_type": "materialized_view",
+    "entities": [
+      "Cell4gCompleteView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\Cell4gCompleteView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+    "column_count": 48
+  },
+  "VW_CELL5G_COMPLETE": {
+    "object_type": "view",
+    "entities": [
+      "Cell5gCompleteView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\Cell5gCompleteView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+    "column_count": 44
+  },
+  "VW_CELL_RU_MAPPING_AUDIT": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\VW_CELL_RU_MAPPING_AUDIT.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\VW_CELL_RU_MAPPING_AUDIT.sql",
+    "column_count": 19
+  },
+  "VW_DEPLOYED_NOT_PLANNED": {
+    "object_type": "view",
+    "entities": [
+      "DeployedNotPlanned"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\vw_deployed_not_planed.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\DeployedNotPlanned.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\vw_deployed_not_planed.sql",
+    "column_count": 118
+  },
+  "VW_LINK_CONFIGURATION_SUMMARY": {
+    "object_type": "view",
+    "entities": [
+      "LinkConfigurationSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Create_Link_Configuration_summary_view_13_02_2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\LinkConfigurationSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\Create_Link_Configuration_summary_view_13_02_2026.sql",
+    "column_count": 6
+  },
+  "VW_LINK_CONFIG_COMBINED": {
+    "object_type": "view",
+    "entities": [
+      "TrlinkReportCombined"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\26_02_2026_vw_link_configuration_comb.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\26_02_2026_vw_link_configuration_comb.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\TrlinkReportCombined.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\26_02_2026_vw_link_configuration_comb.sql",
+    "column_count": 60
+  },
+  "VW_MW_IP_DATA_RESPONSE": {
+    "object_type": "view",
+    "entities": [
+      "MwIpDataResponseView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_IP_DATA_RESPONSE.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\MwIpDataResponseView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_IP_DATA_RESPONSE.sql",
+    "column_count": 29
+  },
+  "VW_MW_NODE_AUDIT_REPORT": {
+    "object_type": "view",
+    "entities": [
+      "MwNodeAuditView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Node_MW_AUDIT_VIEW.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwNodeAuditView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\Node_MW_AUDIT_VIEW.sql",
+    "column_count": 18
+  },
+  "VW_MW_TR_LINK_AUDIT_REPORT": {
+    "object_type": "materialized_view",
+    "entities": [
+      "MwLinkAuditReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\VW_MW_TR_LINK_AUDIT_REPORT.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_TR_LINK_AUDIT_REPORT_17-03-2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\MwLinkAuditReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_MW_TR_LINK_AUDIT_REPORT_17-03-2026.sql",
+    "column_count": 32
+  },
+  "VW_MW_TR_LINK_REPORT": {
+    "object_type": "materialized_view",
+    "entities": [
+      "MwTrLinkReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\UPDATED TR LINK REPORT FOR 179\\03_report_materialized_view.sql",
+      "VW_MW_TR_LINK_REPORT_fixed.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\MwTrLinkReportView.java"
+    ],
+    "selected_sql": "VW_MW_TR_LINK_REPORT_fixed.sql",
+    "column_count": 77
+  },
+  "VW_NEW_CELL_2G": {
+    "object_type": "view",
+    "entities": [
+      "NewCell2gView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\NewCell2gView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CellView.sql",
+    "column_count": 35
+  },
+  "VW_PLANNED_VS_CONFIGURED_TRLINK": {
+    "object_type": "materialized_view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260127_plannedvsConfigured_trLink.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVSconfiguredUpdated.sql",
+    "column_count": 21
+  },
+  "VW_PLAN_VS_CONFIG_TRLINK": {
+    "object_type": "materialized_view",
+    "entities": [
+      "PlannedVsConfiguredTrLink"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260204_plannedVsconfigured.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260206_plannedVsConfigure_View_updated.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260209_plannedVsConfig_view.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260209_plannedVsConfigure_View_updated.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260210_planned_vs_config_updated.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260214_planned_vs_configure_updated.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260226_plannedVsConfigUpdated.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_PLAN_VS_CONFIG_TRLINK.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\PlannedVsConfiguredTrLink.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_PLAN_VS_CONFIG_TRLINK.sql",
+    "column_count": 29
+  },
+  "VW_RAN_CHANGE_DETAILS": {
+    "object_type": "materialized_view",
+    "entities": [
+      "ChangeDetailView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\VW_RAN_CHANGE_DETAILS.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\ChangeDetailView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\VW_RAN_CHANGE_DETAILS.sql",
+    "column_count": 13
+  },
+  "VW_UBR_TR_LINK_AUDIT_REPORT": {
+    "object_type": "materialized_view",
+    "entities": [
+      "UbrTrLinkAuditReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260219_ubr_link_audit_view.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\20260220_ubr_link_audit_updated.sql",
+      "SQL_SCRIPTS\\OLD_SCRIPT\\VW_UBR_TR_LINK_AUDIT_REPORT.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_UBR_TR_LINK_AUDIT_REPORT.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\UbrTrLinkAuditReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\VW_UBR_TR_LINK_AUDIT_REPORT.sql",
+    "column_count": 32
+  },
+  "VW_UBR_TR_LINK_REPORT": {
+    "object_type": "materialized_view",
+    "entities": [
+      "UbrTrLinkReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\VW_UBR_TR_LINK_REPORT.sql",
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\UpdatedUbrTrLink_11_03_2026.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\UbrTrLinkReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\UpdatedUbrTrLink_11_03_2026.sql",
+    "column_count": 69
+  },
+  "V_CAPACITY_COMPLIANCE_DETAIL": {
+    "object_type": "view",
+    "entities": [
+      "CapacityComplianceDetailView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\CapacityComplianceDetailView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+    "column_count": 21
+  },
+  "V_CAPACITY_COMPLIANCE_KPI": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+    "column_count": 8
+  },
+  "V_CAPACITY_DEVIATION_DETAIL": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\capacity_calculation_view.sql",
+    "column_count": 26
+  },
+  "V_CELL_INFERENCE": {
+    "object_type": "materialized_view",
+    "entities": [
+      "CellInferenceView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\CellInferenceView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+    "column_count": 16
+  },
+  "V_CELL_RU_MAPPING": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\CREATE_CELL_TO_RU_MAPPING_AI.sql",
+    "column_count": 28
+  },
+  "V_DUPLICATE_IP_AUDIT": {
+    "object_type": "materialized_view",
+    "entities": [
+      "DuplicateIpDataView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateIpView_31-03-2026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\V_DUPLICATE_IP_AUDIT.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\common\\dto\\DuplicateIpDataView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\DuplicateIpView_31-03-2026.sql",
+    "column_count": 21
+  },
+  "V_IP_PLANE_SUMMARY": {
+    "object_type": "view",
+    "entities": [
+      "IpPlaneSummaryView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\08112025_DASHBOARD_VIEW_CREATION.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\UPDATE_V_IP_PLANE_SUMMARY_TRUE_HEALTH_30062026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\create_view_for_V_IP_SUMMARY.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\IpPlaneSummaryView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 8
+  },
+  "V_IP_SUMMARY": {
+    "object_type": "view",
+    "entities": [
+      "NetworkAuditSummary"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\08112025_DASHBOARD_VIEW_CREATION.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\create_view_for_V_IP_SUMMARY.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\views\\NetworkAuditSummary.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\CREATE_NETWORK_IP_AUDIT_REPORT_VIEW_15_09_2026.sql",
+    "column_count": 6
+  },
+  "V_IP_TRUE_HEALTH": {
+    "object_type": "view",
+    "entities": [
+      "IpTrueHealthView"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\IpTrueHealthView.java"
+    ],
+    "selected_sql": null,
+    "column_count": 7
+  },
+  "V_MISSING_ATTRIBUTES": {
+    "object_type": "materialized_view",
+    "entities": [
+      "MissingAttributesView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\MissingAttributeView_17-03-2026.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\HARDWARE_VALIDATION_NODE_MV.sql",
+      "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\V_MISSING_ATTRIBUTE.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ran\\MissingAttributesView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_2G_IMPLEMENTAION\\V_MISSING_ATTRIBUTE.sql",
+    "column_count": 14
+  },
+  "V_NETWORK_DASHBOARD_SUMMARY": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+    "column_count": 18
+  },
+  "V_NODE_INFERENCE": {
+    "object_type": "materialized_view",
+    "entities": [
+      "NodeInferenceView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\common\\NodeInferenceView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\SCRIPTS_MW_IMPLEMENTAION\\cell_node_invference_view.sql",
+    "column_count": 16
+  },
+  "V_PLANNED_NOT_DEPLOYED": {
+    "object_type": "view",
+    "entities": [
+      "PlannedNotDeployed"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\V_Planned_Not_Deployed.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\PlannedNotDeployed.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\V_Planned_Not_Deployed.sql",
+    "column_count": 24
+  },
+  "V_RAN_SUMMARY": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+    "column_count": 8
+  },
+  "V_STITCHING_REPORT": {
+    "object_type": "view",
+    "entities": [
+      "StitchingReportView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\ADD_REMARKS_TO_STITCHING.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\stitching\\StitchingReportView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\ADD_REMARKS_TO_STITCHING.sql",
+    "column_count": 39
+  },
+  "V_TRANSPORT_SUMMARY": {
+    "object_type": "view",
+    "entities": [],
+    "sources": [
+      "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\NEW_SCRIPT\\Stiching_Dashboard_views_29_09_2026.sql",
+    "column_count": 7
+  },
+  "V_VALIDATION_RECORD_DETAIL": {
+    "object_type": "view",
+    "entities": [
+      "ConfigurationValidationView"
+    ],
+    "sources": [
+      "SQL_SCRIPTS\\OLD_SCRIPT\\Configuration_validation_view.sql",
+      "src\\main\\java\\com\\avendum\\netiq\\model\\mw\\ConfigurationValidationView.java"
+    ],
+    "selected_sql": "SQL_SCRIPTS\\OLD_SCRIPT\\Configuration_validation_view.sql",
+    "column_count": 28
+  },
+  "WIRELINE_BOARD": {
+    "object_type": "table",
+    "entities": [
+      "WirelineBoard"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WirelineBoard.java"
+    ],
+    "selected_sql": null,
+    "column_count": 23
+  },
+  "WIRELINE_LINK": {
+    "object_type": "table",
+    "entities": [
+      "WirelineLink"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WirelineLink.java"
+    ],
+    "selected_sql": null,
+    "column_count": 26
+  },
+  "WIRELINE_LOGICAL_INTERFACE": {
+    "object_type": "table",
+    "entities": [
+      "WireLineLogicalInterface"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WireLineLogicalInterface.java"
+    ],
+    "selected_sql": null,
+    "column_count": 29
+  },
+  "WIRELINE_NODE": {
+    "object_type": "table",
+    "entities": [
+      "WirelineNode"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WirelineNode.java"
+    ],
+    "selected_sql": null,
+    "column_count": 20
+  },
+  "WIRELINE_PORT": {
+    "object_type": "table",
+    "entities": [
+      "WirelinePort"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WirelinePort.java"
+    ],
+    "selected_sql": null,
+    "column_count": 30
+  },
+  "WIRELINE_VLANIP": {
+    "object_type": "table",
+    "entities": [
+      "WirelineVlanIp"
+    ],
+    "sources": [
+      "src\\main\\java\\com\\avendum\\netiq\\model\\ftth\\WirelineVlanIp.java"
+    ],
+    "selected_sql": null,
+    "column_count": 25
+  }
+}
