@@ -107,14 +107,14 @@ def test_model_manager_resolves_configured_roles():
 
 
 @pytest.mark.anyio
-async def test_inference_endpoint_via_asgi():
+async def test_inference_endpoint_via_asgi(monkeypatch):
     """Test POST /v1/inference route registered in FastAPI."""
     app = create_app()
 
     # Inject mock provider into LLM client for deterministic testing
     from app.llms.llm_client import default_llm_client
     mock_provider = OllamaProvider(transport=httpx.MockTransport(mock_ollama_generate_handler))
-    default_llm_client.provider = mock_provider
+    monkeypatch.setattr(default_llm_client, "provider", mock_provider)
 
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post(

@@ -69,7 +69,7 @@ async def test_mandatory_sop_ran_402_deterministic_threshold_evaluation():
 
 
 @pytest.mark.anyio
-async def test_mandatory_sop_anti_hallucination_catches_fabricated_severity_1():
+async def test_mandatory_sop_anti_hallucination_catches_fabricated_severity_1(monkeypatch):
     """If the LLM generates an unmentioned severity level (Severity-1), anti-hallucination guard catches it."""
     doc = KnowledgeDocument(
         doc_id="SOP-RAN-402",
@@ -79,7 +79,7 @@ async def test_mandatory_sop_anti_hallucination_catches_fabricated_severity_1():
     )
 
     # Inject hallucinating mock provider
-    default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_sop_ollama_with_hallucination))
+    monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_sop_ollama_with_hallucination)))
 
     agent = KnowledgeAgent()
     ans = await agent.answer_question(
@@ -106,7 +106,7 @@ async def test_knowledge_agent_insufficient_evidence():
 
 
 @pytest.mark.anyio
-async def test_knowledge_agent_grounded_answer():
+async def test_knowledge_agent_grounded_answer(monkeypatch):
     """Compliant answer with proper source attribution."""
     doc = KnowledgeDocument(
         doc_id="SOP-RAN-402",
@@ -114,7 +114,7 @@ async def test_knowledge_agent_grounded_answer():
         domain="RAN",
         content="SOP-RAN-402: eNodeB cell availability below 98.5% triggers Severity-2 and notification to the NOC RAN team.",
     )
-    default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_sop_ollama_compliant))
+    monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_sop_ollama_compliant)))
 
     agent = KnowledgeAgent()
     ans = await agent.answer_question(

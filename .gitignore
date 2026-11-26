@@ -1,0 +1,7 @@
+*.pyc
+*.pyc
+*.pyc
+*.pyc
+/netiq-ai/app/orchestrator/__pycache__
+/netiq-ai/src/schemas/__pycache__
+netiq-ai/src/schemas/__pycache__/evidence.cpython-314.pyc

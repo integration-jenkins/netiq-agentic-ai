@@ -41,7 +41,7 @@ api_routes:
     tag: chat
     summary: Ask a question
     description: Takes a user question (ChatRequest) and returns an answer with evidence (ChatResponse).
-    status: stub
+    status: implemented
     handler: src.api.routes.chat:chat
 
   - id: reports_query
@@ -50,8 +50,35 @@ api_routes:
     tag: reports
     summary: Query a report
     description: Fetches one page of a NETIQ report (ReportQuery in, ReportPage out).
-    status: stub
+    status: implemented
     handler: src.api.routes.reports:query_report
+
+  - id: results_get
+    method: GET
+    path: /v1/results/{result_id}
+    tag: reports
+    summary: Get paginated result
+    description: Retrieves a specific page of a verified cached result without re-running backend queries.
+    status: implemented
+    handler: src.api.routes.reports:get_paginated_result
+
+  - id: metadata_circles
+    method: GET
+    path: /v1/metadata/circles
+    tag: metadata
+    summary: List authorized circles
+    description: Returns the telecom circles the authenticated user is authorized to query.
+    status: implemented
+    handler: src.api.routes.metadata:list_circles
+
+  - id: metadata_domains
+    method: GET
+    path: /v1/metadata/domains
+    tag: metadata
+    summary: List supported domains
+    description: Returns supported telecom domains dynamically from configs/reports/catalog.yaml.
+    status: implemented
+    handler: src.api.routes.metadata:list_domains
 
   - id: metadata_reports_list
     method: GET
@@ -59,7 +86,7 @@ api_routes:
     tag: metadata
     summary: List reports
     description: Lists the reports in the catalog (configs/reports/catalog.yaml).
-    status: stub
+    status: implemented
     handler: src.api.routes.metadata:list_reports
 
   - id: metadata_report_get
@@ -68,17 +95,44 @@ api_routes:
     tag: metadata
     summary: Get report definition
     description: Returns one report's definition - columns, filters and API mapping.
-    status: stub
+    status: implemented
     handler: src.api.routes.metadata:get_report
+
+  - id: metadata_agents
+    method: GET
+    path: /v1/metadata/agents
+    tag: metadata
+    summary: List testable agents
+    description: Returns available testable AI agents and their configured local Ollama models.
+    status: implemented
+    handler: src.api.routes.metadata:list_agents
+
+  - id: agents_test
+    method: POST
+    path: /v1/agents/test
+    tag: agents
+    summary: Test an individual agent
+    description: Executes and inspects a single AI agent (restricted to developers/administrators).
+    status: implemented
+    handler: src.api.routes.agents:test_agent
 
   - id: export
     method: POST
     path: /v1/export
     tag: export
     summary: Export a report
-    description: Downloads report data as a file.
-    status: stub
+    description: Generates an Excel (.xlsx) workbook from a verified resultId.
+    status: implemented
     handler: src.api.routes.export:export_report
+
+  - id: export_download
+    method: GET
+    path: /v1/export/{file_id}
+    tag: export
+    summary: Download exported Excel
+    description: Downloads a generated Excel workbook after verifying ownership.
+    status: implemented
+    handler: src.api.routes.export:download_export
 
   # Session management (task 1.6): each logged-in user's own chats. Needs the NETIQ login session.
   - id: conversations_list

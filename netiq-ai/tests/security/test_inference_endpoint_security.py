@@ -19,13 +19,13 @@ def mock_safe_ollama(request: httpx.Request) -> httpx.Response:
 
 
 @pytest.mark.anyio
-async def test_inference_rejects_unapproved_system_prompt_for_normal_user():
+async def test_inference_rejects_unapproved_system_prompt_for_normal_user(monkeypatch):
     """Normal user must be forbidden from supplying custom system prompts."""
     app = create_app()
 
     from app.llms.llm_client import default_llm_client
     from src.adapters.llm.provider import OllamaProvider
-    default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama))
+    monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama)))
 
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post(
@@ -40,13 +40,13 @@ async def test_inference_rejects_unapproved_system_prompt_for_normal_user():
 
 
 @pytest.mark.anyio
-async def test_inference_rejects_unapproved_model_override():
+async def test_inference_rejects_unapproved_model_override(monkeypatch):
     """Callers must be forbidden from requesting arbitrary unapproved models."""
     app = create_app()
 
     from app.llms.llm_client import default_llm_client
     from src.adapters.llm.provider import OllamaProvider
-    default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama))
+    monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama)))
 
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post(
@@ -61,13 +61,13 @@ async def test_inference_rejects_unapproved_model_override():
 
 
 @pytest.mark.anyio
-async def test_inference_rejects_invalid_role():
+async def test_inference_rejects_invalid_role(monkeypatch):
     """Callers must not pass invalid or arbitrary agent roles."""
     app = create_app()
 
     from app.llms.llm_client import default_llm_client
     from src.adapters.llm.provider import OllamaProvider
-    default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama))
+    monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama)))
 
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post(
@@ -117,7 +117,7 @@ async def test_inference_authenticates_token_when_enforced(monkeypatch):
         # 3. Valid token
         from app.llms.llm_client import default_llm_client
         from src.adapters.llm.provider import OllamaProvider
-        default_llm_client.provider = OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama))
+        monkeypatch.setattr(default_llm_client, "provider", OllamaProvider(transport=httpx.MockTransport(mock_safe_ollama)))
 
         resp = await client.post(
             "/v1/inference",
