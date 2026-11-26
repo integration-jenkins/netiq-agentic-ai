@@ -1,49 +1,83 @@
 # Offline model and embedding configuration.
-# Configurable model names, Ollama integration, and role-specific configurations.
+# Configurable model names, Ollama integration, strict identity validation, and role mappings.
 models:
-  default_model: "qwen3:4b-instruct-2507"
+  default_model: "qwen3:4b-instruct-2507-q4_K_M"
   ollama_base_url: "http://127.0.0.1:11434"
-  timeout_seconds: 30.0
+  timeout_seconds: 60.0
+
+  identity_validation:
+    enabled: true
+    fail_closed: true
+    allow_unverified_models: false
+    auto_download: false
+
+  registry:
+    primary:
+      tag: "qwen3:4b-instruct-2507-q4_K_M"
+      expected_family: "qwen3"
+      expected_parameter_billions: 4.0
+      parameter_tolerance_billions: 0.6
+      expected_quantization: "Q4_K_M"
+      expected_capability: "completion"
+      required: true
+
+    embedding:
+      tag: "qwen3-embedding:0.6b"
+      expected_family: "qwen3"
+      expected_parameter_billions: 0.6
+      parameter_tolerance_billions: 0.25
+      expected_capability: "embedding"
+      required: true
+
+    sql:
+      tag: "qwen2.5-coder:7b"
+      expected_family: "qwen2"
+      expected_parameter_billions: 7.6
+      parameter_tolerance_billions: 0.8
+      expected_quantization: "Q4_K_M"
+      expected_capability: "completion"
+      required: false
+      live_execution_enabled: false
 
   # Role-specific model assignments mapping to Agent Architecture
   roles:
     intent_classifier:
-      model: "qwen3:4b-instruct-2507"
+      model: "qwen3:4b-instruct-2507-q4_K_M"
       display_name: "Qwen3 4B Instruct 2507"
+      registry_key: "primary"
       temperature: 0.0
       max_tokens: 128
       purpose: "Better candidate for interpreting varied questions"
     report_selector:
-      model: "qwen3:4b-instruct-2507"
+      model: "qwen3:4b-instruct-2507-q4_K_M"
       display_name: "Qwen3 4B Instruct 2507"
+      registry_key: "primary"
       temperature: 0.0
       max_tokens: 256
       purpose: "Match questions to NETIQ report metadata"
     orchestrator_planner:
-      model: "qwen3:4b-instruct-2507"
+      model: "qwen3:4b-instruct-2507-q4_K_M"
       display_name: "Qwen3 4B Instruct 2507"
+      registry_key: "primary"
       temperature: 0.1
       max_tokens: 1024
       purpose: "Structured plans and tool selection"
     knowledge_agent:
-      model: "qwen3:4b-instruct-2507"
+      model: "qwen3:4b-instruct-2507-q4_K_M"
       display_name: "Qwen3 4B Instruct 2507"
-      temperature: 0.2
-      max_tokens: 1024
+      registry_key: "primary"
+      temperature: 0.0
+      max_tokens: 512
       purpose: "Explain retrieved telecom documentation"
     knowledge_retriever:
       model: "qwen3-embedding:0.6b"
       display_name: "Qwen3 Embedding 0.6B"
+      registry_key: "embedding"
       purpose: "Strong candidate for multilingual semantic retrieval"
     sql_agent:
       model: "qwen2.5-coder:7b"
-      display_name: "Qwen2.5-Coder 7B (optional)"
+      display_name: "Qwen2.5-Coder 7B Instruct"
+      registry_key: "sql"
       temperature: 0.0
       max_tokens: 512
       purpose: "SQL-focused benchmark"
-    chat_summarizer:
-      model: "qwen3:4b-instruct-2507"
-      display_name: "Qwen3 4B Instruct 2507"
-      temperature: 0.1
-      max_tokens: 60
-      purpose: "One-line summary of a finished chat for long-term memory (session management)"

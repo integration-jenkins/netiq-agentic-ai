@@ -114,17 +114,30 @@ class OllamaProvider:
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         await self.close()
 
-    async def list_installed_models(self) -> list[str]:
-        """Fetch list of model tags currently installed in local Ollama daemon."""
+    async def list_installed_models_detailed(self) -> list[dict[str, Any]]:
+        """Fetch raw model metadata list (name, digest, size) from Ollama /api/tags."""
         try:
             resp = await self._client.get("/api/tags")
             if resp.status_code == 200:
-                data = resp.json()
-                models = [m.get("name") for m in data.get("models", []) if m.get("name")]
-                return models
+                return resp.json().get("models", [])
             return []
         except httpx.RequestError as e:
             raise OllamaConnectionError(f"Failed to connect to Ollama at {self.base_url}: {e}") from e
+
+    async def list_installed_models(self) -> list[str]:
+        """Fetch list of model tags currently installed in local Ollama daemon."""
+        models = await self.list_installed_models_detailed()
+        return [m.get("name") for m in models if m.get("name")]
+
+    async def get_running_models(self) -> list[dict[str, Any]]:
+        """Query Ollama /api/ps for currently loaded models and VRAM usage."""
+        try:
+            resp = await self._client.get("/api/ps")
+            if resp.status_code == 200:
+                return resp.json().get("models", [])
+            return []
+        except httpx.RequestError as e:
+            raise OllamaConnectionError(f"Failed to query running models at {self.base_url}: {e}") from e
 
     async def inspect_model(self, model_name: str) -> dict[str, Any]:
         """Query Ollama /api/show to inspect real physical model details."""

@@ -13,7 +13,7 @@ import uuid
 from typing import Any
 import httpx
 
-from config import UIConfig, get_ui_config
+from ui.streamlit.config import UIConfig, get_ui_config
 
 
 class NetiqApiError(Exception):
@@ -122,6 +122,10 @@ class NetiqApiClient:
     def get_agents(self) -> list[dict[str, Any]]:
         data = self._get("/v1/metadata/agents")
         return data.get("agents", [])
+
+    def get_models(self, refresh: bool = False) -> dict[str, Any]:
+        params = {"refresh": "true"} if refresh else None
+        return self._get("/v1/metadata/models", params=params)
 
     def send_chat(
         self,

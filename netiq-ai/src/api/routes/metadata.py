@@ -2,6 +2,7 @@
 
 from fastapi import Header, HTTPException, Query
 
+from app.llms.model_manager import default_model_manager
 from src.security.authentication import AuthManager, AuthenticationError
 from src.settings.loader import (
     ConfigurationError,
@@ -163,3 +164,34 @@ async def list_agents(
         })
 
     return {"agents": enriched, "count": len(enriched)}
+
+
+async def list_models(
+    refresh: bool = Query(default=False, description="Force live Ollama re-inspection"),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+    x_netiq_api_key: str | None = Header(default=None, alias="X-NETIQ-API-KEY"),
+) -> dict:
+    """Return verified physical model inventory per agent role. Restricted to developers/admins."""
+    try:
+        user = AuthManager.authenticate_incoming_request(authorization=authorization, api_key=x_netiq_api_key)
+    except AuthenticationError as err:
+        raise HTTPException(status_code=401, detail=str(err))
+
+    if not (user.is_admin or user.has_role("developer")):
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: Developer or administrator privileges required to inspect detailed model inventory.",
+        )
+
+    if refresh or not default_model_manager.get_identity_records():
+        await default_model_manager.validate_startup_models(fail_closed=False)
+
+    records = default_model_manager.get_identity_records()
+    models_out = [rec.model_dump() for rec in records.values()]
+    return {
+        "models": models_out,
+        "count": len(models_out),
+        "all_required_verified": all(
+            rec.available for rec in records.values() if rec.required
+        ),
+    }

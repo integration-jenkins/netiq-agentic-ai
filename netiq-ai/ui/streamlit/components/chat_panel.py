@@ -3,14 +3,14 @@
 from typing import Any
 import streamlit as st
 
-from api_client import NetiqApiClient, NetiqApiError
-from components.charts import render_charts
-from components.data_table import render_data_table
-from components.error_panel import render_error_panel
-from components.export_panel import render_export_panel
-from components.metric_cards import render_metric_cards
-from components.source_panel import render_source_panel
-from session_manager import append_assistant_response, append_user_message
+from ui.streamlit.api_client import NetiqApiClient, NetiqApiError
+from ui.streamlit.components.charts import render_charts
+from ui.streamlit.components.data_table import render_data_table
+from ui.streamlit.components.error_panel import render_error_panel
+from ui.streamlit.components.export_panel import render_export_panel
+from ui.streamlit.components.metric_cards import render_metric_cards
+from ui.streamlit.components.source_panel import render_source_panel
+from ui.streamlit.session_manager import append_assistant_response, append_user_message
 
 EXAMPLE_QUESTIONS = [
     "How many 4G cells are available in Bihar?",

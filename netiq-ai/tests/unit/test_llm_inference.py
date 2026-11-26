@@ -128,7 +128,7 @@ async def test_inference_endpoint_via_asgi(monkeypatch):
         data = resp.json()
         assert data["status"] == "SUCCESS"
         assert data["response"] == "REPORT"
-        assert data["model"] == "qwen3:4b-instruct-2507"
+        assert data["model"] == "qwen3:4b-instruct-2507-q4_K_M"
         assert "metrics" in data
         assert data["metrics"]["eval_count_tokens"] == 2
         assert data["metrics"]["eval_tokens_per_second"] > 0
@@ -145,4 +145,4 @@ async def test_inference_endpoint_via_asgi(monkeypatch):
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "SUCCESS"
-        assert data["model"] == "qwen3:4b-instruct-2507"
+        assert data["model"] == "qwen3:4b-instruct-2507-q4_K_M"

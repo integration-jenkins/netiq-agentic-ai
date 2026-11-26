@@ -137,7 +137,7 @@ class Settings(BaseSettings):
         description="Base URL for local Ollama daemon"
     )
     default_llm_model: str = Field(
-        default="qwen3:4b-instruct-2507",
+        default="qwen3:4b-instruct-2507-q4_K_M",
         alias="DEFAULT_LLM_MODEL",
         description="Configurable default LLM model name for local inference"
     )

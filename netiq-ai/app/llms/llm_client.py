@@ -1,7 +1,8 @@
 """Application-facing LLM client for NETIQ agents and workflows."""
 
 from typing import Any
-from app.llms.model_manager import ModelManager
+from app.llms.model_manager import ModelManager, default_model_manager
+from app.llms.model_registry import ModelVerificationError, ModelVerificationStatus
 from app.llms.prompts import (
     INTENT_CLASSIFICATION_SYSTEM_PROMPT,
     REPORT_SELECTION_SYSTEM_PROMPT,
@@ -15,7 +16,7 @@ class LLMClient:
 
     def __init__(self, provider: OllamaProvider | None = None, manager: ModelManager | None = None) -> None:
         self.provider = provider or default_llm_provider
-        self.manager = manager or ModelManager(self.provider)
+        self.manager = manager or default_model_manager
 
     async def generate_completion(
         self,
@@ -26,7 +27,16 @@ class LLMClient:
         max_tokens: int | None = None,
         role: str | None = None,
     ) -> LLMResult:
-        """Generic completion with speed and quality metrics."""
+        """Generic completion with speed, quality metrics, and identity verification guard."""
+        if role and not self.manager.is_role_available(role):
+            rec = self.manager.get_identity_records().get(role)
+            reason = rec.mismatch_reason if rec else f"Role '{role}' failed model identity verification."
+            status = rec.status if rec else ModelVerificationStatus.IDENTITY_MISMATCH
+            raise ModelVerificationError(
+                f"Inference blocked for role '{role}': {reason}",
+                status=status,
+            )
+
         return await self.provider.generate(
             prompt=prompt,
             model=model,

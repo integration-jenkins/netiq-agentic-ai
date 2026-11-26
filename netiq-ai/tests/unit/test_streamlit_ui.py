@@ -68,9 +68,7 @@ def _build_mock_handler(call_log: list[str], fail_backend: bool = False):
 
 
 def test_streamlit_renders_header_mock_banner_and_chat_flow(monkeypatch):
-    if UI_DIR not in sys.path:
-        sys.path.insert(0, UI_DIR)
-    import api_client
+    from ui.streamlit import api_client
 
     call_log: list[str] = []
     mock_transport = httpx.MockTransport(_build_mock_handler(call_log))
@@ -108,9 +106,7 @@ def test_streamlit_renders_header_mock_banner_and_chat_flow(monkeypatch):
 
 
 def test_streamlit_handles_backend_unavailable(monkeypatch):
-    if UI_DIR not in sys.path:
-        sys.path.insert(0, UI_DIR)
-    import api_client
+    from ui.streamlit import api_client
 
     call_log: list[str] = []
     mock_transport = httpx.MockTransport(_build_mock_handler(call_log, fail_backend=True))

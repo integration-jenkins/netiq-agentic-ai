@@ -45,7 +45,7 @@ async def health(
     except Exception:
         ollama_status = "UNAVAILABLE"
 
-    # 2. Check configured models
+    # 2. Check configured models & identity verification
     try:
         models_cfg = load_models_config()
         configured_model = models_cfg.get("default_model", settings.default_llm_model)
@@ -56,6 +56,19 @@ async def health(
         m == configured_model or m.startswith(f"{configured_model}:")
         for m in installed_models
     )
+
+    identity_records = default_model_manager.get_identity_records()
+    if not identity_records and ollama_status == "CONNECTED":
+        try:
+            identity_records = await default_model_manager.validate_startup_models(fail_closed=False)
+        except Exception:
+            identity_records = {}
+
+    mismatches = {
+        role: {"status": rec.status.value, "reason": rec.mismatch_reason}
+        for role, rec in identity_records.items()
+        if rec.status.value != "VERIFIED"
+    }
 
     # 3. Check Report Catalog readiness
     report_count = 0
@@ -77,6 +90,8 @@ async def health(
         "ollama_status": ollama_status,
         "configured_model": configured_model,
         "configured_model_available": model_available,
+        "model_identity_verified": len(mismatches) == 0 and bool(identity_records),
+        "model_mismatches": mismatches,
         "report_catalog_ready": catalog_ready,
         "report_count": report_count,
         "knowledge_index_ready": len(kb_files) > 0,

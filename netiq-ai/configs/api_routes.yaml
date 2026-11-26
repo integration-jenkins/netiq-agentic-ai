@@ -107,6 +107,15 @@ api_routes:
     status: implemented
     handler: src.api.routes.metadata:list_agents
 
+  - id: metadata_models
+    method: GET
+    path: /v1/metadata/models
+    tag: metadata
+    summary: List verified model inventory
+    description: Returns verified physical model identities, architectures, digests, and statuses per agent role.
+    status: implemented
+    handler: src.api.routes.metadata:list_models
+
   - id: agents_test
     method: POST
     path: /v1/agents/test

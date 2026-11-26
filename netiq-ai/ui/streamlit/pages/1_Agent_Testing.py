@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 import streamlit as st
 
-_UI_DIR = Path(__file__).resolve().parents[1]
-if str(_UI_DIR) not in sys.path:
-    sys.path.insert(0, str(_UI_DIR))
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
-from api_client import NetiqApiClient, NetiqApiError
-from session_manager import init_session_state
+from ui.streamlit.api_client import NetiqApiClient, NetiqApiError
+from ui.streamlit.session_manager import init_session_state
 
 st.set_page_config(page_title="Agent Testing — NETIQ AI", page_icon="🧪", layout="wide")
 
@@ -38,7 +38,24 @@ def main() -> None:
     selected_label = st.selectbox("Select Agent", options=list(agent_map.keys()))
     selected_agent = agent_map[selected_label]
 
-    st.info(f"**Purpose:** {selected_agent['description']} | **Configured Model:** `{selected_agent['configured_model']}`")
+    # Fetch verified model inventory from GET /v1/metadata/models when authorized
+    verified_inventory = {}
+    try:
+        inv_resp = client.get_models()
+        verified_inventory = {m["role"]: m for m in inv_resp.get("models", [])}
+    except NetiqApiError:
+        pass
+
+    role_inv = verified_inventory.get(selected_agent["role"])
+    if role_inv:
+        st.info(
+            f"**Purpose:** {selected_agent['description']} | "
+            f"**Configured:** `{role_inv.get('configured_model_tag')}` | "
+            f"**Status:** `{role_inv.get('status')}` | "
+            f"**Detected:** `{role_inv.get('detected_architecture')}` / `{role_inv.get('detected_parameter_count')}` / `{role_inv.get('quantization')}`"
+        )
+    else:
+        st.info(f"**Purpose:** {selected_agent['description']} | **Configured Model:** `{selected_agent['configured_model']}`")
 
     question = st.text_area(
         "Test Question / Prompt",

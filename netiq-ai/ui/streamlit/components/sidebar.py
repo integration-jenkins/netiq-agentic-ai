@@ -3,8 +3,8 @@
 from typing import Any
 import streamlit as st
 
-from api_client import NetiqApiClient, NetiqApiError
-from session_manager import reset_conversation
+from ui.streamlit.api_client import NetiqApiClient, NetiqApiError
+from ui.streamlit.session_manager import reset_conversation
 
 
 def _load_metadata_once(api_client: NetiqApiClient) -> dict[str, Any]:

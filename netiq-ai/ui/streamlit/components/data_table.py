@@ -4,7 +4,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from api_client import NetiqApiClient, NetiqApiError
+from ui.streamlit.api_client import NetiqApiClient, NetiqApiError
 
 
 def _build_column_config(columns: list[dict[str, Any]]) -> dict[str, Any]:

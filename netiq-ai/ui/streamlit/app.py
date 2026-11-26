@@ -8,15 +8,15 @@ import sys
 from pathlib import Path
 import streamlit as st
 
-# Ensure ui/streamlit is on sys.path for modular local imports
-_UI_DIR = Path(__file__).resolve().parent
-if str(_UI_DIR) not in sys.path:
-    sys.path.insert(0, str(_UI_DIR))
+# Ensure project root (netiq-ai/) is on sys.path for ui.streamlit.* imports
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
-from api_client import NetiqApiClient
-from components.chat_panel import render_chat_panel
-from components.sidebar import render_sidebar
-from session_manager import init_session_state
+from ui.streamlit.api_client import NetiqApiClient
+from ui.streamlit.components.chat_panel import render_chat_panel
+from ui.streamlit.components.sidebar import render_sidebar
+from ui.streamlit.session_manager import init_session_state
 
 st.set_page_config(
     page_title="NETIQ Agentic AI",
