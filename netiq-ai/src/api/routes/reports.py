@@ -4,6 +4,7 @@ from fastapi import Header, HTTPException, Query
 
 from src.schemas.reports import ReportPage, ReportPagination, ReportQuery
 from src.security.authentication import AuthManager, AuthenticationError
+from src.session.identity import session_user_context
 from src.security.authorization import AuthorizationError, AuthorizationService
 from src.security.circle_access import UnauthorizedCircleError
 from src.session.result_store import (
@@ -25,10 +26,13 @@ async def get_paginated_result(
     search: str | None = Query(default=None, max_length=200, description="Optional substring filter"),
     authorization: str | None = Header(default=None, alias="Authorization"),
     x_netiq_api_key: str | None = Header(default=None, alias="X-NETIQ-API-KEY"),
+    x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
 ) -> dict:
     """Retrieve one page of an existing verified result without re-running backend queries."""
     try:
-        user = AuthManager.authenticate_incoming_request(authorization=authorization, api_key=x_netiq_api_key)
+        # NETIQ login (Streamlit chat) first: the chat's results belong to that user.
+        user = session_user_context(x_session_id) or AuthManager.authenticate_incoming_request(
+            authorization=authorization, api_key=x_netiq_api_key)
     except AuthenticationError as err:
         raise HTTPException(status_code=401, detail=str(err))
 

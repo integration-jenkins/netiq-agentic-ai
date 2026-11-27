@@ -33,9 +33,11 @@ class NetiqApiClient:
         config: UIConfig | None = None,
         api_key_override: str | None = None,
         transport: httpx.BaseTransport | None = None,
+        session_id: str | None = None,
     ) -> None:
         self.config = config or get_ui_config()
         self.api_key = api_key_override if api_key_override is not None else self.config.api_key
+        self.session_id = session_id  # NETIQ login session, sent as X-Session-ID
         self._client = httpx.Client(
             base_url=self.config.api_base_url,
             limits=httpx.Limits(max_keepalive_connections=10, max_connections=20),
@@ -50,6 +52,8 @@ class NetiqApiClient:
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
             headers["X-NETIQ-API-KEY"] = self.api_key
+        if self.session_id:
+            headers["X-Session-ID"] = self.session_id
         return headers
 
     def _handle_response(self, resp: httpx.Response, correlation_id: str) -> Any:
@@ -87,12 +91,14 @@ class NetiqApiClient:
             correlation_id=cid,
         )
 
-    def _post(self, path: str, payload: dict[str, Any], timeout: float | None = None) -> Any:
+    def _post(self, path: str, payload: dict[str, Any], timeout: float | None = None,
+              extra_headers: dict[str, str] | None = None) -> Any:
         """Execute non-idempotent POST without automatic retries."""
         cid = str(uuid.uuid4())
         req_timeout = timeout or self.config.request_timeout
         try:
-            resp = self._client.post(path, json=payload, headers=self._headers(cid), timeout=req_timeout)
+            resp = self._client.post(path, json=payload, headers={**self._headers(cid), **(extra_headers or {})},
+                                     timeout=req_timeout)
             return self._handle_response(resp, cid)
         except httpx.TimeoutException as err:
             raise NetiqApiError(f"Request timed out after {req_timeout}s.", status_code=504, correlation_id=cid) from err
@@ -152,6 +158,36 @@ class NetiqApiClient:
             "pagination": {"page": page, "size": size},
         }
         return self._post("/v1/chat", payload)
+
+    # --- Saved chats (session management). A 401 means the chatbot session ended.
+
+    def start_session_from_netiq(self, cookie_header: str) -> dict[str, Any]:
+        """No login form: the backend asks NETIQ who owns this browser's NETIQ cookie.
+        Returns {"session_id", "user"}; 401 means not logged in to NETIQ."""
+        return self._post("/v1/session/netiq", {}, timeout=self.config.metadata_timeout,
+                          extra_headers={"Cookie": cookie_header})
+
+    def list_conversations(self) -> list[dict[str, Any]]:
+        return self._get("/v1/conversations").get("conversations", [])
+
+    def create_conversation(self) -> str:
+        return self._post("/v1/conversations", {})["conversation_id"]
+
+    def get_conversation(self, conversation_id: str) -> dict[str, Any]:
+        return self._get(f"/v1/conversations/{conversation_id}")
+
+    def send_message(
+        self,
+        conversation_id: str,
+        question: str,
+        circle: str | None = None,
+        domain: str | None = None,
+        report_id: str | None = None,
+        size: int = 50,
+    ) -> dict[str, Any]:
+        """Ask in a saved chat: the answer (same fields as /v1/chat) plus history_used, history, circles_counted."""
+        payload = {"question": question, "circle": circle, "domain": domain, "report_id": report_id, "page_size": size}
+        return self._post(f"/v1/conversations/{conversation_id}/messages", payload)
 
     def get_result_page(
         self,

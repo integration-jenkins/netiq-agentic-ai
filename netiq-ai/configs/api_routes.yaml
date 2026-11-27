@@ -144,6 +144,15 @@ api_routes:
     handler: src.api.routes.export:download_export
 
   # Session management (task 1.6): each logged-in user's own chats. Needs the NETIQ login session.
+  - id: session_from_netiq
+    method: POST
+    path: /v1/session/netiq
+    tag: conversations
+    summary: Start a session from the NETIQ login
+    description: No second login. Reads the browser's NETIQ cookie (Cookie header), asks NETIQ GET /auth/me who is logged in, and returns a session_id for the chat routes (X-Session-ID). 401 if not logged in to NETIQ.
+    status: implemented
+    handler: src.api.routes.conversations:start_session_from_netiq
+
   - id: conversations_list
     method: GET
     path: /v1/conversations
@@ -176,16 +185,6 @@ api_routes:
     path: /v1/conversations/{conversation_id}/messages
     tag: conversations
     summary: Send a message in a chat
-    description: Stores the question and answer in the chat; follow-up questions get the recent chat history.
+    description: Gets the answer from the orchestrator and stores the question and the full answer (table included) in the chat; follow-up questions get the recent chat history.
     status: implemented
     handler: src.api.routes.conversations:send_message
-
-  - id: chat_demo
-    method: GET
-    path: /chat-demo
-    tag: ui
-    summary: Chat demo page
-    description: Serves ui/web/chat_demo.html - log in, open your chats, see when history is sent for follow-ups.
-    status: implemented
-    in_schema: false
-    handler: src.api.routes.conversations:chat_demo_page

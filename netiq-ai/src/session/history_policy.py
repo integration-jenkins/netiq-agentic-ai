@@ -48,7 +48,7 @@ _ASKED_A_QUESTION = re.compile(r"\?\s*$")
 # Assistant turns that describe a failure: harmful as context, a small model copies them.
 _FAILURE_MARKERS = (
     "not connected to the orchestrator",
-    "once the answer engine is connected",  # the placeholder reply in src/api/routes/conversations.py
+    "once the answer engine is connected",  # old placeholder reply, still in chats saved before the orchestrator was connected
     "sorry, something went wrong",
     "sorry, i couldn't",
     "i couldn't find",

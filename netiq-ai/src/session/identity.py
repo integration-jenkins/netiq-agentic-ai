@@ -12,9 +12,11 @@ circle list, means the user may see every circle. Circle names are turned into N
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 
+import httpx
 from fastapi import HTTPException, Request
 
 from src.schemas.user import UserContext
@@ -121,6 +123,45 @@ def current_user(request: Request) -> SessionUser:
     through netiq_login.get_user_info also resets that session's idle timer.
     """
     session_id = request.headers.get(netiq_login.SESSION_HEADER) or request.cookies.get(netiq_login.SESSION_COOKIE)
+    return _logged_in(session_id)
+
+
+NETIQ_USERINFO_PATH = os.getenv("NETIQ_USERINFO_PATH", "").strip() or "/auth/me"
+
+
+async def session_from_netiq_cookie(cookie_header: str | None,
+                                    transport: httpx.AsyncBaseTransport | None = None) -> tuple[str, dict] | None:
+    """No second login: the user is whoever is logged in to NETIQ in this browser.
+
+    NETIQ keeps its login in a Spring session cookie (JSESSIONID); NETIQ GET /auth/me says who
+    owns it. That user gets a chatbot session in the same store as a normal login (same
+    30-minute idle rule). None when NETIQ does not know the cookie (not logged in, or ended).
+    Connection errors (NETIQ down) are raised for the route to report. `transport` is for tests.
+    """
+    if not cookie_header:
+        return None
+    async with httpx.AsyncClient(base_url=netiq_login.NETIQ_LOGIN_BASE_URL, timeout=netiq_login.NETIQ_API_TIMEOUT,
+                                 follow_redirects=False, transport=transport) as http:
+        resp = await http.get(NETIQ_USERINFO_PATH, headers={"Cookie": cookie_header, "Accept": "application/json"})
+    if resp.status_code != 200 or "json" not in resp.headers.get("content-type", ""):
+        return None
+    try:
+        login = netiq_login.parse_login_response(resp.json())
+    except (ValueError, netiq_login.LoginError):
+        return None
+    if not login.get("username"):
+        return None
+    return netiq_login._create_session(login), login
+
+
+def session_user_context(session_id: str | None) -> UserContext | None:
+    """For routes that also accept an API key (result pages, Excel export): the NETIQ-logged-in
+    user, or None when no session id was sent. A session id that has ended gives 401, never a
+    quiet switch to the API-key user (who would not own the chat's results)."""
+    return _logged_in(session_id).user_context() if session_id else None
+
+
+def _logged_in(session_id: str | None) -> SessionUser:
     login = netiq_login.get_user_info(session_id)
     if not login:
         raise HTTPException(401, "Not logged in or session expired. Please log in to NETIQ again.")

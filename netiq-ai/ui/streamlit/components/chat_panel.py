@@ -10,7 +10,7 @@ from ui.streamlit.components.error_panel import render_error_panel
 from ui.streamlit.components.export_panel import render_export_panel
 from ui.streamlit.components.metric_cards import render_metric_cards
 from ui.streamlit.components.source_panel import render_source_panel
-from ui.streamlit.session_manager import append_assistant_response, append_user_message
+from ui.streamlit.session_manager import SESSION_ENDED, append_assistant_response, append_user_message, end_login
 
 EXAMPLE_QUESTIONS = [
     "How many 4G cells are available in Bihar?",
@@ -22,25 +22,31 @@ EXAMPLE_QUESTIONS = [
 
 
 def _execute_question(question: str, api_client: NetiqApiClient) -> None:
-    """Send a question to POST /v1/chat and update session state."""
+    """Send a question to the user's saved chat (the backend saves it and gets the answer)."""
     append_user_message(question)
     st.session_state["last_failed_question"] = None
     with st.spinner("Querying NETIQ Agentic AI..."):
         try:
-            resp = api_client.send_chat(
-                session_id=st.session_state["session_id"],
+            if not st.session_state.get("conversation_id"):  # a new chat is saved with its first question
+                st.session_state["conversation_id"] = api_client.create_conversation()
+            resp = api_client.send_message(
+                conversation_id=st.session_state["conversation_id"],
                 question=question,
                 circle=st.session_state.get("selected_circle"),
                 domain=st.session_state.get("selected_domain"),
                 report_id=st.session_state.get("selected_report_id"),
-                page=0,
                 size=st.session_state.get("page_size", 50),
             )
             append_assistant_response(resp)
+            st.session_state["chats"] = None  # title and order in "My chats" change
         except NetiqApiError as err:
+            if err.status_code == 401:
+                end_login(SESSION_ENDED)  # renewed from the NETIQ login on the next run
+            st.session_state["chats"] = None  # the question is saved even when the answer failed
             st.session_state["last_failed_question"] = {
                 "question": question,
-                "message": str(err),
+                "message": "Your session had ended, so this question was not sent. Press Retry to send it."
+                if err.status_code == 401 else str(err),
                 "status_code": err.status_code,
                 "correlation_id": err.correlation_id,
             }
@@ -62,6 +68,14 @@ def render_chat_panel(api_client: NetiqApiClient) -> None:
         with st.chat_message(msg["role"]):
             # Safe markdown rendering (no unsafe HTML)
             st.markdown(msg.get("content", ""))
+
+            # Short-term memory: was the earlier chat sent along with this question?
+            if msg["role"] == "assistant" and msg.get("history_used") is not None:
+                st.caption("Follow-up, so chat history was sent" if msg["history_used"]
+                           else "New question, no history sent")
+            if msg.get("history"):
+                with st.expander("What the AI received as history with this question", expanded=False):
+                    st.code(msg["history"], language=None)
 
             if msg["role"] == "assistant" and isinstance(msg.get("payload"), dict):
                 payload: dict[str, Any] = msg["payload"]

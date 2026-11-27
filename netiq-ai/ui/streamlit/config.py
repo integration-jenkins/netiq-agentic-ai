@@ -12,6 +12,7 @@ class UIConfig:
     request_timeout: float = float(os.getenv("NETIQ_AI_REQUEST_TIMEOUT", "120"))
     metadata_timeout: float = float(os.getenv("NETIQ_AI_METADATA_TIMEOUT", "15"))
     default_page_size: int = int(os.getenv("NETIQ_AI_DEFAULT_PAGE_SIZE", "50"))
+    netiq_web_url: str = os.getenv("NETIQ_WEB_URL", "").rstrip("/")  # NETIQ login page link; empty = this host, port 6061
 
 
 def get_ui_config() -> UIConfig:

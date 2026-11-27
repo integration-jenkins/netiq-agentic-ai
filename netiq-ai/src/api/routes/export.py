@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 
 from src.schemas.export import ExportRequest, ExportResponse
 from src.security.authentication import AuthManager, AuthenticationError
+from src.session.identity import session_user_context
 from src.session.result_store import (
     ResultAccessDeniedError,
     ResultNotFoundError,
@@ -23,10 +24,13 @@ async def export_report(
     body: ExportRequest,
     authorization: str | None = Header(default=None, alias="Authorization"),
     x_netiq_api_key: str | None = Header(default=None, alias="X-NETIQ-API-KEY"),
+    x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
 ) -> ExportResponse:
     """Generate an Excel (.xlsx) workbook from a verified backend result."""
     try:
-        user = AuthManager.authenticate_incoming_request(authorization=authorization, api_key=x_netiq_api_key)
+        # NETIQ login (Streamlit chat) first: the chat's results belong to that user.
+        user = session_user_context(x_session_id) or AuthManager.authenticate_incoming_request(
+            authorization=authorization, api_key=x_netiq_api_key)
     except AuthenticationError as err:
         raise HTTPException(status_code=401, detail=str(err))
 
@@ -62,10 +66,13 @@ async def download_export(
     file_id: str,
     authorization: str | None = Header(default=None, alias="Authorization"),
     x_netiq_api_key: str | None = Header(default=None, alias="X-NETIQ-API-KEY"),
+    x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
 ) -> FileResponse:
     """Download a previously generated Excel export after verifying ownership."""
     try:
-        user = AuthManager.authenticate_incoming_request(authorization=authorization, api_key=x_netiq_api_key)
+        # NETIQ login (Streamlit chat) first: the chat's results belong to that user.
+        user = session_user_context(x_session_id) or AuthManager.authenticate_incoming_request(
+            authorization=authorization, api_key=x_netiq_api_key)
     except AuthenticationError as err:
         raise HTTPException(status_code=401, detail=str(err))
 

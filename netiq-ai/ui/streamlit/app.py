@@ -15,6 +15,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from ui.streamlit.api_client import NetiqApiClient
 from ui.streamlit.components.chat_panel import render_chat_panel
+from ui.streamlit.components.login_panel import render_login_panel
 from ui.streamlit.components.sidebar import render_sidebar
 from ui.streamlit.session_manager import init_session_state
 
@@ -31,7 +32,11 @@ def main() -> None:
     init_session_state()
 
     api_key = st.session_state.get("api_key_input") or None
-    client = NetiqApiClient(api_key_override=api_key)
+    client = NetiqApiClient(api_key_override=api_key, session_id=st.session_state.get("netiq_session"))
+
+    if not st.session_state.get("netiq_session"):
+        render_login_panel(client)  # chats belong to a NETIQ user, so log in first
+        return
 
     meta = render_sidebar(client)
 

@@ -4,7 +4,47 @@ from typing import Any
 import streamlit as st
 
 from ui.streamlit.api_client import NetiqApiClient, NetiqApiError
-from ui.streamlit.session_manager import reset_conversation
+from ui.streamlit.session_manager import SESSION_ENDED, end_login, local_time, open_conversation, reset_conversation
+
+
+def _render_user() -> None:
+    """Who is logged in to NETIQ, and their circles. Logging out happens in NETIQ."""
+    user = st.session_state.get("netiq_user") or {}
+    circles = user.get("circleList") or []
+    st.markdown(f"Logged in as **{user.get('username') or user.get('id') or 'unknown'}**")
+    st.caption("Circles: " + (", ".join(map(str, circles)) if circles else "all (none set)"))
+
+
+def _render_chats(api_client: NetiqApiClient) -> None:
+    """My chats: newest first, with the one-line summary written after the user left the chat."""
+    st.subheader("My chats")
+    try:
+        if st.session_state.get("chats") is None:
+            st.session_state["chats"] = api_client.list_conversations()
+    except NetiqApiError as err:
+        if err.status_code == 401:
+            end_login(SESSION_ENDED)
+            st.rerun()
+        st.caption(f"Could not load chats: {err}")
+        return
+
+    if not st.session_state["chats"]:
+        st.caption("No chats yet. Ask a question to start one.")
+    for chat in st.session_state["chats"]:
+        cid = chat["conversation_id"]
+        title = chat.get("title") or "Untitled chat"
+        is_open = cid == st.session_state.get("conversation_id")
+        if st.button(title[:60], key=f"chat_{cid}", use_container_width=True,
+                     type="primary" if is_open else "secondary", help=title):
+            try:
+                open_conversation(cid, api_client.get_conversation(cid).get("messages", []))
+            except NetiqApiError as err:
+                if err.status_code == 401:
+                    end_login(SESSION_ENDED)
+                else:
+                    st.session_state["chats"] = None  # e.g. the chat was deleted after 30 days unused
+            st.rerun()
+        st.caption(" · ".join(x for x in (chat.get("summary"), local_time(chat.get("updated_at"))) if x))
 
 
 def _load_metadata_once(api_client: NetiqApiClient) -> dict[str, Any]:
@@ -46,10 +86,14 @@ def render_sidebar(api_client: NetiqApiClient) -> dict[str, Any]:
     """Render sidebar filters, controls, and health indicator."""
     with st.sidebar:
         st.header("NETIQ Controls")
+        _render_user()
 
         if st.button("New Conversation", use_container_width=True, type="primary"):
             reset_conversation()
             st.rerun()
+
+        _render_chats(api_client)
+        st.divider()
 
         if st.button("Refresh Metadata", use_container_width=True):
             st.session_state["metadata_cache"] = {}
@@ -93,7 +137,7 @@ def render_sidebar(api_client: NetiqApiClient) -> dict[str, Any]:
             st.session_state["selected_report_id"] = sel_report_label.split(" — ", 1)[0]
 
         st.divider()
-        st.caption(f"Session: `{st.session_state.get('session_id')}`")
+        st.caption(f"Chat: `{st.session_state.get('conversation_id') or 'new (saved with the first question)'}`")
         msg_count = len([m for m in st.session_state.get("messages", []) if m["role"] == "user"])
         st.caption(f"Turns in chat: {msg_count}")
 

@@ -61,7 +61,7 @@ What it does
 - Long-term memory (across chats): counts which circles each user asks about, from the circle box and from the question text. A circle named in both places counts once.
 - Chat summaries: when the user leaves a chat, a local model writes a one-line summary of the questions in the background (`chat_summarizer` in `configs/models.yaml`, Qwen3 4B). If Ollama is not running, the chat simply has no summary yet and everything else still works.
 - Storage: one SQLite file, `data/session/chat_history.db` (change it with `CHAT_DB_PATH`). Chats not used for 30 days are deleted. Circle counts and summaries are deleted after 90 days.
-- Answers: until the orchestrator is connected, every question gets a fixed reply saying the question is saved in the chat.
+- Answers: come from the orchestrator and are saved whole, table included (see "Session Management in the Streamlit UI" below).
 
 Routes (all need the NETIQ login session cookie or the `X-Session-ID` header)
 
@@ -69,7 +69,6 @@ Routes (all need the NETIQ login session cookie or the `X-Session-ID` header)
 - `POST /v1/conversations`: start a new chat.
 - `GET /v1/conversations/{conversation_id}`: open a chat with all its messages.
 - `POST /v1/conversations/{conversation_id}/messages`: ask a question. The reply also shows whether history was sent and which circles were counted.
-- `GET /chat-demo`: a demo page to try all of this in the browser.
 
 Files added
 
@@ -78,16 +77,57 @@ Files added
 - `src/session/identity.py`: reads the logged-in user from the NETIQ session and finds circle names in a question.
 - `src/session/chat_summary.py`: writes the one-line chat summaries.
 - `src/api/routes/conversations.py`: the chat routes above.
-- `ui/web/chat_demo.html`: the demo page.
 - New entries in `configs/api_routes.yaml` (routes), `configs/models.yaml` (`chat_summarizer` role) and `.env.example` (session settings).
 - Tests: `tests/unit/test_session_memory.py` and `tests/workflow/test_conversation_api.py`.
+
+How to try it: in the Streamlit UI, see "Session Management in the Streamlit UI" below. For chat summaries, start Ollama with `qwen3:4b-instruct-2507` pulled.
+
+Run the tests: `python -m pytest tests/unit/test_session_memory.py tests/workflow/test_conversation_api.py`
+
+## Session Management in the Streamlit UI
+
+Session management now works in the Streamlit UI (`ui/streamlit`), the same way it worked on the old demo page, which is now removed. Answers come from the orchestrator, so a saved chat keeps the real answers with their tables.
+
+What it does
+
+- No login form: the chat opens for the user who is already logged in to NETIQ in the same browser. NETIQ keeps its login in a browser cookie, and the backend asks NETIQ (`GET /auth/me`) who owns it. No username or password is asked.
+- Same host name: browsers share cookies by host name, not port, so open NETIQ and the chatbot with the same host name. `localhost` and `127.0.0.1` count as different.
+- Not logged in to NETIQ: the page says "Log in to NETIQ first" with a link. Log in to NETIQ, then reload the chatbot page. Streamlit reads the cookies only when the page opens.
+- Sidebar: who is logged in and their circles, New Conversation, and My chats: the user's saved chats, newest first, with the one-line summary and the time. Click a chat to open it again. There is no Log out button; logging out happens in NETIQ.
+- New chat: it is saved when its first question is sent.
+- Answers: the backend works out the follow-up history, counts the circles, asks the orchestrator for the answer, and saves the question and the whole answer (text, number cards, table rows, sources, export). The answer is the same one `/v1/chat` gives. A reopened chat shows its tables again.
+- Follow-up tag: under each answer, "Follow-up, so chat history was sent" or "New question, no history sent". For the newest answer, "What the AI received as history with this question" shows the history text.
+- Filters: the circle, domain and report picked in the sidebar go with the question. The circle also counts for long-term memory.
+- A failed answer: the question and a short "Sorry, I couldn't answer..." reply are saved, and the error shows with a Retry button. Such replies are never sent as history.
+- Session end: the chatbot session ends after 30 minutes without activity. If the user is still logged in to NETIQ, it is renewed quietly: the open chat stays, and a question that was not sent can be sent with Retry. If not, the page asks to log in to NETIQ. The chats stay saved.
+- Logging out of NETIQ: the open chatbot page keeps working until it is reloaded or stays unused for 30 minutes.
+- Table pages and Excel export: these work for the logged-in user. The page and export routes now also accept the NETIQ login, and an ended login gets 401. Without a login they work as before, with the API key.
+- For now: the orchestrator does not use the history text yet. It keeps its own memory for each chat (last report, circle and result). The history is worked out and shown, ready for when the orchestrator uses it.
+- Older tables: page buttons and export work for 1 hour after the answer, because results are kept in memory for 1 hour. After that the saved first page still shows.
+
+Files added or changed
+
+- `ui/streamlit/components/login_panel.py` (new): takes the user from the NETIQ login cookie, or shows "Log in to NETIQ first".
+- `ui/streamlit/app.py`: opens the chat only for a user logged in to NETIQ.
+- `ui/streamlit/components/sidebar.py`: the user and My chats.
+- `ui/streamlit/components/chat_panel.py`: sends each question to the saved chat and shows the follow-up tag and the history.
+- `ui/streamlit/session_manager.py`: keeps the session and the open chat, and opens a saved chat.
+- `ui/streamlit/api_client.py`: sends the session as the `X-Session-ID` header, and has new calls for the session and chats.
+- `ui/streamlit/config.py`: `NETIQ_WEB_URL`, the NETIQ link on the "Log in to NETIQ first" message. When empty, it is this host on port 6061.
+- `src/api/routes/conversations.py`: new route `POST /v1/session/netiq`, which starts a session from the NETIQ login cookie. The message route gets the answer from the orchestrator and saves it whole. The demo page route is removed.
+- `src/session/identity.py`: asks NETIQ who owns the cookie (path set by `NETIQ_USERINFO_PATH`, default `/auth/me`), and lets the table page and export routes read the session.
+- `src/api/routes/reports.py` and `src/api/routes/export.py`: accept the NETIQ login.
+- `configs/api_routes.yaml`: `/v1/session/netiq` added, `/chat-demo` removed.
+- Removed: `ui/web/chat_demo.html` (the old demo page) and its route `GET /chat-demo`.
+- Tests: `tests/workflow/test_conversation_api.py` and `tests/unit/test_streamlit_ui.py`.
 
 How to try it
 
 1. Start the NETIQ backend on port 6061 (needed for login).
-2. Optional, for summaries: start Ollama with `qwen3:4b-instruct-2507` pulled.
-3. Start the service: `uvicorn app.main:app --reload --port 8000`.
-4. Open http://localhost:8000/chat-demo and log in with a NETIQ user.
-5. Ask "how many 4G cells in Mumbai?", then "and 5G?". The second question is tagged as a follow-up, and the page shows the history that was sent with it.
+2. From this folder, start the service: `python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000`.
+3. Start the UI: `python -m streamlit run ui/streamlit/app.py --server.address 127.0.0.1 --server.port 8501`.
+4. Log in to NETIQ at http://127.0.0.1:6061, then open http://127.0.0.1:8501 in the same browser. Use the same host name for both.
+5. Ask "How many 4G cells are available in Bihar?", then "and 5G?". The second answer says "Follow-up, so chat history was sent".
+6. Click New Conversation, then click the first chat under My chats. It opens again with its table.
 
-Run the tests: `python -m pytest tests/unit/test_session_memory.py tests/workflow/test_conversation_api.py`
+Run the tests: `python -m pytest tests/workflow/test_conversation_api.py tests/unit/test_streamlit_ui.py`
