@@ -1,0 +1,61 @@
+# Logging set-up for NETIQ Agentic AI (the Python version of log4j2.xml / logback.xml).
+# Applied at start-up by src/observability/logging.py (setup_logging).
+#
+# Every part of the code logs under its module name (logging.getLogger(__name__)), and the
+# "loggers" section below sends each part to its own file in LOG_DIR (default: logs/).
+# Warnings and errors from every part are also copied into errors.log, and everything is shown
+# in the terminal. Files hold one JSON object per line; a new file starts every midnight and
+# files older than backupCount days are deleted. LOG_LEVEL in .env sets the level (default INFO).
+# ponytail: one server process per log folder. If the server is ever run with several workers,
+# give each worker its own LOG_DIR (or add a QueueHandler), else they clash at midnight rotation.
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    (): src.observability.logging.JsonFormatter
+  console:
+    (): src.observability.logging.ConsoleFormatter
+
+handlers:
+  app: &file                       # general: start-up, shutdown, config, anything not listed below
+    class: logging.handlers.TimedRotatingFileHandler
+    filename: app.log
+    when: midnight
+    backupCount: 30                # days of old files kept
+    encoding: utf-8
+    delay: true                    # a file is created on its first line
+    formatter: json
+  api:      {<<: *file, filename: api.log}        # one line per request: route, status, time, user
+  llm:      {<<: *file, filename: llm.log}        # every LLM call: model, time, tokens in/out
+  agents:   {<<: *file, filename: agents.log}     # orchestrator and agents: route chosen, agent run
+  tools:    {<<: *file, filename: tools.log}      # NETIQ API calls and report tools: time, rows
+  database: {<<: *file, filename: database.log}   # chat DB and Oracle: failures, clean-ups
+  audit:    {<<: *file, filename: audit.log, backupCount: 90}   # logins, logouts, refused requests
+  errors:   {<<: *file, filename: errors.log, level: WARNING}   # copy of every warning and error
+  console:
+    class: logging.StreamHandler
+    formatter: console
+
+loggers:
+  src.api:                 {handlers: [api, errors, console], propagate: false}
+  netiq.audit:             {handlers: [audit, errors, console], propagate: false}
+  src.adapters.llm:        {handlers: [llm, errors, console], propagate: false}
+  app.llms:                {handlers: [llm, errors, console], propagate: false}
+  app.agents:              {handlers: [agents, errors, console], propagate: false}
+  app.orchestrator:        {handlers: [agents, errors, console], propagate: false}
+  src.tools:               {handlers: [tools, errors, console], propagate: false}
+  src.adapters.netiq_http: {handlers: [tools, errors, console], propagate: false}
+  src.session.chat_store:  {handlers: [database, errors, console], propagate: false}
+  src.adapters.oracle:     {handlers: [database, errors, console], propagate: false}
+
+  # Libraries
+  uvicorn:                 {handlers: [app, errors, console], propagate: false, level: INFO}
+  uvicorn.access:          {level: WARNING}   # replaced by the request line in api.log
+  httpx:                   {level: WARNING}   # its INFO lines hold full URLs, and login sends the password in the URL
+  httpcore:                {level: WARNING}
+  watchfiles:              {level: WARNING}   # file-change noise from --reload
+
+root:
+  level: INFO
+  handlers: [app, errors, console]

@@ -7,6 +7,8 @@ from importlib import import_module
 
 from fastapi import FastAPI
 
+from src.api.middleware import RequestLogMiddleware
+from src.observability.logging import setup_logging
 from src.security.netiq_login import router as netiq_auth_router
 from src.settings.env import settings
 from src.settings.loader import ConfigurationError, load_yaml_file
@@ -21,6 +23,7 @@ def load_api_routes() -> list[dict]:
 
 
 def create_app() -> FastAPI:
+    setup_logging()  # logs/ files per component, configs/logging.yaml
     app = FastAPI(title="NetIQ Agentic AI", version="0.1.0")
 
     seen: set[tuple[str, str]] = set()
@@ -53,6 +56,7 @@ def create_app() -> FastAPI:
     if netiq_auth_router is not None:
         app.include_router(netiq_auth_router)
 
+    app.add_middleware(RequestLogMiddleware)  # request ID + one api.log line per request
     return app
 
 

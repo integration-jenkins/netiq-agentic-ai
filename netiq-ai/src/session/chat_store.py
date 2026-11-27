@@ -28,6 +28,7 @@ KEYWORD_RETENTION_DAYS (90).
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sqlite3
 import uuid
@@ -38,6 +39,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 _DEFAULT_DB = Path(__file__).resolve().parents[2] / "data" / "session" / "chat_history.db"
+log = logging.getLogger(__name__)  # -> logs/database.log
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS conversations (
@@ -102,12 +104,16 @@ def _int_setting(name: str, default: int) -> int:
 
 def _connect() -> sqlite3.Connection:
     path = Path(os.getenv("CHAT_DB_PATH") or _DEFAULT_DB)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path, timeout=30)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    conn.execute("PRAGMA journal_mode = WAL")
-    conn.executescript(_SCHEMA)  # cheap no-op once the tables exist
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(path, timeout=30)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.executescript(_SCHEMA)  # cheap no-op once the tables exist
+    except (OSError, sqlite3.Error) as exc:  # the stack trace is logged once, by the request middleware
+        log.error("chat_db_unavailable", extra={"db_path": str(path), "error_type": type(exc).__name__, "error": str(exc)})
+        raise
     return conn
 
 
@@ -277,6 +283,10 @@ def purge_expired() -> None:
     chat_cutoff = (now - timedelta(days=_int_setting("CHAT_RETENTION_DAYS", 30))).isoformat(timespec="microseconds")
     word_cutoff = (now - timedelta(days=_int_setting("KEYWORD_RETENTION_DAYS", 90))).isoformat(timespec="microseconds")
     with closing(_connect()) as conn, conn:
-        conn.execute("DELETE FROM conversations WHERE updated_at < ?", (chat_cutoff,))  # messages go too (cascade)
-        conn.execute("DELETE FROM user_keywords WHERE last_used < ?", (word_cutoff,))
-        conn.execute("DELETE FROM chat_summaries WHERE updated_at < ?", (word_cutoff,))
+        deleted = {
+            "chats": conn.execute("DELETE FROM conversations WHERE updated_at < ?", (chat_cutoff,)).rowcount,  # messages go too (cascade)
+            "keywords": conn.execute("DELETE FROM user_keywords WHERE last_used < ?", (word_cutoff,)).rowcount,
+            "summaries": conn.execute("DELETE FROM chat_summaries WHERE updated_at < ?", (word_cutoff,)).rowcount,
+        }
+    if any(deleted.values()):
+        log.info("chat_db_purged", extra=deleted)

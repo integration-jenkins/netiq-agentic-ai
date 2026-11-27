@@ -16,6 +16,7 @@ Key Guarantees:
 """
 
 import asyncio
+import logging
 import time
 from typing import Any
 import httpx
@@ -23,6 +24,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from src.settings.env import settings
 from src.settings.loader import load_models_config
+
+log = logging.getLogger(__name__)  # -> logs/llm.log
 
 
 class LLMMetrics(BaseModel):
@@ -209,39 +212,49 @@ class OllamaProvider:
         # Apply concurrency guard
         async with self._semaphore:
             wall_start = time.perf_counter()
+            log_fields = {"model": selected_model, "role": role or "default", "prompt_chars": len(prompt)}
             try:
-                resp = await self._client.post("/api/generate", json=payload)
-            except httpx.TimeoutException as te:
-                raise OllamaTimeoutError(f"Inference request timed out after {self.timeout}s: {te}") from te
-            except httpx.RequestError as re:
-                raise OllamaConnectionError(
-                    f"Cannot connect to local Ollama instance at {self.base_url}. Ensure 'ollama serve' is running."
-                ) from re
+                try:
+                    resp = await self._client.post("/api/generate", json=payload)
+                except httpx.TimeoutException as te:
+                    raise OllamaTimeoutError(f"Inference request timed out after {self.timeout}s: {te}") from te
+                except httpx.RequestError as re:
+                    raise OllamaConnectionError(
+                        f"Cannot connect to local Ollama instance at {self.base_url}. Ensure 'ollama serve' is running."
+                    ) from re
 
-            wall_duration = time.perf_counter() - wall_start
+                wall_duration = time.perf_counter() - wall_start
 
-            if resp.status_code == 404:
-                raise OllamaModelNotFoundError(
-                    f"Model '{selected_model}' not found on Ollama. Please install it offline via Ollama."
+                if resp.status_code == 404:
+                    raise OllamaModelNotFoundError(
+                        f"Model '{selected_model}' not found on Ollama. Please install it offline via Ollama."
+                    )
+                elif resp.status_code != 200:
+                    raise LLMProviderError(f"Ollama returned HTTP {resp.status_code}: {resp.text}")
+
+                data = resp.json()
+                eval_count = data.get("eval_count", 0)
+                eval_duration_sec = data.get("eval_duration", 0) / 1e9
+                tok_per_sec = (eval_count / eval_duration_sec) if eval_duration_sec > 0 else 0.0
+                prompt_eval_count = data.get("prompt_eval_count", 0)
+                prompt_eval_duration_sec = data.get("prompt_eval_duration", 0) / 1e9
+
+                metrics = LLMMetrics(
+                    total_duration_seconds=round(wall_duration, 4),
+                    eval_count_tokens=eval_count,
+                    eval_tokens_per_second=round(tok_per_sec, 2),
+                    prompt_eval_count_tokens=prompt_eval_count,
+                    prompt_eval_duration_seconds=round(prompt_eval_duration_sec, 4),
                 )
-            elif resp.status_code != 200:
-                raise LLMProviderError(f"Ollama returned HTTP {resp.status_code}: {resp.text}")
+            except Exception as exc:  # one llm.log line for a failed call too, then the same error as before
+                log.warning("llm_call", extra={**log_fields, "status": "error", "error_type": type(exc).__name__,
+                                               "error": str(exc)[:300],
+                                               "latency_ms": round((time.perf_counter() - wall_start) * 1000)})
+                raise
 
-            data = resp.json()
-            eval_count = data.get("eval_count", 0)
-            eval_duration_sec = data.get("eval_duration", 0) / 1e9
-            tok_per_sec = (eval_count / eval_duration_sec) if eval_duration_sec > 0 else 0.0
-            prompt_eval_count = data.get("prompt_eval_count", 0)
-            prompt_eval_duration_sec = data.get("prompt_eval_duration", 0) / 1e9
-
-            metrics = LLMMetrics(
-                total_duration_seconds=round(wall_duration, 4),
-                eval_count_tokens=eval_count,
-                eval_tokens_per_second=round(tok_per_sec, 2),
-                prompt_eval_count_tokens=prompt_eval_count,
-                prompt_eval_duration_seconds=round(prompt_eval_duration_sec, 4),
-            )
-
+            log.info("llm_call", extra={**log_fields, "status": "ok", "latency_ms": round(wall_duration * 1000),
+                                        "tokens_in": prompt_eval_count, "tokens_out": eval_count,
+                                        "tokens_per_sec": metrics.eval_tokens_per_second})
             return LLMResult(
                 model=selected_model,
                 response_text=data.get("response", "").strip(),

@@ -7,6 +7,7 @@ be opened again after logging in. The Streamlit UI (ui/streamlit) uses these rou
 
 from __future__ import annotations
 
+import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 
@@ -22,6 +23,8 @@ from src.session import chat_store, identity
 from src.session.chat_summary import summarise_left_chats
 from src.session.history_policy import NO_HISTORY, history_for_question
 from src.session.identity import SessionUser, circles_in_text, current_user, normalize_circle
+
+log = logging.getLogger(__name__)
 
 
 class MessageIn(BaseModel):
@@ -99,9 +102,14 @@ async def send_message(conversation_id: str, body: MessageIn, background: Backgr
         _save_failure(user, conversation_id, used, f"Sorry, I couldn't answer this question: {err}")
         raise HTTPException(403, str(err)) from err
     except Exception as err:
+        log.exception("chat_answer_failed", extra={"conversation_id": conversation_id})
         _save_failure(user, conversation_id, used, "Sorry, I couldn't answer this question because of an internal error.")
         raise HTTPException(500, f"Chat orchestration error: {err}") from err
 
+    # Length only, never the question text (it is in the chat DB already).
+    log.info("chat_question", extra={"conversation_id": conversation_id, "question_chars": len(body.question),
+                                     "history_used": used, "circles": circles, "intent": reply.intent,
+                                     "agent": reply.agent, "status": reply.status})
     # The whole answer is saved, table rows too, so a reopened chat shows it again.
     payload = reply.model_dump(mode="json", exclude={"structured_data"})  # same rows as table.rows
     chat_store.add_message(user.username, conversation_id, "assistant", reply.answer,

@@ -19,6 +19,7 @@ from dataclasses import dataclass
 import httpx
 from fastapi import HTTPException, Request
 
+from src.observability.correlation import set_user
 from src.schemas.user import UserContext
 from src.security import netiq_login
 
@@ -165,4 +166,6 @@ def _logged_in(session_id: str | None) -> SessionUser:
     login = netiq_login.get_user_info(session_id)
     if not login:
         raise HTTPException(401, "Not logged in or session expired. Please log in to NETIQ again.")
-    return SessionUser.from_login(session_id, login)
+    user = SessionUser.from_login(session_id, login)
+    set_user(user.username)  # shown on this request's line in api.log
+    return user

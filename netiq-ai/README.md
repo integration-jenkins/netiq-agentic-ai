@@ -104,6 +104,7 @@ What it does
 - Table pages and Excel export: these work for the logged-in user. The page and export routes now also accept the NETIQ login, and an ended login gets 401. Without a login they work as before, with the API key.
 - For now: the orchestrator does not use the history text yet. It keeps its own memory for each chat (last report, circle and result). The history is worked out and shown, ready for when the orchestrator uses it.
 - Older tables: page buttons and export work for 1 hour after the answer, because results are kept in memory for 1 hour. After that the saved first page still shows.
+- Logging: the `chat_question` line in `api.log` now also shows the route the orchestrator chose (`intent`, `agent`, `status`).
 
 Files added or changed
 
@@ -117,6 +118,7 @@ Files added or changed
 - `src/api/routes/conversations.py`: new route `POST /v1/session/netiq`, which starts a session from the NETIQ login cookie. The message route gets the answer from the orchestrator and saves it whole. The demo page route is removed.
 - `src/session/identity.py`: asks NETIQ who owns the cookie (path set by `NETIQ_USERINFO_PATH`, default `/auth/me`), and lets the table page and export routes read the session.
 - `src/api/routes/reports.py` and `src/api/routes/export.py`: accept the NETIQ login.
+- `src/api/middleware.py`: `POST /v1/session/netiq` is written to `audit.log` as a login.
 - `configs/api_routes.yaml`: `/v1/session/netiq` added, `/chat-demo` removed.
 - Removed: `ui/web/chat_demo.html` (the old demo page) and its route `GET /chat-demo`.
 - Tests: `tests/workflow/test_conversation_api.py` and `tests/unit/test_streamlit_ui.py`.
@@ -131,3 +133,74 @@ How to try it
 6. Click New Conversation, then click the first chat under My chats. It opens again with its table.
 
 Run the tests: `python -m pytest tests/workflow/test_conversation_api.py tests/unit/test_streamlit_ui.py`
+
+## Logging and Monitoring
+
+Every request now leaves a trail in the `logs/` folder. Each line shows which request it belongs to, so one answer can be followed from the question through every LLM call and NETIQ API call. This uses Python's built-in `logging`, so there are no new packages.
+
+What it does
+
+- Request ID: every request gets an ID, and it appears on every log line that request writes, in every file. If the caller sends an `X-Correlation-ID` header, that ID is used. Otherwise a new one is made. A header value with odd characters or more than 64 characters is replaced with a new ID. The ID is sent back in the `X-Correlation-ID` response header and passed on in the same header to NETIQ API calls.
+- One line per request in `api.log`: method, route, status, time taken in ms, and the user name once logged in.
+- One line per LLM call in `llm.log`: model, role, time taken, tokens in and out, and tokens per second. A failed call is logged with the error and then raised as before.
+- One line per NETIQ API call in `tools.log`: report, mode, circle, rows returned, and time taken, or the error.
+- Audit trail in `audit.log`: successful and failed logins, logouts, and requests refused with 401 or 403.
+- Errors: every warning and error is also copied to `errors.log`. A crash is written with its full stack trace. The user gets a short 500 reply that includes the request ID, so a complaint can be traced.
+- Never logged: passwords, tokens, cookies, session IDs and API keys. They are replaced with `[REDACTED]` wherever they appear, even inside a URL or an error message. The question text is not logged either, only its length. Library lines that print full URLs are switched off, because the NETIQ login can send the password in the URL.
+- Format: each line in a file is one JSON object with the same core fields: `timestamp`, `level`, `module`, `event`, `request_id`, plus that event's own fields. The console shows a short, readable version.
+- Old files: at midnight each file starts fresh. The old one is kept with the date added to its name. Files are deleted after 30 days, or 90 days for `audit.log`.
+
+Log files
+
+| File | What goes in it |
+|---|---|
+| `api.log` | one line per request |
+| `llm.log` | every LLM call |
+| `tools.log` | NETIQ API calls and report tools |
+| `agents.log` | orchestrator and agents (empty until they are built) |
+| `database.log` | chat database failures and clean-ups |
+| `audit.log` | logins, logouts, refused requests |
+| `errors.log` | a copy of every warning and error |
+| `app.log` | everything else, including server start and stop |
+
+A file is created only when its first line is written, so not all of them show up at once.
+
+Example line from `api.log`:
+
+```json
+{"timestamp": "2026-11-26T11:57:34.523+05:30", "level": "INFO", "module": "src.api.middleware", "event": "request_done", "request_id": "e2e-health", "method": "GET", "route": "/health", "status": 200, "duration_ms": 1.9, "user": null}
+```
+
+Settings (in `.env` or as environment variables)
+
+- `LOG_LEVEL`: `DEBUG`, `INFO` (default), `WARNING` or `ERROR`.
+- `LOG_DIR`: where the files go. The default is `logs/` inside this folder. The `logs/` folder is not committed to git.
+- Everything else (files, which code writes to which file, how many days to keep) is in `configs/logging.yaml`.
+
+Monitoring
+
+`python -m src.observability.metrics` prints today's numbers from the log files: requests, server errors, refused requests, average and slowest response times, LLM calls and failures, average LLM time and tokens, calls per model, and NETIQ API calls and failures. Add a date for another day: `python -m src.observability.metrics 2026-11-25`. Alerts and health checks on the server are a separate, later task.
+
+Files added or changed
+
+- `configs/logging.yaml` (new): the one place for all logging settings.
+- `src/observability/logging.py`: the JSON line format, the hiding of secrets, and the setup.
+- `src/observability/correlation.py`: holds the current request's ID and user.
+- `src/observability/audit.py`: the audit logger.
+- `src/observability/metrics.py`: the monitoring summary.
+- `src/api/middleware.py`: gives each request its ID, writes its line in `api.log` and the audit lines, and catches crashes.
+- `src/api/app.py`: two lines that turn logging on and add the middleware.
+- `src/adapters/llm/provider.py`: the `llm.log` line for each LLM call.
+- `src/adapters/netiq_http/client.py`: the `tools.log` line for each NETIQ API call.
+- `src/session/chat_store.py`, `src/session/identity.py` and `src/api/routes/conversations.py`: chat database failures and clean-ups, the user name on the request line, and one line per chat question.
+- `.gitignore` (new): keeps `logs/` out of git.
+- Tests: `tests/unit/test_logging.py`.
+
+How to try it
+
+1. From this folder, start the service: `python -m uvicorn src.api.app:app --host 127.0.0.1 --port 8000`.
+2. Send a request with your own ID: `curl.exe -H "X-Correlation-ID: my-test-1" http://127.0.0.1:8000/health`.
+3. Open `logs/api.log`. The last line has `"request_id": "my-test-1"`.
+4. See the day's numbers: `python -m src.observability.metrics`.
+
+Run the tests: `python -m pytest tests/unit/test_logging.py`

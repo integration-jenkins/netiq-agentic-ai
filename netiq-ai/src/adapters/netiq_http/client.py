@@ -23,6 +23,8 @@ Key Guarantees:
 """
 
 import json
+import logging
+import time
 from pathlib import Path
 from typing import Any
 import uuid
@@ -39,6 +41,7 @@ from src.adapters.netiq_http.response_adapters import (
     MalformedResponseError,
     ResponseAdapterRegistry,
 )
+from src.observability.correlation import request_id
 from src.schemas.errors import ErrorCode, StandardError
 from src.schemas.metadata import ReportDefinition
 from src.schemas.reports import ReportMode, ReportPage, ReportQuery
@@ -46,6 +49,8 @@ from src.security.authentication import AuthManager
 from src.security.circle_access import CircleAccessPolicy, UnauthorizedCircleError
 from src.settings.env import ApiMode, settings
 from src.settings.loader import load_limits_config, load_report_definition
+
+log = logging.getLogger(__name__)  # -> logs/tools.log
 
 
 class NetIQClientError(Exception):
@@ -176,7 +181,28 @@ class NetIQHttpClient:
             UnverifiedContractError: If LIVE mode attempted on unverified contract.
             NetIQClientError: If network or backend failure occurs.
         """
-        corr_id = correlation_id or str(uuid.uuid4())
+        # One tools.log line per call (time, rows, or the error); the work itself is below.
+        started = time.perf_counter()
+        fields = {"report_id": query.report_id, "mode": self.mode.value, "circle": query.circle}
+        try:
+            page = await self._execute_report_query(query, user_permitted_circles, correlation_id)
+        except Exception as exc:
+            log.warning("netiq_api_call", extra={**fields, "status": "error", "error_type": type(exc).__name__,
+                                                 "error": str(exc)[:300],
+                                                 "latency_ms": round((time.perf_counter() - started) * 1000)})
+            raise
+        log.info("netiq_api_call", extra={**fields, "status": "ok", "rows": len(page.data),
+                                          "latency_ms": round((time.perf_counter() - started) * 1000)})
+        return page
+
+    async def _execute_report_query(
+        self,
+        query: ReportQuery,
+        user_permitted_circles: list[str] | None,
+        correlation_id: str | None,
+    ) -> ReportPage:
+        # The request ID of the question goes to the Java API, so both sides log the same ID.
+        corr_id = correlation_id or request_id() or str(uuid.uuid4())
 
         # Step 1: Load report metadata definition
         report_meta = load_report_definition(query.report_id)
