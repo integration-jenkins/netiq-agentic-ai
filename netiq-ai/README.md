@@ -204,3 +204,33 @@ How to try it
 4. See the day's numbers: `python -m src.observability.metrics`.
 
 Run the tests: `python -m pytest tests/unit/test_logging.py`
+
+
+## Fixed Q&A Knowledge Base
+
+The chatbot now answers a fixed set of NETIQ questions (product, scope, architecture, ingestion, security, dashboards, audits, service stitching, AI audit, troubleshooting) with approved answers and source citations. These answers come from the NETIQ Solution Document v3.3 and the User Manual v3.5. They do not use the LLM.
+
+What it does
+
+- Fixed answers first: a question that matches a fixed question is answered with the approved answer word for word, with `SUCCESS` status, intent `KNOWLEDGE` and agent `FIXED_QA_AGENT`. The source (document and section) and the entry ID (for example `NETIQ-STI-001`) are returned in `sources`.
+- Matching: spelling, case and punctuation do not matter. Chat-style shortcuts ("wat is srvc stitching") and common Hinglish ("service stitching ka matlab kya hai") also match. A question that matches only loosely is not answered from the fixed set.
+- Reports are not hijacked: a request that starts with show, list, get, export and so on, a "which sites / cells..." question, or a question naming a circle, vendor or site ID that the fixed answer does not cover, goes to the normal report route. Keyword-style phrasing (no question word) is answered only when it is an exact saved alias.
+- Deployment-specific answers (server sizing, SLA, RPO/RTO, support contacts, SSO/MFA, retention) carry a note and a warning to confirm the value with the NETIQ administrator.
+- Questions the fixed set does not cover go on to the existing knowledge agent (SOP-RAN-402, glossary), report and comparison routes, unchanged.
+
+Data files (`data/knowledge/`)
+
+| File | Use |
+|---|---|
+| `netiq_chatbot_knowledge_base.json` | Main file the bot loads: 199 Q&A entries with alternate questions, keywords, audience, type and sources |
+| `netiq_fixed_qa_expanded.json` | One row per question wording, same answer. Used only if the main file is missing |
+| `netiq_fixed_qa.json` | One row per question (`id`, `category`, `question`, `answer`). Used only if the two above are missing |
+| `netiq_chatbot_knowledge_base.md` | The same content in Markdown, for people and for loading into a knowledge-base tool. The bot does not read it |
+| `kb_testset.jsonl` | Test questions with expected route, status and answer checks. Not loaded by the bot |
+
+To add or change an answer, edit `netiq_chatbot_knowledge_base.json` (keep `id`, `question`, `answer`; add other wordings under `alternate_questions`) and restart the service. Set `NETIQ_FIXED_QA_PATH` to load a different file.
+
+Files changed
+
+- `app/orchestrator/chat_service.py`: the fixed Q&A matcher and the guardrails, which run as step 0 of `process_chat` before export, comparison and report routing. Severity questions are also sent to the knowledge agent.
+- `data/knowledge/`: the five data files above.

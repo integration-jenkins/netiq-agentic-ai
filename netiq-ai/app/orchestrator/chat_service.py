@@ -13,6 +13,10 @@ Coordinates:
 
 from __future__ import annotations
 
+import difflib
+import json
+import math
+import os
 import re
 import time
 import uuid
@@ -158,6 +162,560 @@ def _load_knowledge_docs() -> list[KnowledgeDocument]:
     return docs
 
 
+# ---------------------------------------------------------------------------
+# Fixed Q&A engine (deterministic, no LLM) + conversational guardrails
+# ---------------------------------------------------------------------------
+# Source of truth: data/knowledge/netiq_chatbot_knowledge_base.json
+#   (fallbacks: netiq_fixed_qa_expanded.json, netiq_fixed_qa.json).
+# Override the location with env var NETIQ_FIXED_QA_PATH.
+# A matched fixed question returns the approved answer VERBATIM with citations;
+# anything that does not match confidently falls through to the existing
+# report / knowledge-agent routing unchanged.
+
+_FQA_FILES = (
+    "netiq_chatbot_knowledge_base.json",
+    "netiq_fixed_qa_expanded.json",
+    "netiq_fixed_qa.json",
+)
+
+_FQA_STOP = frozenset(
+    "a an the is are was were be of in on at to do does did i me my we our you your it its this that "
+    "for and or can could would should please with by from there any tell about as so if will shall "
+    "am im ive pls plz".split()
+)
+
+_FQA_ABBREV = {
+    "srvc": "service", "svc": "service", "rpt": "report", "rpts": "reports", "hlp": "help",
+    "vendr": "vendor", "vndr": "vendor", "tech": "technology", "util": "utilisation",
+    "utilization": "utilisation", "utilisations": "utilisation", "dashbrd": "dashboard",
+    "dash": "dashboard", "wat": "what", "wats": "whats", "whats": "what", "schdule": "schedule",
+    "schdul": "schedule", "sched": "schedule", "chng": "change", "mon": "monday", "mw": "mw",
+    "2": "to", "u": "you", "cant": "cannot", "cannot": "cannot", "unable": "cannot",
+    "wher": "where", "hw": "how", "mail": "email", "emailed": "email", "emailing": "email",
+    "sign": "login", "signin": "login", "log": "login", "logon": "login", "meaning": "mean",
+    "define": "what", "definition": "what", "explain": "what", "describe": "what",
+    "weekly": "weekly", "exports": "export", "downloaded": "download",
+}
+
+# Light Hinglish / chat-style phrase normalisation (applied before tokenising).
+_FQA_PHRASES = (
+    ("matlab kya hai", "mean"), ("ka matlab", "mean"), ("kya hai", "what"), ("kya hota hai", "what"),
+    ("kaise kare", "how"), ("kaise karein", "how"), ("kaise karna", "how"), ("kaise", "how"),
+    ("kahan milega", "where"), ("kahan milta hai", "where"), ("kahan hai", "where"), ("kahan", "where"),
+    ("nahi ho raha", "not working"), ("nahi hota", "not working"), ("nahi chal raha", "not working"),
+    ("aa sakti hai kya", "can"), ("aa sakta hai kya", "can"), ("ho sakta hai kya", "can"),
+    ("har monday", "every monday"), ("har somvar", "every monday"), ("mail pe", "email"),
+    ("ka dashboard", "dashboard"), ("ke liye", ""), ("mujhe", ""), ("bata", "tell"), ("batao", "tell"),
+    (" me ", " in "), (" ka ", " "), (" ki ", " "), (" ke ", " "), (" hai ", " "), (" kya ", " "),
+)
+
+# Leading verbs of data/report requests: these need a (near-)exact match to be
+# answered from the fixed Q&A, so report routing is never hijacked.
+_FQA_STRICT_START = (
+    "show", "list", "give", "get", "find", "display", "fetch", "count", "compare", "export",
+    "download", "view", "open", "pull", "check", "how many",
+)
+_FQA_STRICT_THRESHOLD = 0.90
+_FQA_THRESHOLD = 0.72
+_FQA_MARGIN = 0.03
+
+
+def _fqa_stem(tok: str) -> str:
+    if len(tok) > 5 and tok.endswith("ing"):
+        return tok[:-3]
+    if len(tok) > 5 and tok.endswith("ed"):
+        return tok[:-2]
+    if tok.endswith("ies") and len(tok) > 4:
+        return tok[:-3] + "y"
+    if tok.endswith("s") and not tok.endswith("ss") and len(tok) > 3:
+        return tok[:-1]
+    return tok
+
+
+def _fqa_norm(text: str) -> str:
+    t = f" {text.lower().strip()} "
+    t = t.replace("'s ", " is ").replace("\u2019s ", " is ")
+    t = re.sub(r"[^a-z0-9\-/+ ]", " ", t)
+    t = re.sub(r"\s+", " ", t)
+    for src, dst in _FQA_PHRASES:
+        t = t.replace(src if src.startswith(" ") else f" {src} ", f" {dst} " if dst else " ")
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def _fqa_tokens(norm: str) -> list[str]:
+    out: list[str] = []
+    for tok in norm.split():
+        tok = _FQA_ABBREV.get(tok, tok)
+        if tok in _FQA_STOP:
+            continue
+        out.append(_fqa_stem(tok))
+    return out
+
+
+# Entries added on top of the document-derived knowledge base. They close gaps found
+# when the fixed Q&A set was tested against real user phrasing (chat style, Hinglish).
+_FQA_SUPPLEMENTAL: list[dict[str, Any]] = [
+    {
+        "id": "NETIQ-SUP-001",
+        "category": "Navigation, Filters & Search",
+        "type": "how-to",
+        "question": "How do I filter the inventory by vendor and technology?",
+        "alternate_questions": [
+            "filter by vendor", "filter by vendor and technology", "how do i filter by vendor and tech?",
+            "inventory filter vendor how to do", "Inventory me vendor aur technology se filter kaise kare",
+            "how 2 filter vendr", "How do I filter reports by vendor?",
+        ],
+        "answer": (
+            "Open the blue funnel Dashboard Filter Panel, choose the Vendor (and Circle), and click Apply Filters. "
+            "In any inventory or audit report use the Filters control to filter the Vendor and Technology columns, "
+            "or the Advanced query builder when you need several conditions together. Circle and Vendor filters stay "
+            "active for the session until you click Reset All."
+        ),
+        "keywords": ["filter", "vendor", "technology", "inventory", "filter panel", "advanced query"],
+        "source_references": [{"document": "NETIQ User Manual v3.5", "section": "§3.3, §3.4, §9 Q3 Q5"}],
+    },
+    {
+        "id": "NETIQ-SUP-002",
+        "category": "Dashboards & KPIs",
+        "type": "how-to",
+        "question": "Where can I find the dashboard for microwave link utilisation?",
+        "alternate_questions": [
+            "where's the MW utilisation dashboard?", "mw utilisation dashboard where is", "MW utilization dashboard",
+            "MW utilisation ka dashboard kahan milega", "mw util dashboard where?", "Where is the MW capacity dashboard?",
+        ],
+        "answer": (
+            "Switch the Project Hub toggle to Txn, set Type to MW, and open the Network Intelligence View dashboard. "
+            "Capacity-wise Hop Categorisation shows MW hops by configured capacity band (0-250 up to 2001-4000), "
+            "Hop Type Distribution and Transmission-links status show the link mix, and the AI Inference panel includes "
+            "MW capacity utilisation based on historical trend (BETA). NETIQ audits configuration from CM dumps; it does "
+            "not ingest live performance counters, so real-time link utilisation is not shown."
+        ),
+        "keywords": ["MW", "utilisation", "dashboard", "capacity", "hop", "txn"],
+        "source_references": [
+            {"document": "NETIQ User Manual v3.5", "section": "§4.1.3"},
+            {"document": "NETIQ Solution Document v3.3", "section": "§18.2, §18.5"},
+        ],
+    },
+    {
+        "id": "NETIQ-SUP-003",
+        "category": "Navigation, Filters & Search",
+        "type": "scope-limit",
+        "question": "Can I schedule the weekly audit report to be emailed to my team every Monday?",
+        "alternate_questions": [
+            "can you send me the audit report every monday?", "weekly audit report mail every monday possible?",
+            "schedule audit report weekly", "Audit report har Monday mail pe aa sakti hai kya", "schdule audit rpt mon",
+            "Can reports be scheduled?", "Can NETIQ email reports automatically?",
+        ],
+        "answer": (
+            "A user-configurable schedule that e-mails a specific audit report every Monday is not described in the NETIQ "
+            "documentation, so I cannot confirm or set one. What is available today: audit reports refresh with every "
+            "collection cycle, any report can be exported on demand to Excel/CSV and shared, and role-aware notifications "
+            "(including scheduled-report-ready events and e-mail digest where enabled) are listed as a platform capability. "
+            "Please confirm with your NETIQ administrator whether scheduled delivery is enabled in your deployment."
+        ),
+        "keywords": ["schedule", "report", "email", "weekly", "monday", "notification", "export"],
+        "source_references": [{"document": "NETIQ Solution Document v3.3", "section": "§3.1.7, §3.2, §11.2"}],
+    },
+    {
+        "id": "NETIQ-SUP-004",
+        "category": "Access, Roles & Security",
+        "type": "troubleshooting",
+        "question": "I am unable to log in to NETIQ. Could you please help?",
+        "alternate_questions": [
+            "can't log in, help?", "login not happening netiq", "login issue", "NETIQ me login nahi ho raha",
+            "cant login netiq pls hlp", "I cannot sign in", "NETIQ login not working",
+        ],
+        "answer": (
+            "Try these in order: (1) open the NETIQ URL provided by your administrator on the corporate LAN/VPN with a "
+            "supported browser (Chrome, Edge or Firefox); (2) re-enter your registered e-mail and password and avoid repeated "
+            "failed attempts because they can lock the account; (3) use the Forgot Password link, or reset your corporate "
+            "password if your organisation uses SSO/LDAP; (4) if you are still blocked or see 'Access denied', contact your "
+            "NETIQ administrator, who can unlock the account, check your role and escalate to Avendum support. For security I "
+            "cannot look up or share any other user's account details."
+        ),
+        "keywords": ["login", "log in", "cannot login", "password", "account locked", "support", "administrator"],
+        "source_references": [{"document": "NETIQ User Manual v3.5", "section": "§2.3, §8.2, §9 Q2"}],
+    },
+    {
+        "id": "NETIQ-SUP-005",
+        "category": "Navigation, Filters & Search",
+        "type": "concept",
+        "question": "What is the difference between RAN and Txn?",
+        "alternate_questions": ["RAN vs Txn", "What does the RAN / Txn toggle mean?", "difference between RAN and transmission view"],
+        "answer": (
+            "RAN is the radio-access context (sites, nodes, cells and their hardware and IP data). Txn is the transmission "
+            "context: microwave (MW), UBR and fibre backhaul nodes, links and hops. The RAN / Txn switch on the top command "
+            "bar re-scopes the dashboard, KPI strip, inventory tree and audit menus; in Txn mode the Type dropdown narrows "
+            "the view to ALL, MW or UBR."
+        ),
+        "keywords": ["RAN", "Txn", "transmission", "microwave", "toggle", "project hub"],
+        "source_references": [{"document": "NETIQ User Manual v3.5", "section": "§3.2, §4.1.2"}],
+    },
+    {
+        "id": "NETIQ-SUP-006",
+        "category": "MW, UBR & Transport Audits",
+        "type": "concept",
+        "question": "What is Planned vs Config?",
+        "alternate_questions": [
+            "What is Planned-vs-Config?", "What is Planned vs Configured?", "What does planned vs configured mean?",
+            "Explain planned vs configured",
+        ],
+        "answer": (
+            "Planned vs Configured compares the designed (planned) parameters, such as the MIDS link plan, with the live "
+            "configuration discovered in the network. For MW/UBR links it checks frequency, channel spacing, modulation and "
+            "hop type and classifies each link as Deployed & Matched, Deployed & Unmatched, Planned Not Deployed or Deployed "
+            "Not Planned. Deployment Compliance = Deployed & Matched links divided by Total Planned links."
+        ),
+        "keywords": ["planned vs configured", "planned", "live configuration", "MIDS", "deployment compliance"],
+        "source_references": [{"document": "NETIQ User Manual v3.5", "section": "§4.1.4"},
+                              {"document": "NETIQ Solution Document v3.3", "section": "§17.8, §18.5.2"}],
+    },
+    {
+        "id": "NETIQ-SUP-007",
+        "category": "Dashboards & KPIs",
+        "type": "how-to",
+        "question": "Where do I see the most critical issues first?",
+        "alternate_questions": [
+            "Where can I see critical issues?", "How do I find the most critical anomalies?", "show most critical issues first",
+            "Where are the top anomalies?",
+        ],
+        "answer": (
+            "On the RAN dashboard open Audit Insights, which lists the Top 5 anomalies with live counts (View All Issues opens "
+            "the full audit). In Catchy Search use the Smart Shortcut 'Critical anomalies impacting 10+ sites', which ranks "
+            "critical anomalies by the number of sites they affect. In Txn mode the same card shows the transmission anomalies."
+        ),
+        "keywords": ["critical anomalies", "audit insights", "top 5", "smart shortcut", "most critical"],
+        "source_references": [{"document": "NETIQ User Manual v3.5", "section": "§3.5.3, §4.1.1.4"}],
+    },
+]
+
+
+
+_FQA_QUESTION_START = re.compile(
+    r"^\s*(what|whats|wat|wats|how|hw|where|wher|why|when|who|which|can|could|does|do|is|are|will|should|"
+    r"explain|define|describe|tell me|difference|meaning)\b|\?\s*$|\b(kya|kaise|kahan|kyun|kab|kaun)\b",
+    re.I,
+)
+# "Which sites / cells / duplicates ..." is a data request even though it is phrased as a question.
+_FQA_DATA_REQUEST = re.compile(
+    r"^\s*which\b.{0,25}\b(sites?|cells?|nodes?|links?|records?|elements?|services?|circuits?|duplicates?|hardware|boards?)\b"
+    r"|^\s*what\s+(sites|cells|nodes|links|records)\b",
+    re.I,
+)
+# Context-dependent wording ("this node", "these mismatches") refers to a previous result.
+_FQA_DEICTIC = re.compile(
+    r"\b(this|these|that|those)\s+(node|nodes|cell|cells|site|sites|link|links|audit|result|results|mismatch\w*|"
+    r"record|records|value|values|number|figure|computed|calculated)\b|\bhow was this\b",
+    re.I,
+)
+# Circle / vendor scoping that the matched fixed answer does not itself talk about -> treat as a data query.
+_FQA_SCOPE_TOKENS = frozenset(
+    "ericsson nokia huawei zte samsung ceragon cambium bihar delhi haryana mumbai maharashtra punjab karnataka "
+    "tamilnadu chennai kolkata ap br dl hr mh pb ka tn up wb rj gj kl hp jk mp ue uw or as ne".split()
+)
+_FQA_ID_TOKEN = re.compile(r"\b[a-z]{2,4}[-_]?\d{3,}\b", re.I)
+
+# Extra phrasings (chat style / Hinglish / short forms) for document-derived entries, keyed by canonical question.
+_FQA_EXTRA_ALTERNATES: dict[str, list[str]] = {
+    "What is service stitching in NETIQ?": [
+        "What does 'service stitching' mean in NETIQ?", "what's service stitching exactly?",
+        "service stitching meaning what", "service stitching meaning", "Service stitching ka matlab kya hai",
+        "wat is srvc stitching", "What does service stitching mean?", "What is stitching?",
+    ],
+    "How do I filter by circle and vendor?": [
+        "Do my filters carry between reports?", "Do filters persist between reports?", "Are my filters remembered?",
+    ],
+    "What happens to elements that disappear from a dump?": [
+        "What happens to deleted / aged-out elements?", "What happens to deleted elements?",
+    ],
+    "What are the support contact details?": [
+        "Who do I contact for a problem this manual does not cover?", "Who do I contact for a problem the manual does not cover?",
+        "How do I get my access changed?",
+    ],
+}
+
+_FQA_WH = frozenset("what how where why when who which whats".split())
+
+
+class _FixedQAEngine:
+    """Weighted token + fuzzy matcher over the approved fixed Q&A entries."""
+
+    def __init__(self) -> None:
+        self.entries: list[dict[str, Any]] = []
+        self._phrasings: list[list[tuple[str, set[str]]]] = []
+        self._exact: dict[str, int] = {}
+        self._idf: dict[str, float] = {}
+        self._loaded = False
+
+    # ---- loading
+    def _candidate_paths(self) -> list[Path]:
+        env = os.environ.get("NETIQ_FIXED_QA_PATH")
+        base = PROJECT_ROOT / "data" / "knowledge"
+        paths = [Path(env)] if env else []
+        paths += [base / n for n in _FQA_FILES]
+        return paths
+
+    def load(self, force: bool = False) -> None:
+        if self._loaded and not force:
+            return
+        entries: list[dict[str, Any]] = []
+        for p in self._candidate_paths():
+            if not p.is_file():
+                continue
+            try:
+                raw = json.loads(p.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            rows = raw.get("entries", raw) if isinstance(raw, dict) else raw
+            if isinstance(rows, list) and rows:
+                entries = self._coerce(rows)
+                break
+        for e in entries:
+            extra = _FQA_EXTRA_ALTERNATES.get(e["question"])
+            if extra:
+                e["alternate_questions"] = list(e.get("alternate_questions", [])) + [x for x in extra if x not in e.get("alternate_questions", [])]
+        existing = {e["question"].lower() for e in entries}
+        entries += [e for e in _FQA_SUPPLEMENTAL if e["question"].lower() not in existing]
+        self.entries = entries
+        self._index()
+        self._loaded = True
+
+    @staticmethod
+    def _coerce(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Accept rich KB entries, flat {id,question,answer} rows, or expanded one-row-per-phrasing files."""
+        merged: dict[str, dict[str, Any]] = {}
+        order: list[str] = []
+        for r in rows:
+            if not isinstance(r, dict) or not r.get("question") or not r.get("answer"):
+                continue
+            key = str(r.get("id") or r["question"])
+            if key not in merged:
+                merged[key] = {
+                    "id": key, "category": r.get("category", "NETIQ"), "type": r.get("type", "concept"),
+                    "question": r["question"], "answer": r["answer"],
+                    "alternate_questions": list(r.get("alternate_questions", [])),
+                    "keywords": list(r.get("keywords", [])),
+                    "source_references": list(r.get("source_references", [])),
+                }
+                order.append(key)
+            elif r["question"] != merged[key]["question"]:
+                merged[key]["alternate_questions"].append(r["question"])
+        return [merged[k] for k in order]
+
+    def _index(self) -> None:
+        df: dict[str, int] = {}
+        self._phrasings = []
+        self._exact = {}
+        for i, e in enumerate(self.entries):
+            ph: list[tuple[str, set[str]]] = []
+            seen_tokens: set[str] = set()
+            for text in [e["question"], *e.get("alternate_questions", [])]:
+                norm = _fqa_norm(text)
+                toks = set(_fqa_tokens(norm))
+                if not toks:
+                    continue
+                ph.append((norm, toks))
+                self._exact.setdefault(norm, i)
+                seen_tokens |= toks
+            self._phrasings.append(ph)
+            for t in seen_tokens:
+                df[t] = df.get(t, 0) + 1
+        n = max(len(self.entries), 1)
+        self._idf = {t: math.log(1.0 + n / c) for t, c in df.items()}
+
+    # ---- matching
+    def _w(self, tok: str) -> float:
+        return self._idf.get(tok, math.log(1.0 + len(self.entries)))  # unseen tokens are rare = high weight
+
+    def _score(self, idx: int, qn: str, qt: set[str], q_weight: float) -> float:
+        best = 0.0
+        for pn, pt in self._phrasings[idx]:
+            inter = qt & pt
+            if not inter:
+                continue
+            iw = sum(self._w(t) for t in inter)
+            pw = sum(self._w(t) for t in pt)
+            dice = 2 * iw / (q_weight + pw)
+            cover = iw / q_weight
+            ratio = difflib.SequenceMatcher(None, qn, pn).ratio()
+            best = max(best, 0.50 * dice + 0.25 * cover + 0.25 * ratio)
+        kw_hits = sum(1 for k in self.entries[idx].get("keywords", []) if len(k) > 3 and _fqa_norm(k) in qn)
+        return min(1.0, best + min(0.12, 0.04 * kw_hits)) if best else 0.0
+
+    def match(self, query: str, strict: bool = False, exact_only: bool = False) -> tuple[dict[str, Any], float, str] | None:
+        self.load()
+        if not self.entries:
+            return None
+        qn = _fqa_norm(query)
+        qt = set(_fqa_tokens(qn))
+        if not qt:
+            return None
+        if qn in self._exact:
+            return self.entries[self._exact[qn]], 1.0, "exact"
+        if exact_only:
+            return None
+        q_weight = sum(self._w(t) for t in qt)
+        scored = sorted(((self._score(i, qn, qt, q_weight), i) for i in range(len(self.entries))), reverse=True)
+        top_s, top_i = scored[0]
+        second_s = scored[1][0] if len(scored) > 1 else 0.0
+        top_entry = self.entries[top_i]
+        threshold = _FQA_STRICT_THRESHOLD if strict else _FQA_THRESHOLD
+        # Circle / vendor / ID in the query that the matched answer does not cover => a data query, be strict.
+        scope = {t for t in qn.split() if t in _FQA_SCOPE_TOKENS} | set(m.lower() for m in _FQA_ID_TOKEN.findall(query))
+        if scope:
+            covered = {t for _, pt in self._phrasings[top_i] for t in pt} | {
+                w for k in top_entry.get("keywords", []) for w in _fqa_norm(k).split()
+            }
+            if scope - covered:
+                threshold = _FQA_STRICT_THRESHOLD
+        if top_s >= threshold and (top_s - second_s >= _FQA_MARGIN or top_s >= 0.85):
+            return top_entry, round(top_s, 3), "fuzzy"
+        return None
+
+
+_fixed_qa = _FixedQAEngine()
+
+
+# ---- Guardrails (deterministic) -------------------------------------------------
+_REPORT_VERBS = re.compile(r"^\s*(show|list|give|get|find|display|fetch|count|view|pull|export)\b", re.I)
+
+_RE_INJECTION = re.compile(
+    r"(ignore|disregard|forget)\b.{0,30}\b(previous|prior|above|all)\b.{0,30}\b(instruction|prompt|rule)s?"
+    r"|(print|show|reveal|repeat|tell me)\b.{0,25}\b(system|hidden|initial)\s+(prompt|instruction)s?"
+    r"|\bjailbreak\b|\bdeveloper mode\b",
+    re.I,
+)
+_RE_PRIVACY = re.compile(
+    r"\b(login|log in|password|credential|credentials|access|circles?)\b.{0,40}\b(of|for|assigned to|belong\w* to)\b.{0,6}\buser\b"
+    r"|\b(login details|passwords?|credentials)\b.{0,40}\buser\s+[a-z0-9._-]+"
+    r"|\bcircles?\s+assigned\s+to\s+user\b",
+    re.I,
+)
+_RE_WRITE_VERB = r"(change|chng|modify|update|set|edit|configure|push|apply|delete|remove|reboot|restart|lock|unlock|reset|fix)"
+_RE_WRITE_TARGET = r"(pci|tac|earfcn|bandwidth|cell|node|parameter|param|config|configuration|vlan|ip|frequency|power|site)"
+_RE_CHANGE_REQUEST = re.compile(
+    rf"^\s*(?:(?:can|could|would|will)\s+you\s+|please\s+|pls\s+|just\s+|kindly\s+)*{_RE_WRITE_VERB}\b.{{0,60}}\b{_RE_WRITE_TARGET}\b"
+    rf"|^\s*{_RE_WRITE_TARGET}\s+{_RE_WRITE_VERB}\b.{{0,40}}\b(to|=)\s*\d+"
+    rf"|\b{_RE_WRITE_TARGET}\b.{{0,40}}\b(kar\s*do|kardo)\b",
+    re.I,
+)
+_RE_OFF_TOPIC = re.compile(
+    r"\b(cricket|ipl|football|weather|forecast|movie|film|song|joke|recipe|horoscope|stock price|bitcoin|politics|election)\b"
+    r"|\bwho\s+won\b|\b(wh?ats?|what'?s)\s+the\s+scor\w*\b|\bmatch\s+(kaun|jeeta|result)\b|\baaj\s+ka\s+match\b",
+    re.I,
+)
+# Bare follow-ups ("Only 5G", "Export", "Why?") that make no sense without a previous result.
+_RE_NEEDS_CONTEXT = re.compile(
+    r"^\s*(only\s+(show\s+)?[\w .-]{1,25}|give me count only|show (details|trend|changed records)|compare|explain|why\??|"
+    r"export( differences| the result| result)?|(make|give me)( a)? management summary|export differences)\s*[.?!]*\s*$"
+    r"|^\s*(what|why|how|explain|who|where)\b.{0,30}\b(this|these|that|those)\s+"
+    r"(node|nodes|cell|cells|link|links|audit|result|results|mismatch\w*|record|records|value|values|number|computed|calculated)\b"
+    r"|^\s*how was this (computed|calculated)\b",
+    re.I,
+)
+_MSG_NEEDS_CONTEXT = (
+    "I don't have a previous result in this conversation to work from. Tell me which report, circle or site you mean "
+    "(for example 'Show eNodeB nodes for Delhi') and I can then filter, explain, compare or export it."
+)
+_VAGUE_TOKENS = frozenset(
+    "show me the data give report details detail info information status dikhao please pls what is it all "
+    "some any more tell do de dena kar".split()
+)
+_RE_ALARM_KPI = re.compile(
+    r"^\s*(why|what'?s wrong|what is wrong|reason)\b.{0,40}\b(down|failing|failed|outage|not working|degrad\w*|dropp\w*|congest\w*)\b"
+    r"|\b(alarms?|kpis?|counters?|throughput|drop\s*call|call\s*drop|prb\s+utili[sz]ation|rsrp|sinr)\b.{0,40}\b(cell|site|node)\b",
+    re.I,
+)
+_RE_3G = re.compile(r"\b(3g|umts|wcdma|hspa|nodeb|rnc)\b(?!\s*b\b)", re.I)
+_RE_PCI_CONFLICT = re.compile(r"\bpci\b.{0,30}\b(conflict|collision|clash|confusion|plan\w*)\b|\b(conflict|collision)\b.{0,30}\bpci\b", re.I)
+_RE_VENDOR_EQUIV = re.compile(
+    r"\b(equivalent|mapping|map|corresponding)\b.{0,50}\b(ericsson|nokia|huawei|zte|samsung)\b|"
+    r"\b(ericsson|nokia|huawei|zte|samsung)\b.{0,50}\b(equivalent|corresponding)\b",
+    re.I,
+)
+
+_MSG_READ_ONLY = (
+    "NETIQ is a read-only platform: it audits and reports on your network inventory, but it cannot change, push or write "
+    "configuration (for example PCI, TAC or any cell/node parameter) to the network. Please raise this with your OSS / "
+    "network operations team through the normal change process. Once the value is corrected at source it will appear in "
+    "NETIQ after the next collection cycle, and I can then show you the updated inventory or audit result."
+)
+_MSG_OFF_TOPIC = (
+    "I can only help with NETIQ network inventory, audit, service-stitching and platform questions, so I can't help with "
+    "that. You could try, for example, 'Show eNodeB nodes for Delhi' or 'What is service stitching?'."
+)
+_MSG_INJECTION = (
+    "I can't share or change my instructions. I answer NETIQ network inventory, audit and platform questions only - "
+    "what would you like to look up?"
+)
+_MSG_PRIVACY = (
+    "I cannot share another user's login details, credentials or circle assignments. Access questions are handled by your "
+    "NETIQ administrator (Admin / Super Admin), who manages roles and circle access centrally."
+)
+_MSG_AMBIGUOUS = (
+    "Could you tell me a little more? Which circle, site or domain (RAN, MW/UBR, FTTH, Wireline) and which report or "
+    "audit would you like to see?"
+)
+_MSG_ALARM_KPI = (
+    "SCOPE_LIMIT: NETIQ does not hold alarm or KPI/performance data, so it cannot tell why a cell is down or degraded. "
+    "It audits configuration and inventory from CM dumps. For fault or performance analysis please use your alarm / PM "
+    "system; in NETIQ I can show the cell's inventory, audit findings and service path."
+)
+_MSG_3G = (
+    "SCOPE_LIMIT: NETIQ covers 2G, 4G and 5G radio, microwave/UBR, FTTH and Wireline. 3G (UMTS/RNC) data is not held in NETIQ."
+)
+_MSG_PCI_CONFLICT = (
+    "SCOPE_LIMIT: NETIQ audits PCI values as cell attributes (for example missing or duplicate configuration), but it does not "
+    "run PCI conflict / collision-risk or RF planning analysis. Use your RF planning tool for that."
+)
+_MSG_VENDOR_EQUIV = (
+    "INSUFFICIENT_EVIDENCE: a vendor-to-vendor parameter equivalence (for example Ericsson to Nokia) is not loaded as an approved "
+    "mapping in the NETIQ knowledge base, so I will not guess one. Name the exact parameter and refer to the Ericsson / Nokia "
+    "Attributes and Mapping documents, or ask your NETIQ administrator to add the approved mapping."
+)
+
+
+def _guard_reply(query: str) -> tuple[str, str, str, str] | None:
+    """Return (status, answer, agent, response_type) for policy / scope guards, else None."""
+    q = query.strip()
+    ql = q.lower()
+    if _RE_INJECTION.search(q):
+        return "NO_MATCH", _MSG_INJECTION, "POLICY_GUARD", "RT-06"
+    if _RE_PRIVACY.search(q):
+        return "NO_MATCH", _MSG_PRIVACY, "POLICY_GUARD", "RT-12"
+    if _RE_CHANGE_REQUEST.search(q) and not re.match(r"^\s*(show|list|what|which|how|where|why|who|find|get|give|display)\b", ql):
+        return "NO_MATCH", _MSG_READ_ONLY, "POLICY_GUARD", "RT-12"
+    if _RE_OFF_TOPIC.search(q) and not re.search(r"\b(netiq|cell|node|site|circle|audit|stitch)\w*", ql):
+        return "NO_MATCH", _MSG_OFF_TOPIC, "POLICY_GUARD", "RT-06"
+    return None
+
+
+def _scope_reply(query: str) -> tuple[str, str, str, str] | None:
+    """Scope-limit answers for question-form queries about data NETIQ does not hold."""
+    q = query.strip()
+    if _REPORT_VERBS.match(q) and not re.search(r"\bpci\b.*\b(conflict|collision)", q, re.I):
+        return None
+    if _FQA_ID_TOKEN.search(q):  # a concrete site / cell / node id means a data question, not a scope question
+        return None
+    if _RE_PCI_CONFLICT.search(q):
+        return "NO_MATCH", _MSG_PCI_CONFLICT, "SCOPE_GUARD", "RT-05"
+    if _RE_VENDOR_EQUIV.search(q):
+        return "NO_MATCH", _MSG_VENDOR_EQUIV, "SCOPE_GUARD", "RT-04"
+    if _RE_ALARM_KPI.search(q):
+        return "NO_MATCH", _MSG_ALARM_KPI, "SCOPE_GUARD", "RT-05"
+    if re.search(r"\b3g\b|\bumts\b|\bwcdma\b|\brnc\b", q, re.I) and re.match(r"^\s*(which|what|where|how|why|is|are|does|do)\b", q, re.I):
+        # 3G data questions only; definition questions (e.g. "Explain RNC relationship") go to the knowledge agent.
+        if re.search(r"\b(cells?|sites?|nodes?|carrier|inventory|data|audit)\b", q, re.I):
+            return "NO_MATCH", _MSG_3G, "SCOPE_GUARD", "RT-05"
+    return None
+
+
+def _is_vague(query: str) -> bool:
+    toks = re.findall(r"[a-z]+", query.lower())
+    return bool(toks) and len(toks) <= 5 and all(t in _VAGUE_TOKENS for t in toks)
+
+
+
 class ChatService:
     """Orchestrates chat queries into standardized, verified ChatResponse payloads."""
 
@@ -174,6 +732,116 @@ class ChatService:
         except Exception:
             pass
         return {}
+
+    # ------------------------------------------------------------------
+    # Step 0: fixed Q&A + guardrails (deterministic, runs before routing)
+    # ------------------------------------------------------------------
+    def _handle_fixed_qa(
+        self,
+        request: ChatRequest,
+        user: UserContext,
+        session_id: str,
+        session_state: Any,
+        t0: float,
+    ) -> ChatResponse | None:
+        query = request.query.strip()
+        q_lower = query.lower()
+
+        def _respond(
+            status: str,
+            answer: str,
+            agent: str,
+            sources: list[SourceReference] | None = None,
+            warnings: list[str] | None = None,
+            limitations: list[str] | None = None,
+        ) -> ChatResponse:
+            default_result_store.update_session(
+                session_id=session_id,
+                owner_username=user.username,
+                user_question=request.query,
+                assistant_answer=answer,
+            )
+            return ChatResponse(
+                request_id=request.request_id,
+                session_id=session_id,
+                status=status,
+                intent="KNOWLEDGE",
+                agent=agent,
+                answer=answer,
+                sources=sources or [],
+                warnings=warnings or [],
+                limitations=limitations or [],
+                mode=settings.netiq_api_mode.value,
+                execution_time_ms=int((time.perf_counter() - t0) * 1000),
+            )
+
+        # A. Policy guards: prompt-injection, other users' data, change requests, off-topic
+        guard = _guard_reply(query)
+        if guard:
+            status, answer, agent, _rt = guard
+            return _respond(status, answer, agent)
+
+        # A2. Bare follow-ups with no previous result to refer to -> ask for context
+        if not session_state.last_result_id and _RE_NEEDS_CONTEXT.search(query):
+            return _respond("AMBIGUOUS", _MSG_NEEDS_CONTEXT, "CLARIFY_AGENT")
+
+        # B. Follow-up filters on a live result are handled by the data path, not the FAQ
+        is_followup_filter = bool(session_state.last_result_id) and q_lower.startswith(
+            ("show only ", "filter ", "only ")
+        )
+        if not is_followup_filter:
+            strict = (
+                q_lower.startswith(_FQA_STRICT_START)
+                or not _FQA_QUESTION_START.search(query)
+                or bool(_FQA_DATA_REQUEST.search(query))
+                or bool(_FQA_DEICTIC.search(query))
+            )
+            hit = _fixed_qa.match(query, strict=strict, exact_only=not _FQA_QUESTION_START.search(query))
+            if hit:
+                entry, score, how = hit
+                answer = entry["answer"].strip()
+                warnings: list[str] = []
+                if entry.get("type") == "deployment-specific":
+                    answer += (
+                        " (This value is confirmed per deployment - please verify it with your NETIQ administrator.)"
+                    )
+                    warnings.append("Deployment-specific: confirm the final value with your NETIQ administrator.")
+                sources = [
+                    SourceReference(
+                        reportId=None,
+                        reportName=(
+                            f"{r.get('document', 'NETIQ')} {r.get('section', '')}".strip()
+                        ),
+                        domain=entry.get("category"),
+                        mode=settings.netiq_api_mode.value,
+                        docId=entry["id"],
+                    )
+                    for r in (entry.get("source_references") or [])[:3]
+                ] or [
+                    SourceReference(
+                        reportName="NETIQ fixed Q&A",
+                        domain=entry.get("category"),
+                        mode=settings.netiq_api_mode.value,
+                        docId=entry["id"],
+                    )
+                ]
+                limitations = (
+                    ["Scope limit: " + entry["question"]] if entry.get("type") == "scope-limit" else []
+                )
+                resp = _respond("SUCCESS", answer, "FIXED_QA_AGENT", sources, warnings, limitations)
+                return resp
+
+        # C. Scope-limit answers (data NETIQ does not hold) for question-form queries
+        scope = _scope_reply(query)
+        if scope:
+            status, answer, agent, _rt = scope
+            return _respond(status, answer, agent)
+
+        # D. Too vague to route: ask one short clarifying question
+        if _is_vague(query) and not session_state.last_result_id:
+            return _respond("AMBIGUOUS", _MSG_AMBIGUOUS, "CLARIFY_AGENT")
+
+        return None
 
     async def process_chat(self, request: ChatRequest, user: UserContext) -> ChatResponse:
         """Process a user chat request and return a standardized ChatResponse."""
@@ -194,6 +862,11 @@ class ChatService:
         extracted_circles = _extract_circles_from_text(query)
         if not requested_circle and len(extracted_circles) == 1:
             requested_circle = extracted_circles[0]
+
+        # 0. Fixed Q&A answers and conversational guardrails (deterministic, no LLM)
+        fixed = self._handle_fixed_qa(request, user, session_id, session_state, t0)
+        if fixed is not None:
+            return fixed
 
         # 1. Handle Export Follow-Up ("Export the result", "Export to Excel")
         if any(w in q_lower for w in ("export", "download excel", "xlsx")) and session_state.last_result_id:
@@ -246,7 +919,9 @@ class ChatService:
             )
 
         # 4. Handle Knowledge Questions
-        if any(kw in q_lower for kw in ("explain", "difference between", "what is", "what happens", "sop-", "cplane", "uplane", "rsrp")):
+        if any(kw in q_lower for kw in ("explain", "difference between", "what is", "what happens", "sop-", "cplane", "uplane", "rsrp")) or (
+            "severity" in q_lower and not q_lower.startswith(_FQA_STRICT_START)
+        ):
             return await self._handle_knowledge(request, user, session_id, t0)
 
         # 5. Authorize Circle before Report Execution

@@ -1,0 +1,1196 @@
+[
+  {
+    "id": "NETIQ-GEN-001",
+    "category": "Platform Overview",
+    "question": "What is NETIQ?",
+    "answer": "NETIQ (Network Intelligence & Quality) is an AI-powered audit and intelligence platform from Avendum Technologies. It collects configuration-management (CM) dumps from every domain's NMS/EMS, normalises them into one common data model, audits them against configurable rules, and stitches the result into a single end-to-end picture from radio cell to core. It does not replace existing systems; it sits above them and reconciles them."
+  },
+  {
+    "id": "NETIQ-GEN-002",
+    "category": "Platform Overview",
+    "question": "What problems does NETIQ solve for the operator?",
+    "answer": "It addresses five problems: (1) the 'illusion of accuracy' where NMS/OSS data is used without verification; (2) legacy/ghost elements that stay active after decommissioning; (3) incorrect site/node linkages that break fault isolation; (4) conflicting data across Excel sheets and vendor files; and (5) the lack of a deep audit engine, because NMS tools are built for operations, not cross-validation of topology."
+  },
+  {
+    "id": "NETIQ-GEN-003",
+    "category": "Platform Overview",
+    "question": "Does NETIQ replace our existing NMS, EMS or OSS?",
+    "answer": "No. NETIQ operates independently of live OSS and sits above the existing systems. It consumes their exports (CM dumps), reconciles them and gives a single trustworthy view. It is read-and-reconcile only and never writes configuration back to the network."
+  },
+  {
+    "id": "NETIQ-GEN-004",
+    "category": "Platform Overview",
+    "question": "Which network domains does NETIQ cover today?",
+    "answer": "Live domains are RAN (2G/4G/5G nodes, cells, hardware, cabinet, IP, Core IP), Microwave (MW), UBR, Transport, FTTH and Wireline, plus end-to-end Service Stitching from RAN through MW/UBR/FTTH, Wireline and aggregation to the Core. The Core itself is only the stitching endpoint and is not deeply audited."
+  },
+  {
+    "id": "NETIQ-GEN-005",
+    "category": "Platform Overview",
+    "question": "Which vendors and technologies does NETIQ support?",
+    "answer": "Technologies: 2G/4G/5G radio, microwave and UBR transport, FTTH and Wireline. Vendors are multi-vendor, for example Ericsson, Nokia, Huawei, ZTE and Samsung for radio, and Ceragon (and Cambium per the manual) for microwave/UBR. Detailed attribute-mapping documents are maintained for Ericsson and Nokia. The exact vendor set per domain is confirmed per deployment."
+  },
+  {
+    "id": "NETIQ-GEN-006",
+    "category": "Platform Overview",
+    "question": "What are the main modules of the NETIQ console?",
+    "answer": "The sidebar has six modules: Network Intelligence View (dashboards), Service Path Explorer Canvas (topology and stitching), Network Health Scorecard (audits), Network Truth Repository (normalised inventory), AI Insights Engine (inference reports) and Decommission Ledger (deleted/retired assets). The Network Intelligence View also contains AI Intelligence (BETA). Two global tools support them: Catchy Search / Smart Filter and the Platform Tour."
+  },
+  {
+    "id": "NETIQ-GEN-007",
+    "category": "Platform Overview",
+    "question": "Who are the intended users of NETIQ?",
+    "answer": "Circle Operations, NOC/OSS teams, Audit and Inventory/Data Governance teams, Network Planning and Analytics, Administrators and management. OEMs are stakeholders because they are responsible for CM dump delivery. Each user sees only the circles and domains their role permits."
+  },
+  {
+    "id": "NETIQ-GEN-008",
+    "category": "Platform Overview",
+    "question": "What business benefits does NETIQ target?",
+    "answer": "Improve RAN inventory accuracy to 99.9% or better, reduce MTTR through better network visibility, detect and eliminate ghost/legacy elements, enforce naming and planned-configuration compliance, and reduce dependency on manual Excel-based audits. Management can also track the stitch percentage with evidence."
+  },
+  {
+    "id": "NETIQ-GEN-009",
+    "category": "Platform Overview",
+    "question": "What is the hierarchy NETIQ uses to organise RAN inventory?",
+    "answer": "Nation, Circle, Site, Node, Cell, Attributes. Site is the anchor: every element rolls up to a Site. A Site holds one or more Nodes (eNodeB/gNodeB/SRAN), each Node holds Cells (for example 4G LNCEL, 5G NRCELL) and each Cell has attributes such as TAC, PCI, EARFCN, bandwidth and GPS. Hardware (cabinets, boards, RUs) links to both Site and Node."
+  },
+  {
+    "id": "NETIQ-GEN-010",
+    "category": "Platform Overview",
+    "question": "How does NETIQ assign a circle to a node or cell?",
+    "answer": "Circle is derived from the MCC/MNC defined on the node or cell class, using the 'MCC MNC Mapping' tab of the 'Reporting and Attribute Details' reference workbook. If an OSS dump contains MCC/MNC values belonging to a different circle, those sites, nodes and cells are routed to that circle."
+  },
+  {
+    "id": "NETIQ-GEN-011",
+    "category": "Platform Overview",
+    "question": "How does NETIQ derive the Site ID?",
+    "answer": "Site ID can be derived from Node or Cell data, with Cell taking priority. If both derivations match, Site ID Source is 'Same in Cell and Node'; if they differ it is 'Cell Name'; if it comes from a static sheet or customer-approved entry it is 'Manual/Customer Approved'. Vendor-specific logic and nomenclature overrides are defined in the Ericsson and Nokia mapping documents. GPS, Cell IDs and TACs cross-validate the mapping."
+  },
+  {
+    "id": "NETIQ-GEN-012",
+    "category": "Platform Overview",
+    "question": "What documents describe NETIQ and which is the controlling reference?",
+    "answer": "The Solution Document (v3.3) is the controlling design reference covering objective, scope, architecture, FRD, reporting schema, KPIs, test cases and NFRs. The User Manual (v3.5) is the screen-by-screen operating companion. The Technical Solution Document (v1.2) is the build-level design for development teams. The AI-driven service stitching design (updated 29-Sep-2026) is consolidated into Solution Document section 9.10."
+  },
+  {
+    "id": "NETIQ-SCP-001",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "What is out of scope for the current NETIQ release?",
+    "answer": "Deep configuration audit of the Core (EPC/5GC); a dedicated IP/Router domain and optical/DWDM deep audit; live real-time API integration with source OSS/NMS (ingestion is file-based); integration with ticketing and external planning tools (for example ServiceNow, Remedy); automated corrective actions or closed-loop orchestration; writing configuration back to the network; and real-time fault/performance management (alarms and counters)."
+  },
+  {
+    "id": "NETIQ-SCP-002",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "Does NETIQ do real-time alarm or performance monitoring?",
+    "answer": "No. NETIQ audits configuration and inventory from CM dumps. It does not consume live alarms, counters or performance KPIs. Data freshness is bounded by the collection cadence, typically a daily cycle."
+  },
+  {
+    "id": "NETIQ-SCP-003",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "Does NETIQ integrate with ServiceNow, Remedy or other ticketing systems?",
+    "answer": "Not in the current scope. Integration with ticketing systems, external planning tools and other OSS/BSS systems is listed as a future-phase capability. Today, findings are exported to Excel/CSV and handed to the owning team."
+  },
+  {
+    "id": "NETIQ-SCP-004",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "Does NETIQ provide a REST API for downstream systems?",
+    "answer": "Not in the delivered scope today. Exposing stitching results through REST endpoints for OSS/BSS consumption is a proposed optional enhancement awaiting scope confirmation. Current outbound integration is on-demand Excel/CSV export from any report."
+  },
+  {
+    "id": "NETIQ-SCP-005",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "Does NETIQ automatically fix the inventory or network configuration?",
+    "answer": "No. NETIQ is read-and-reconcile. Fixes are made at source; the finding clears automatically once the corrected data is ingested in the next cycle. AI suggestions are surfaced for review and are not written back without acceptance. Auto-healing (promoting AI-suggested links to draft link records) is a recommended enhancement awaiting confirmation."
+  },
+  {
+    "id": "NETIQ-SCP-006",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "Does NETIQ audit the Core network (EPC / 5GC)?",
+    "answer": "No. The Core is referenced only as the end point of service stitching (matched through the Core IP Report). Deep configuration and inventory audit of the packet/mobile core is a future-phase item."
+  },
+  {
+    "id": "NETIQ-SCP-007",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "What enhancements are proposed for service stitching?",
+    "answer": "Six enhancements await scope confirmation: (1) auto-healing of AI-suggested links, (2) multi-circle rollout dashboard with stitching coverage per circle, (3) REST API for stitching results, (4) historical delta tracking between stitching snapshots, (5) planning-link comparison module to detect missing deployments, and (6) a mobile map/service-status view for field engineers. Items 1, 2 and 5 are marked recommended."
+  },
+  {
+    "id": "NETIQ-SCP-008",
+    "category": "Scope, Limitations & Roadmap",
+    "question": "What future phases are planned beyond the current platform?",
+    "answer": "Core network audit (EPC/5GC), IP/Router and optical/DWDM domains, live OSS/NMS API integration, external system integration (ticketing, planning), closed-loop automation and auto-remediation, predictive analytics (capacity forecasting and predictive anomaly detection), and extended long-term retention."
+  },
+  {
+    "id": "NETIQ-ARC-001",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What is the high-level architecture of NETIQ?",
+    "answer": "Five cooperating layers: Collection (scheduled collectors pull CM dumps), Ingestion & Parsing (vendor-specific parsers normalise to the common model), Intelligence & Audit (validation, duplicate, mapping and compliance rules plus AI inference), Storage (inventory, audit results, stitched paths and history) and Presentation (role-aware web console). Process flow: CM Dumps, Data Collection Layer, NETIQ, Audit & Validation, Dashboards/Reports."
+  },
+  {
+    "id": "NETIQ-ARC-002",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What are the architecture principles of NETIQ?",
+    "answer": "Single source of truth across domains; source-agnostic ingestion (vendor dialects normalised to a common model); idempotent processing (re-ingestion updates in place, never duplicates); separation of concerns across collection, intelligence, storage and presentation; and security by design with role-based access on every circle, domain and action."
+  },
+  {
+    "id": "NETIQ-ARC-003",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What components make up the NETIQ platform?",
+    "answer": "Collector (one profile per domain/source), Parser registry (pluggable parsers keyed by file signature), Normaliser (field mapping, types, units, controlled vocabularies), Audit engine (rule-driven, severity-tagged findings), Stitching engine (site matching then cross-domain link resolution and scoring), Inference engine (Site/Node/Cell relationships with confidence), Data store, Web application (RBAC, server-side filtering/pagination) and Scheduler (cadence, no overlapping runs)."
+  },
+  {
+    "id": "NETIQ-ARC-004",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What is the processing pipeline for each cycle?",
+    "answer": "The scheduler runs an ordered pipeline: collect, parse, normalise, validate, load, audit, stitch, infer and publish. Domains can run on independent cadences, but within a domain the stages run in sequence so audits and stitching always work on a fully loaded inventory. The scheduler prevents overlapping runs for a domain and records start/end times and record counts per stage."
+  },
+  {
+    "id": "NETIQ-ARC-005",
+    "category": "Architecture, Deployment & Technology",
+    "question": "How is NETIQ deployed and accessed?",
+    "answer": "NETIQ is a server-hosted, browser-accessed application with an application/web tier, a processing tier (collectors, parsers, audit and stitching engines, scheduler) and a data store, which may be co-located or separated by scale. Users open the URL provided by their administrator (example format http://<server-ip>:8095/login). No client software is installed. Exact server topology, CPU/RAM/disk and OS versions are deployment-specific and confirmed with the infrastructure team."
+  },
+  {
+    "id": "NETIQ-ARC-006",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What are the client browser and screen requirements?",
+    "answer": "Use the latest Chrome, Edge or Firefox; Internet Explorer is not supported. Minimum screen 1366x768, with 1920x1080 or higher recommended for dashboards and the Service Path Explorer canvas. HTTPS access to the NETIQ URL over corporate LAN or VPN, a valid account with an assigned role, and about 8 GB RAM or more is comfortable for large inventory grids."
+  },
+  {
+    "id": "NETIQ-ARC-007",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What environments are used for NETIQ delivery?",
+    "answer": "Development (build and unit verification), UAT/Staging (customer acceptance on production-like data) and Production (live operation across in-scope circles and domains). Rollout is phased: Proof of Concept, Domain Expansion (FTTH, Wireline, Transport detail), Stitching & Analytics, then PAN-India rollout."
+  },
+  {
+    "id": "NETIQ-ARC-008",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What is the technology stack of NETIQ?",
+    "answer": "The solution document describes the stack by layer: a browser-based web application with no client install; server-side application/API services; processing components (collector, parser, audit, stitching, scheduler); a persistent data store for inventory, audit results and stitched paths; and RBAC/authentication/session/audit-logging controls. Specific products, versions and frameworks are implementation choices recorded for the delivered build and are not fixed in the document."
+  },
+  {
+    "id": "NETIQ-ARC-009",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What data volumes is NETIQ designed for?",
+    "answer": "Indicative discovery volumes across the estate: about 18 source NMS, 46,000+ sites, 64,000+ nodes, 629,000+ cells, 309,000+ hardware items and about 7.9 million Wireline logical records (the largest dataset). These figures are indicative and should be refreshed from the live platform for the delivered baseline."
+  },
+  {
+    "id": "NETIQ-ARC-010",
+    "category": "Architecture, Deployment & Technology",
+    "question": "What performance and availability targets apply?",
+    "answer": "Parse and audit about 100,000+ cells in under 10 minutes; reports stay responsive on multi-million-row datasets through server-side filtering and pagination; console availability target of at least 99.5%; the processing tier tolerates a missed cycle without data loss because ingestion is idempotent. Targets marked indicative are confirmed and contracted per deployment."
+  },
+  {
+    "id": "NETIQ-ARC-011",
+    "category": "Architecture, Deployment & Technology",
+    "question": "How do rules and parsers change without code changes?",
+    "answer": "Vendor-neutral logic is held in external reference documents and configuration: the Ericsson and Nokia Attributes and Mapping documents and the 'Reporting and Attribute Details' workbook (report formats, mandatory attributes, Site ID rules, severity rules, MCC/MNC mapping, NMS IP/name mapping). Audit rules are kept in versioned YAML files, parsers are modular and pluggable, and ML models are versioned and validated before promotion. Changes take effect on the next cycle."
+  },
+  {
+    "id": "NETIQ-ARC-012",
+    "category": "Architecture, Deployment & Technology",
+    "question": "How are logging, errors and reprocessing handled?",
+    "answer": "Every stage logs start/end, volumes processed and rejects. Malformed records are quarantined as rejects with a reason code rather than failing the whole cycle. Because loading is an idempotent upsert on natural keys, a failed or partial cycle can be safely re-run without duplication."
+  },
+  {
+    "id": "NETIQ-ING-001",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What data does NETIQ ingest and how often?",
+    "answer": "The primary input is daily Configuration Management (CM) dumps from each domain's NMS/EMS, collected on a schedule per domain (for example daily). Planning/reference files are used for validation where available, and the static 'Reporting and Attribute Details' workbook supplies reference rules. Dumps are parsed, normalised into the common model, validated and loaded via idempotent upsert."
+  },
+  {
+    "id": "NETIQ-ING-002",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What are the steps of the daily ingestion and sync process?",
+    "answer": "1) Collect circle-wise CM dumps and copy them from OSS folders to the NETIQ environment; 2) vendor-specific parsers extract node, cell, hardware and attributes into a unified schema; 3) load into the central inventory database against the last baseline; 4) validate: dump-size consistency, attribute completeness (Site ID, Node ID, GPS, IP, cabinet) and duplicates. The output is a validated, normalised, site-mapped dataset that feeds all audits, reports and dashboards."
+  },
+  {
+    "id": "NETIQ-ING-003",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What is delta import and how are New, Updated, Removed and Total counts defined?",
+    "answer": "NETIQ compares each day's dump with the previous state on the natural key and processes only the change set. Total = New + Updated + Available (unchanged) inventory; New = first seen in today's dump; Updated = changed versus last discovered values; Remove = present previously but absent today. Unchanged 'Available' records count in Total but are not reprocessed, which is the source of the performance gain."
+  },
+  {
+    "id": "NETIQ-ING-004",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What happens if the same dump is ingested twice?",
+    "answer": "Nothing is duplicated. Loading is an idempotent upsert on natural keys (node, cell, serial or link identifiers), so re-ingesting updates records in place and counts are not inflated."
+  },
+  {
+    "id": "NETIQ-ING-005",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "How does NETIQ decide whether an NMS is Updated or Non-Updated?",
+    "answer": "An NMS (unique NMS IP from the reference sheet) is Updated when its dump size exceeds 10 MB and the dump date is the current date or current date minus one. It is Non-Updated when the dump exceeds 10 MB but is older than that window. NMS folders under 10 MB or 0 bytes are treated as orphan and excluded from counts. New NMS are folders not processed before. NMS with reduced dump sizes are highlighted."
+  },
+  {
+    "id": "NETIQ-ING-006",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "When does NETIQ flag a reduced dump size as an anomaly?",
+    "answer": "The dump-size consistency check compares file size and record count with the previous day. For RAN, if the size reduces by more than 100 MB the record is flagged as an anomaly. NMS instances with reduced dump sizes are highlighted on dashboards and reports."
+  },
+  {
+    "id": "NETIQ-ING-007",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What happens to malformed or invalid records during ingestion?",
+    "answer": "Rows failing validation (mandatory fields, types, ranges, controlled values) go to a reject store with a reason code and source reference; they are never silently dropped. A per-cycle ingestion summary records files processed, records loaded and records rejected per domain, so data owners can correct the source and have it re-ingested next cycle."
+  },
+  {
+    "id": "NETIQ-ING-008",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "How current is the data shown in NETIQ?",
+    "answer": "It reflects the last scheduled collection cycle. Check the last-updated indicator in the report footer or the status tile at the foot of the sidebar. Data freshness is bounded by the source collection cadence."
+  },
+  {
+    "id": "NETIQ-ING-009",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What happens if a source dump is missed or delayed?",
+    "answer": "NETIQ tolerates a missed cycle without data loss because ingestion is idempotent. The affected NMS shows as Non-Updated on the dashboard, and the scheduler-completion record helps operations spot missing cycles. Timely, complete source exports are a stated dependency, so source SLAs should be agreed and missing cycles alerted."
+  },
+  {
+    "id": "NETIQ-ING-010",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What happens to elements that disappear from a dump?",
+    "answer": "Records present in the previous dump but absent today are counted as Removed (Deleted). They age out of the live inventory and are preserved in the Decommission Ledger, so history stays auditable. Retention is governed by a configurable policy."
+  },
+  {
+    "id": "NETIQ-ING-011",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "What lineage information does each record carry?",
+    "answer": "Each record stores its originating source (NMS/EMS), site source (Cell, Node, Both or Manual) and insert/update timestamps. This lets users judge how current and trustworthy a record is, supports delta tracking between cycles and underpins the Deleted Reports view."
+  },
+  {
+    "id": "NETIQ-ING-012",
+    "category": "Data Collection, Ingestion & Delta Import",
+    "question": "How long is data retained?",
+    "answer": "Each cycle is retained for trend and historical analysis under a configurable retention policy; the window is set per deployment (the user manual cites 180 days as an example) and administrators manage it. The purge/archival policy uses partitioned database storage and gzip archive jobs and is exposed in the UI for visibility."
+  },
+  {
+    "id": "NETIQ-SEC-001",
+    "category": "Access, Roles & Security",
+    "question": "How do I log in to NETIQ?",
+    "answer": "Open the NETIQ URL provided by your administrator, enter your registered user e-mail and password, and click Sign In. On success you land on the default dashboard (RAN), scoped to the circles and domains your role allows. On failure an inline error appears; re-enter credentials or use the password-reset option."
+  },
+  {
+    "id": "NETIQ-SEC-002",
+    "category": "Access, Roles & Security",
+    "question": "I forgot my password. What should I do?",
+    "answer": "Avoid repeated attempts because repeated failures may lock the account. With NETIQ's built-in login, use the Forgot Password link and follow the e-mailed reset instructions. If your organisation uses single sign-on (SSO/LDAP), reset your network password through the normal corporate process. If still locked out, contact your NETIQ administrator or the support desk."
+  },
+  {
+    "id": "NETIQ-SEC-003",
+    "category": "Access, Roles & Security",
+    "question": "What is the password and session policy?",
+    "answer": "Built-in login enforces a password policy (minimum length and complexity, periodic expiry, password history) and lockout after repeated failed attempts. Sessions expire after inactivity and return the user to the login screen. Logins and significant actions are logged in an audit trail retained per policy."
+  },
+  {
+    "id": "NETIQ-SEC-004",
+    "category": "Access, Roles & Security",
+    "question": "Does NETIQ support SSO, LDAP and multi-factor authentication?",
+    "answer": "Where configured, NETIQ integrates with corporate SSO/LDAP so the network account governs access, and supports optional MFA with an authenticator app, e-mail or SMS. The user manual marks MFA as not applicable for the documented build, so confirm whether SSO/LDAP and MFA are enabled in your deployment with your administrator."
+  },
+  {
+    "id": "NETIQ-SEC-005",
+    "category": "Access, Roles & Security",
+    "question": "What access roles exist in NETIQ?",
+    "answer": "The governance model has three tiers: Admin (PAN India; read, write, update, delete, approve; limited to product owner and super-admin), Hub Lead (multiple circles; read, update, approve; approves exceptions for Cell Name, Site ID and Node Name; no write/delete) and Circle User (read-only, scoped to one circle). The live console exposes finer roles: Super Admin, Admin, Operator, Auditor, NOC User and Read Only, which map onto those tiers."
+  },
+  {
+    "id": "NETIQ-SEC-006",
+    "category": "Access, Roles & Security",
+    "question": "Why can I see only some circles or menus?",
+    "answer": "Your role scopes you to specific circles and domains through RBAC. A message such as 'Access denied / not authorised' means the dashboard, repository or action is outside your role. If you believe you need access, ask your administrator; access is managed centrally by an Admin/Super Admin."
+  },
+  {
+    "id": "NETIQ-SEC-007",
+    "category": "Access, Roles & Security",
+    "question": "Can two people share one NETIQ login?",
+    "answer": "No. Each user should have their own account so that actions are attributed correctly and audit logging remains meaningful."
+  },
+  {
+    "id": "NETIQ-SEC-008",
+    "category": "Access, Roles & Security",
+    "question": "Can NETIQ users modify the underlying network data?",
+    "answer": "Exports are read-only and do not modify source data, and NETIQ never writes configuration to the network. Corrections are made at the source system and flow in through the next CM dump. Hub Leads approve exceptions (Cell Name, Site ID, Node Name) and perform day-to-day metadata fixes; Circle Users are read-only."
+  },
+  {
+    "id": "NETIQ-SEC-009",
+    "category": "Access, Roles & Security",
+    "question": "What security and governance controls does NETIQ provide?",
+    "answer": "RBAC on every circle, domain and action; authentication with password policy and optional SSO/MFA; session management; audit logs of parser runs, rule changes and model promotions (version-controlled); versioned YAML rules and ML models; configurable data retention; and least-privilege role assignment with periodic access reviews as a mitigation for RBAC misconfiguration."
+  },
+  {
+    "id": "NETIQ-UI-001",
+    "category": "Navigation, Filters & Search",
+    "question": "How do I switch between RAN and Transport views?",
+    "answer": "Use the Project Hub switcher (RAN / Txn) on the top command bar. Txn opens the microwave, UBR and fibre backhaul context; the Type dropdown then narrows it to ALL, MW or UBR (it only appears with Txn). The dashboard, KPI strip, inventory tree and audit menus all re-scope, and the selection persists as you move between modules until you switch back."
+  },
+  {
+    "id": "NETIQ-UI-002",
+    "category": "Navigation, Filters & Search",
+    "question": "How do I filter by circle and vendor?",
+    "answer": "Set Circle in the top command bar, or open the blue funnel Dashboard Filter Panel (Circle, Vendor, Apply Filters, Reset). Circle and Vendor filters are sticky for the session and carry between reports until you click Reset All. Column filters apply only to the single report you are viewing."
+  },
+  {
+    "id": "NETIQ-UI-003",
+    "category": "Navigation, Filters & Search",
+    "question": "What controls are common to every report grid?",
+    "answer": "View toggle (table, card, list), Columns (show/hide), Filters (per column), Export (CSV/Excel), Advanced multi-condition query builder, column sort (multi-level), row expand for the full record, record count, pagination with rows per page, and a last-updated indicator in the footer."
+  },
+  {
+    "id": "NETIQ-UI-004",
+    "category": "Navigation, Filters & Search",
+    "question": "How do I export a report?",
+    "answer": "Open the report, apply the circle/vendor/column filters and column choices you want, click Export and choose CSV or Excel. The file contains exactly the rows and columns in view and is read-only. Scope the report first to avoid exporting the whole estate. If nothing downloads, allow pop-ups and downloads for the NETIQ site."
+  },
+  {
+    "id": "NETIQ-UI-005",
+    "category": "Navigation, Filters & Search",
+    "question": "How do I find one specific node, cell or serial number?",
+    "answer": "Use the per-column filter or search on the relevant report, or open the Advanced query builder for multi-condition searches. You can also type the identifier into Catchy Search, and on the Service Path Explorer the 'Filter Site ID' search centres the canvas on any site, node or link."
+  },
+  {
+    "id": "NETIQ-UI-006",
+    "category": "Navigation, Filters & Search",
+    "question": "What is Catchy Search (Smart Filter)?",
+    "answer": "A command palette in the top bar that turns plain-language questions into precise checks. It offers Quick Ideas (friendly aliases for technical audits) and Smart Shortcuts (one-click deep links), then opens the matching audit or inventory report already filtered to the relevant records. In the current build it is labelled 'Smart Filter (BETA) - Powered by AI'."
+  },
+  {
+    "id": "NETIQ-UI-007",
+    "category": "Navigation, Filters & Search",
+    "question": "What are the Quick Ideas and which reports do they open?",
+    "answer": "'This link is feeling weak' opens the Degraded Link Audit; 'Lost? multiple sites forgot where they are' opens GPS Accuracy Audit/GPS Suggestion; 'Two nodes, same name' opens Duplicate Node Audit/Duplicate Resolution; 'Your plan and reality disagree' opens Planned vs Configured/Frequency Deviation; 'These cells forgot their frequency' opens Missing EARFCN; 'A node that won't leave' opens Ghost Nodes; 'Unplugged? Cells without a radio unit' opens Cell-to-RU Link Audit; 'This name doesn't follow the rules' opens Nomenclature/Site ID validation."
+  },
+  {
+    "id": "NETIQ-UI-008",
+    "category": "Navigation, Filters & Search",
+    "question": "What are the Smart Shortcuts?",
+    "answer": "Five one-click tiles: 'Critical anomalies impacting 10+ sites' (highest-impact findings ranked by site count), 'Show sites missing GPS coordinates' (GPS Accuracy Audit filtered to failures), 'Find duplicate Node IDs in network' (Duplicate Node Audit), 'List cells missing EARFCN' and 'Show ghost or legacy nodes' (Ghost Nodes report)."
+  },
+  {
+    "id": "NETIQ-UI-009",
+    "category": "Navigation, Filters & Search",
+    "question": "What Smart Filter prompts are available on the Service Path Explorer?",
+    "answer": "Stitching-aware prompts include: 'Where is the edge VLAN mismatch?' (VLAN_MISMATCH / MISSING_TX_HOP), 'Edge routing discrepancy on L2/L3 hops' (MISSING_AGW, Default_AP/Default_AGW), 'Stitching paths with confidence < 80%' (Partial, Suggested, Unresolved), 'AI Inference: recommended topology fixes' (Condition 1-4 suggestions), 'Unresolved edges (missing transport nodes)' (NO_TX_NODE), and 'Fully stitched active paths (E2E verified)' (score 80 or more). Others open the animated path, the media-mix distribution or the stitching report."
+  },
+  {
+    "id": "NETIQ-UI-010",
+    "category": "Navigation, Filters & Search",
+    "question": "What is the Platform Tour?",
+    "answer": "A built-in interactive guided walkthrough that highlights each control in turn and explains what it does inside the live application. It covers orientation and navigation, the RAN and Transmission dashboards, inventory grids, the Network Health Scorecard and the Service Path Explorer, and is the quickest way for a new user to get oriented."
+  },
+  {
+    "id": "NETIQ-UI-011",
+    "category": "Navigation, Filters & Search",
+    "question": "What notifications and alerts does NETIQ send?",
+    "answer": "Role-aware notifications for audit findings, health/threshold breaches, AI-inference insights, scheduled-report-ready events and data-refresh completion, delivered in-app and, where enabled, by e-mail digest. Detailed notification preference screens are marked not applicable in the current user manual."
+  },
+  {
+    "id": "NETIQ-UI-012",
+    "category": "Navigation, Filters & Search",
+    "question": "Are there keyboard shortcuts?",
+    "answer": "NETIQ is mainly mouse-driven. Catchy Search opens the command palette (the in-app hint shows the key for your build); Esc closes dialogs, panels and the palette; F5 or Ctrl+R reloads the screen; Ctrl+F searches the current page; Ctrl +/- adjusts zoom (reset to 100% if dashboards are clipped). Availability varies by browser and deployment."
+  },
+  {
+    "id": "NETIQ-DSH-001",
+    "category": "Dashboards & KPIs",
+    "question": "What does the RAN dashboard show?",
+    "answer": "Read top to bottom: the Discovered Inventories KPI strip (NMS, Site, Node, Cell, Hardware), a discovery-metrics drill-down, Health Overview donut, Audit Insights (Top 5 anomalies), AI Inference (Site/Node/Cell), Network Audit Overview (total vs consistent issues), Network IP Audit (User/Control/Management/NR-ENDC planes by 2G/4G/5G), Node and Cell Distribution charts, and Node & Cell Change Tracking cards. Every number drills into the report behind it."
+  },
+  {
+    "id": "NETIQ-DSH-002",
+    "category": "Dashboards & KPIs",
+    "question": "What does the Health Overview card mean?",
+    "answer": "It shows a data-health score as a donut with a colour-coded status word (Good, Fair or Poor), the Total, Deleted and Not-Updated counts and a Health Progress bar. Green means clean, amber means records need attention and red means critical data-quality issues, so you know where to focus first."
+  },
+  {
+    "id": "NETIQ-DSH-003",
+    "category": "Dashboards & KPIs",
+    "question": "How is NMS Discovery (%) calculated?",
+    "answer": "NMS Discovery % = NMS processed on the current date divided by the number of NMS listed in the static reference sheet (Total OSS/NMS count). Clicking it shows Total NMS, Today Updated, Not Updated and Newly Discovered NMS, each with tabular detail (circle, EMS IP, name, vendor, last updated date, current and last dump size)."
+  },
+  {
+    "id": "NETIQ-DSH-004",
+    "category": "Dashboards & KPIs",
+    "question": "What is shown under Audit Insights?",
+    "answer": "The Top 5 data-validation anomalies with live counts and a category tag (Configuration or Data Quality), for example Missing Class attribute, Missing Hardware, Duplicate Cell 2G, Missing IP & Components and Duplicate IP. 'View All Issues' opens the full audit. In Txn mode it lists transmission anomalies such as Missing Txn Links, Non-Matched Freq. HOP, Non-Matched Channel BW. HOP, Duplicate Node and Orphan Nodes."
+  },
+  {
+    "id": "NETIQ-DSH-005",
+    "category": "Dashboards & KPIs",
+    "question": "What is the Network Audit Overview and what is a 'Consistent' count?",
+    "answer": "A bar chart of Total Issues against Consistent Count for each audit category (Missing Class attribute, Missing Hardware, Duplicate Cell, Missing IP & Components, Duplicate IP, 2G Compliance, Duplicate Node, Duplicate Hardware, GPS issue, Missing Cell to RU, Nomenclature Issue), with Total Issues, Consistent Cases and a Consistency Rate tile. 'Consistent' means issues persisting over the last 3 weeks (configurable). Click a bar to drill into the offending records."
+  },
+  {
+    "id": "NETIQ-DSH-006",
+    "category": "Dashboards & KPIs",
+    "question": "What does the Network IP Audit panel show?",
+    "answer": "Plane-wise addressing health across the User, Control, M-Plane and NR-ENDC planes, switchable by 2G/4G/5G tabs, with issue cards such as Nodes With Missing IPs, Duplicate IPs, Missing Gateway, Missing VLAN and Missing Core Details, plus a short written insight. The Solution Document adds checks of destination core mapping (SGW for user plane, MME/AMF for control plane), VLAN consistency, gateway alignment and subnet definitions."
+  },
+  {
+    "id": "NETIQ-DSH-007",
+    "category": "Dashboards & KPIs",
+    "question": "What does Node & Cell Change Tracking show?",
+    "answer": "For each element type (BTS, gNodeB, eNodeB, Ghost, SRANBS and 2G cells) NETIQ compares the latest cycle with the previous one and classifies records as Technology change, ID change, Name change or Stable. A record can fall into more than one class. Cards show Total, Changed vs prev and a progress bar; click a category to open the matching records. Ghost nodes have no technology change; their ID/Name changes appear in the change report."
+  },
+  {
+    "id": "NETIQ-DSH-008",
+    "category": "Dashboards & KPIs",
+    "question": "What do the Site Discovery, Node Discovery, Cell Discovery and HW Inventory tiles drill into?",
+    "answer": "Site Discovery: total unique Site IDs, updated per accepted nomenclature, non-uniform nomenclature, sites with no GPS and removed sites. Node Discovery: total, new, updated, name correction, non-uniform nomenclature, no-cell-mapped and orphan nodes. Cell Discovery: unique cells (4G and 5G), new, updated names, inconsistent nomenclature, missing EARFCN, missing TAC and missing Cell-to-RU mapping. HW Inventory: total, updated, removed and new inventory with circle-wise and vendor-wise breakdown."
+  },
+  {
+    "id": "NETIQ-DSH-009",
+    "category": "Dashboards & KPIs",
+    "question": "What dashboard panels are available for Transport, MW and UBR?",
+    "answer": "Txn discovery KPIs (NMS, Site, Node, Transmission-Link, Hardware), Txn Audit Insights, Vendor-wise Node Distribution, Node IP Version (IPv4 vs IPv6), Capacity-wise Hop Categorisation (0-250, 251-500, 501-1000, 1001-2000, 2001-4000 bands), Hop Type Distribution (1+0, 2+0 XPIC, 1+0 EBAND, 4+0 XPIC, MIMO), Transmission-links status (active/inactive, 1+0, 1+1, XPIC) and Planned vs Configured analysis."
+  },
+  {
+    "id": "NETIQ-DSH-010",
+    "category": "Dashboards & KPIs",
+    "question": "What is Deployment Compliance in the Planned vs Configured analysis?",
+    "answer": "Deployment Compliance = Deployed & Matched links divided by Total Planned links. The KPI tiles classify every planned link as Deployed & Matched, Deployed & Unmatched, Planned Not Deployed or Deployed Not Planned. 'Planned Not Deployed' feeds the Missing Txn Links insight. Configuration Validation compares Frequency, Channel Spacing, Modulation and Hop Type with Match % against Mismatch %."
+  },
+  {
+    "id": "NETIQ-DSH-011",
+    "category": "Dashboards & KPIs",
+    "question": "Can I drill down from PAN India to a single cell?",
+    "answer": "Yes. Dashboards support multi-level drill-down PAN India, Circle, NMS, Site, Node, Cell with dynamic filters for Vendor, Technology, Date Range and Audit Type, and views can be sliced PAN India-wise, circle-wise, vendor-wise and domain-wise for different teams."
+  },
+  {
+    "id": "NETIQ-DSH-012",
+    "category": "Dashboards & KPIs",
+    "question": "How are dashboards computed and refreshed?",
+    "answer": "Dashboards are computed from the freshly loaded inventory and the latest audit results for the active circle, vendor and domain context. Discovery counts, the NMS health gauge, distribution charts, IP-audit gauges and top anomalies are aggregated per circle and per domain at view time and recomputed on refresh."
+  },
+  {
+    "id": "NETIQ-DSH-013",
+    "category": "Dashboards & KPIs",
+    "question": "What does the summary audit dashboard report?",
+    "answer": "A pass/fail summary per validation area: total checks, passed, failed and pass % for Node/Class/Attribute count, Duplicate Data, Missing Classes/Attributes, Nomenclature Validation, Hardware & Cabinet Information, Site ID Mapping, GPS Validation and Cell-to-RU Mapping. The figures in the solution document are illustrative examples."
+  },
+  {
+    "id": "NETIQ-AUD-001",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What are the three audit families in NETIQ?",
+    "answer": "Validation (completeness and correctness: missing attributes, GPS, hardware, Site ID, IP), Duplicate (uniqueness: same identity discovered more than once) and Mapping (relationship and rule compliance: cell-to-radio-unit, mapping rules). The same discipline applies to Transport through the Transport Audit Suite. Each rule belongs to a family, targets an element type, encodes a check and assigns High/Medium/Low severity."
+  },
+  {
+    "id": "NETIQ-AUD-002",
+    "category": "RAN Audits & Validation Rules",
+    "question": "Which RAN audit validators are available in the Network Health Scorecard?",
+    "answer": "Configuration Validator (Validation): Missing Field Detector, GPS Accuracy Audit, Hardware Health Check, Site ID Integrity Check, IP Address Validator. Duplicate Detector: Duplicate Node Audit, 4G/5G/2G Duplicate Cell Audits, Duplicate IP Finder, Duplicate Equipment Audit. Mapping Compliance Audit: Cell-to-RU Link Audit and Mapping Rule Checker. A Transport Audit Suite covers MW Node Validation, MW Hardware Validation, MW Link Audit and UBR Link Audit."
+  },
+  {
+    "id": "NETIQ-AUD-003",
+    "category": "RAN Audits & Validation Rules",
+    "question": "How do I work an audit finding?",
+    "answer": "Choose the family tab and validator; use column filters to narrow to your circle, technology or node; expand a row to read the exact attribute or rule that failed; export the filtered list to the team owning the source data; fix at source. The finding clears automatically once the corrected dump is ingested in the next cycle."
+  },
+  {
+    "id": "NETIQ-AUD-004",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What does the Missing Field Detector check?",
+    "answer": "It finds nodes and cells missing mandatory classes or attributes (for example EARFCN, MCC/MNC, TAC, latitude/longitude, cabinet product name). Columns include Circle, Entity ID, Entity Name, Report Name, Site ID, Missing Attribute, Missing Class and Remark. Mandatory attributes and severity come from the static reference workbook."
+  },
+  {
+    "id": "NETIQ-AUD-005",
+    "category": "RAN Audits & Validation Rules",
+    "question": "How does the GPS validation work?",
+    "answer": "GPS values of node and cell are checked for completeness and correct mapping to the Site ID. Coordinates outside the valid range (latitude -90 to +90, longitude -180 to +180) or equal to 0,0 are flagged invalid. A Status column shows Pass or Failed. Accurate GPS is a prerequisite for topology, geo-based stitching and proximity searches."
+  },
+  {
+    "id": "NETIQ-AUD-006",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What do the Hardware Health Check and Hardware & Cabinet validations cover?",
+    "answer": "They verify that each node has complete cabinet and hardware information: cabinet availability, board mapping, and missing board attributes such as product code, version, serial number and vendor. Examples of anomalies: Missing Cabinet Record, Cabinet with No Inventory, Unknown Cabinet Model, Missing Serial Number (High), Duplicate Serial Numbers (High), New Board/Product Code identified (High) and Orphan Boards (Medium). Cabinet sources are CABINET_R for Nokia and vsDataCabinet for Ericsson."
+  },
+  {
+    "id": "NETIQ-AUD-007",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What is checked by the Site ID Integrity Check and Nomenclature validation?",
+    "answer": "That the Site ID generated from node-level and cell-level data is identical and follows the standard format; deviations, including those produced by AI inference, are highlighted. Node and cell naming conventions are enforced, with exceptions handled through the static 'Reporting & Attribute Details' sheet. Non-conforming Site IDs are reported with supported technology and status."
+  },
+  {
+    "id": "NETIQ-AUD-008",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What does the IP Address Validator and IP Data Report catch?",
+    "answer": "Out-of-range, unassigned, overlapping or conflicting addresses across planes; extra IPs mapped to a node; IPs missing VLAN, gateway, subnet mask or name; and VLAN entries missing IP details. Node logical parameters (IP, subnet mask, VLAN) are validated separately across C-Plane, U-Plane and M-Plane to ensure transport separation and management reachability."
+  },
+  {
+    "id": "NETIQ-AUD-009",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What duplicate checks does NETIQ run?",
+    "answer": "Duplicate Node IDs and Names, 4G/5G/2G Cell IDs and Cell Names (for example repeated ECGI, NCGI or CGI), duplicate IPs and VLANs, and duplicate hardware serials. Duplicate Node IDs and Names, and Duplicate Serial Numbers, are High severity. Uniqueness is checked per circle scope, and a Count column shows how many times each identity appears."
+  },
+  {
+    "id": "NETIQ-AUD-010",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What is a Ghost node?",
+    "answer": "A node discovered without a complete expected profile, flagged for investigation. Decommissioned nodes that remain active in the NMS inflate counts and distort audits; NETIQ identifies them, among other ways, by their absence from CM dumps. Ghost nodes are listed in Network Truth Repository, RAN Repository, Node, Ghost Nodes, and a Smart Shortcut opens them directly."
+  },
+  {
+    "id": "NETIQ-AUD-011",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What is an orphan element?",
+    "answer": "An element without a valid parent in the hierarchy, for example a Cell without a parent Node, a Node without a Site, or a Board without a Node. Orphan nodes, orphan boards (Medium) and orphan MW/UBR links (an endpoint node or interface missing) are flagged. Orphan RAN Sites are RAN sites where no media node (MW/UBR/FTTH/POP) is identified."
+  },
+  {
+    "id": "NETIQ-AUD-012",
+    "category": "RAN Audits & Validation Rules",
+    "question": "How does NETIQ distinguish an SRAN node from a standalone 2G BTS?",
+    "answer": "Using GNBCF and BCF classes: if the BSC ID, BCF ID and SBTS (MRBTS) ID in class GNBCF also exist in class BCF (checked in either direction), the node is SRAN; otherwise it is a standalone BTS. The mapping must be validated across all EMS IPs within the same circle, not restricted to a single EMS IP."
+  },
+  {
+    "id": "NETIQ-AUD-013",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What does the Cell-to-RU Link Audit check?",
+    "answer": "That every configured cell maps to its serving radio unit, aligning cell identifiers, RU serial details and hardware placement. Missing, incorrect or unmapped relationships are highlighted, and NETIQ surfaces a suggested RRU mapping for the gaps (see Cell-to-RU Mapping Suggestion in AI Intelligence)."
+  },
+  {
+    "id": "NETIQ-AUD-014",
+    "category": "RAN Audits & Validation Rules",
+    "question": "Which node model and parameter anomalies are tracked and at what severity?",
+    "answer": "Node model: Unexpected Model Type (High), Model Mismatch vs Planning (Medium), Model Count Deviation (Medium), Duplicate Node IDs/Names (High). Parameter rules: TAC, EARFCN UL/DL and Bandwidth UL/DL must be integers; Cell Admin Status must be Locked or Unlocked; Duplex Mode must be FDD or TDD; MCC/MNC must match the MCC-MNC sheet. Anything else is counted as Non-Uniform. Each parameter is tracked as Available, Non-Available, New, Updated, Removed and Non-Uniform."
+  },
+  {
+    "id": "NETIQ-AUD-015",
+    "category": "RAN Audits & Validation Rules",
+    "question": "What consistency checks apply across aggregation levels?",
+    "answer": "PAN India totals must equal the sum of Circle totals, which equal the sum of NMS totals and node/cell totals; Vendor split (Ericsson/Nokia) and Technology split (eNodeB/gNodeB/SRANBs, 4G/5G) are cross-checked. The PAN-01 test expects a 100% match. Reduced or deviated counts are flagged in dashboards and reports."
+  },
+  {
+    "id": "NETIQ-AUD-016",
+    "category": "RAN Audits & Validation Rules",
+    "question": "How are audit scores calculated?",
+    "answer": "The audit scoring dashboard calculates compliance scores per Circle and PAN India and computes Match %, Severity Index and Confidence Index, offering unified views for normal reporting and audit reporting. Findings carry severity (High/Medium/Low) and the offending-element context."
+  },
+  {
+    "id": "NETIQ-TXN-001",
+    "category": "MW, UBR & Transport Audits",
+    "question": "What does the Transport Audit Suite cover?",
+    "answer": "MW Node Validation, MW Hardware Validation, MW Link Audit and UBR Link Audit, applying the same validation, duplicate and mapping discipline as RAN. The MW audit reports include the Site Report, Node Validation, Duplicate Data, Nomenclature, Hardware Validation, MW/UBR Links Validation, Planned vs Configured and IP data reports."
+  },
+  {
+    "id": "NETIQ-TXN-002",
+    "category": "MW, UBR & Transport Audits",
+    "question": "Which MW link parameters does NETIQ validate?",
+    "answer": "Tx/Rx frequency (aligned to the MIDS frequency table of the circle), channel bandwidth (for example 7/14/28/56 MHz), modulation scheme, capacity/throughput, ATPC status (mismatch between link ends is non-uniform) and link availability. For each parameter NETIQ tracks availability, new discovery, updates, removal and non-uniform values."
+  },
+  {
+    "id": "NETIQ-TXN-003",
+    "category": "MW, UBR & Transport Audits",
+    "question": "How does NETIQ identify modulation from capacity and bandwidth?",
+    "answer": "Spectral Efficiency = (Capacity / Channel Spacing) / K, mapped to a modulation order (BPSK 1 bps/Hz, QPSK 2, 8QAM 3, 16QAM 4, 32QAM 5, 64QAM 6, 128QAM 7, 256QAM 8, 512QAM 9, 1024QAM 10, 2048QAM 11, 4096QAM 12). K = 0.85 for Ceragon and 0.80 for other vendors (except E-Band, where K is vendor-specific: Ceragon 0.88-0.95, Nokia 0.87-0.94, Huawei 0.85-0.92, Aviat 0.90). Modulation inconsistent with bandwidth and capacity is non-uniform."
+  },
+  {
+    "id": "NETIQ-TXN-004",
+    "category": "MW, UBR & Transport Audits",
+    "question": "How does NETIQ classify an MW link as Up, Down or Degraded?",
+    "answer": "A link is Up when Node1 or Node2 Rx level (min/max) is not in the range -90 to -100 dBm, and Down when the values fall within that range. For the Degraded RSL Links count, links whose Node1 or Node2 Max/Min 24-hour Rx power falls between -85 and -100 are counted. In AI Intelligence the Degraded Link Audit groups hops into Healthy, At Risk or Degraded."
+  },
+  {
+    "id": "NETIQ-TXN-005",
+    "category": "MW, UBR & Transport Audits",
+    "question": "Which UBR link checks does NETIQ run?",
+    "answer": "MCS (flagged where not feasible for the reported RSSI or capacity), Downlink vs Uplink RSSI (flagged where the DL-UL difference exceeds the threshold, for example plus/minus 3 dB), and capacity/throughput (flagged where inconsistent with bandwidth, MCS or interface speed)."
+  },
+  {
+    "id": "NETIQ-TXN-006",
+    "category": "MW, UBR & Transport Audits",
+    "question": "What MW/UBR element counts and anomalies are reported?",
+    "answer": "Site level: total unique sites, new MW sites, RAN with MW/UBR, standalone MW, standalone RAN, deleted, non-uniform nomenclature and standalone MW sites with no lat/long. Node level: total, new, updated, non-uniform nomenclature, no link mapping, orphan and duplicate. Link level: total, new, updated, modified (same Link ID but changed frequency, band, spacing, modulation or configuration), degraded RSL, orphan links and links with no traffic (no VLAN on any interface)."
+  },
+  {
+    "id": "NETIQ-TXN-007",
+    "category": "MW, UBR & Transport Audits",
+    "question": "How does the Planned vs Configured comparison work for MW/UBR links?",
+    "answer": "NETIQ matches planned and configured links on the composite key (HOP ID plus manufacturer against Link ID Site A-Site B in either order plus manufacturer), then compares Frequency, Channel Spacing, Modulation and HOP Type. Each link is classified: Missing Link, Unplanned Link (Likely New / Partial / Match Gap), Modulation Deviation, Frequency Deviation, Channel Spacing Deviation, combinations, or Out of Scope (vendor not in the live report). The top 10 categories are shown and the rest grouped as Other."
+  },
+  {
+    "id": "NETIQ-TXN-008",
+    "category": "MW, UBR & Transport Audits",
+    "question": "Where do MW and UBR site coordinates come from?",
+    "answer": "The MW Site Report consolidates sites from RAN where MW/UBR is present plus standalone MW/UBR sites. For standalone sites latitude and longitude are fetched from the MIDS / UBR LB reports (and validated against RAN GPS and MIDS planning data); standalone sites with no coordinates after validation are counted separately."
+  },
+  {
+    "id": "NETIQ-STI-001",
+    "category": "E2E Service Stitching Logic",
+    "question": "What is service stitching in NETIQ?",
+    "answer": "Stitching links elements across domains into an end-to-end path anchored to physical sites: RAN, then MW/UBR/FTTH, then the first Wireline node (L2 Access POP), then the Aggregation Gateway (AGW, L3 POP), and finally the Core node. It works in two phases: site resolution (site IDs, co-location and, where needed, geo-proximity) and path construction. All logic operates on deployed NMS inventory and live logical configuration, not on KPIs or alarms."
+  },
+  {
+    "id": "NETIQ-STI-002",
+    "category": "E2E Service Stitching Logic",
+    "question": "What input reports does the stitching engine use?",
+    "answer": "Thirteen NMS report types: RAN IP Report (primary), Transmission Node Report, MW Port Report, MW Link Report, UBR Link Report, FTTH Node Report, FTTH Link Report, Wireline Node Report, Wireline Link Report, Wireline IP_VLAN Report, Core IP Report, Site Report (with Default LATITUDE_LONGITUDE sheet) and the Planned vs Configured Link Report (used only by the AI Audit Engine as supporting evidence). No performance KPIs or alarm data are consumed."
+  },
+  {
+    "id": "NETIQ-STI-003",
+    "category": "E2E Service Stitching Logic",
+    "question": "How is a RAN service identified and its plane classified?",
+    "answer": "Every RAN IP record becomes a service with the composite key RAN_Node_ID : Technology : Plane : IP, for example MRBTS-90550:4G:UP:100.120.0.90. Technology comes from node type (eNodeB/SRANBS is 4G, gNodeB is 5G). Plane: 4G S1-U/UPLANE is UP, S1-MME/CPLANE is CP, MPLANE/OAM is MP; 5G N3 is UP, N2 is CP, O1 is MP. VLAN is the primary match key and the plane-specific Gateway IP is used for AGW matching."
+  },
+  {
+    "id": "NETIQ-STI-004",
+    "category": "E2E Service Stitching Logic",
+    "question": "In what order does NETIQ look for the RAN parent transmission node?",
+    "answer": "1) A direct Wireline connection (RAN Site ID matches a Wireline node site); 2) a collocated MW node chosen by VLAN-group probability match; 3) a UBR node at the site; 4) an FTTH ONT at the site (FTTH fallback); 5) an MW node with a free port within 100 metres (proximity search, SUGGESTED). If none qualifies, NO_TX_NODE is raised and L2 identification continues using Gateway IP matching only."
+  },
+  {
+    "id": "NETIQ-STI-005",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does VLAN-group probability matching work?",
+    "answer": "NETIQ extracts the full VLAN group of the RAN Site ID and technology from the RAN IP Report. For every MW node at the site it scans all ETH, GETH, FETH and SFP ports in the Port Report and computes Match % = (VLANs in common with the RAN VLAN group / total VLANs in the group) x 100 against the port's VLAN TRUNK. The highest Match % wins; ties go to the lowest port index; with several MW nodes the node with the highest best-port match is chosen."
+  },
+  {
+    "id": "NETIQ-STI-006",
+    "category": "E2E Service Stitching Logic",
+    "question": "What are the VLAN match thresholds and what happens below them?",
+    "answer": "Priority 1 is a 100% match, Priority 2 is 80% or more, Priority 3 is 70% or more. The default threshold is 70% and is operator-configurable per circle. Matches below it are recorded with the VLAN_MISMATCH audit flag and escalated to the AI Audit Engine, which re-runs with a lowered 50% threshold, records the partial match score and flags it for review."
+  },
+  {
+    "id": "NETIQ-STI-007",
+    "category": "E2E Service Stitching Logic",
+    "question": "Why does a RAN node get only one parent transmission connection?",
+    "answer": "The Mandatory Parent Transmission Uniqueness Rule: once a valid parent MW/UBR/FTTH/Wireline device is established for a RAN node, the same RAN-to-transmission connection is reused for all its services. The engine does not create separate physical connections to other devices just because another service or IP record yields an alternate candidate. Where service-specific VLAN evidence conflicts with the identified parent, that service is sent to AI Audit as an exception."
+  },
+  {
+    "id": "NETIQ-STI-008",
+    "category": "E2E Service Stitching Logic",
+    "question": "When does NETIQ prefer a direct Wireline connection over MW?",
+    "answer": "Per the connection hierarchy: if all RAN VLANs are on the Wireline node (alone or alongside MW), RAN connects directly to Wireline. If some VLANs are missing on Wireline but all match on MW, or no VLAN is on Wireline but all match on MW, MW is selected as parent (RAN to MW to Wireline). If all VLANs are on Wireline and only partial on MW, Wireline is preferred. Partial on both goes to AI Audit; no VLAN on either does not create a confirmed link and falls to AI audit, planning or co-location fallback logic."
+  },
+  {
+    "id": "NETIQ-STI-009",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does NETIQ detect a direct RAN-to-Wireline connection?",
+    "answer": "It matches the RAN IP Report SITE ID with the Wireline Node Report SITE ID. If the RAN VLAN matches the Wireline IP_VLAN VLAN ID and the RAN Gateway IP matches a WAN IP, the RAN connects directly to the AGW (L3). If only the VLAN matches (Gateway IP absent or unmatched) it connects to an L2 Access POP. Otherwise MW node identification follows. WAN IP entries are comma-separated and each is compared individually."
+  },
+  {
+    "id": "NETIQ-STI-010",
+    "category": "E2E Service Stitching Logic",
+    "question": "How is a UBR parent identified and which interfaces are used?",
+    "answer": "If no MW node is at the RAN site, NETIQ checks the Transmission Node Report for a UBR node (Node Category = UBR) at the same site and creates a RAN-UBR internal link with default interface mapping RAN Slot 0/Port 1 and UBR Slot 0/Port 2. The far end is found from the UBR Link Report and continues to an MW or Wireline site. No VLAN check is done at each UBR hop."
+  },
+  {
+    "id": "NETIQ-STI-011",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does the FTTH fallback work?",
+    "answer": "If neither MW nor UBR is at the RAN site, NETIQ looks for an FTTH ONT at the same site in the FTTH Node Report and creates an internal RAN-FTTH link (RAN Slot 0/Port 1 to FTTH Slot 1/Port 1). It then traces FTTH to FTTH hops through the FTTH Link Report accuracy chain L1 to L4 until a Wireline site is reached. No VLAN validation is performed on FTTH hops."
+  },
+  {
+    "id": "NETIQ-STI-012",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does the proximity search work for RAN sites with no collocated transmission?",
+    "answer": "NETIQ computes the Haversine distance from the RAN site to all MW sites, keeps those within 100 metres, and checks each for a free ETH/GETH/FETH/SFP port (not present in the MW Link Report as SITE 1 or SITE 2) whose VLAN TRUNK holds at least one RAN service VLAN. If found it creates a SUGGESTED internal link with TX_SUGGESTION_FLAG = Y, SUGGESTION_METHOD = PROXIMITY_100M and the distance recorded. Otherwise NO_TX_NODE is raised."
+  },
+  {
+    "id": "NETIQ-STI-013",
+    "category": "E2E Service Stitching Logic",
+    "question": "How is the MW hop chain traced to the Wireline site?",
+    "answer": "From the RAN-side IDU the engine follows the MW Link Report hop by hop, verifying at each intermediate node that the RAN VLAN is on the incoming port using the same VLAN probability match. If the VLAN disappears, MISSING_TX_HOP is flagged to the AI Audit Engine and traversal continues from the last confirmed hop. The chain ends at an MW node located at a Wireline node site, where an internal MW-to-Wireline link is created using VLAN availability in the IP_VLAN report. If the VLAN is not on that Wireline node, an alternate hop chain is checked."
+  },
+  {
+    "id": "NETIQ-STI-014",
+    "category": "E2E Service Stitching Logic",
+    "question": "Which port types are preferred when connecting MW to Wireline?",
+    "answer": "The interface priority is SFP, then FETH, then GETH, then ETH, with ports selected by the VLAN matching rule. The source design also lists SFP, GETH, FETH, ETH in places; the consolidation notes state SFP, FETH, GETH, ETH (stated three times) is used and should be confirmed with the rule owners."
+  },
+  {
+    "id": "NETIQ-STI-015",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does NETIQ classify the first Wireline node as L2 (Access POP) or AGW (L3)?",
+    "answer": "It searches the Wireline IP_VLAN Report of the first Wireline node for the service's plane-specific Gateway IP under WAN IP. Case A: Gateway IP found, so the node is the AGW (L3) with no separate L2. Case B: Gateway IP not found but the RAN VLAN is present, so the node is L2 (Access POP) and the AGW is discovered next. Case C: neither found, so another Wireline site via another hop chain is tried, then AI audit. Case D: another IP of the same node/technology/plane is stitched to an AGW, so Same-Service/Alternate IP validation applies."
+  },
+  {
+    "id": "NETIQ-STI-016",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does NETIQ find the AGW (L3) after identifying an L2?",
+    "answer": "It first matches the RAN VLAN to the VLAN ID column of the Wireline IP_VLAN Report; then traverses the Wireline Link Report from the L2 to the next Wireline node holding the RAN Gateway IP under WAN IP. If found via TX links it becomes the AGW and a physical L2-AGW link is created. If not, it searches all nodes for a Gateway IP (plus VLAN) match and creates a default cloud connection. If still not found, Default_AGW is assigned, MISSING_AGW is raised and the AGW is marked unresolved."
+  },
+  {
+    "id": "NETIQ-STI-017",
+    "category": "E2E Service Stitching Logic",
+    "question": "What is Same-Service / Alternate IP validation (Case D)?",
+    "answer": "Before assigning Default_AGW, NETIQ checks whether another IP of the same RAN Node ID, Technology and Plane (for example IPv4 vs IPv6) is already stitched to an actual AGW. That AGW is reference evidence only and is not inherited automatically. If the unmatched IP has no live AGW configuration of its own, no Default_AGW is created; the status is UNRESOLVED with flags MISSING_AGW / SUSPECT_NON_LIVE_SERVICE, and the other AGW may be shown as a Reference AGW without a confirmed logical connection."
+  },
+  {
+    "id": "NETIQ-STI-018",
+    "category": "E2E Service Stitching Logic",
+    "question": "What is an IP Cloud connection and how is it drawn?",
+    "answer": "A logical segment used when no physical Wireline TX link exists, either between L2 and AGW or between AGW and Core. It is drawn as a dashed/cloud line in all views, whereas physical links are solid. Using the L2-to-AGW default cloud reduces the confidence score of that segment by 30 points. Names follow <L2 NODE NAME>_Wireline_Cloud - <L3 NODE NAME>_Cloud_IP and <AGW NODE NAME>_IPCloud - <DESTINATION NODE NAME>_IPCloud."
+  },
+  {
+    "id": "NETIQ-STI-019",
+    "category": "E2E Service Stitching Logic",
+    "question": "How does NETIQ associate the Core node?",
+    "answer": "It matches the NODE ID of the Core IP Report to the RAN IP Report NODE ID and retrieves the DESTINATION NODE IP; the IP NAME is chosen by plane (UPLANE maps to S1-U, CPLANE to S1-MME; MPLANE is ignored). If the AGW site has a Wireline TX link to a site in the Core IP Report, a physical AGW-to-Core connection (solid line) is created; otherwise an IP CLOUD connection is made using DESTINATION NODE IP. If the destination IP is not in the Core IP Report, MISSING_CORE is raised."
+  },
+  {
+    "id": "NETIQ-STI-020",
+    "category": "E2E Service Stitching Logic",
+    "question": "What are internal links and in which order are they created?",
+    "answer": "Internal links join collocated nodes at the same site and are created before inter-site links. Priority 1 (intra-site, same domain): RAN-MW IDU (VLAN matched on ETH/GETH/FETH/SFP) and RAN-UBR (same site only, no VLAN check). Priority 2 (intra-site cross-domain and inter-site TX): MW IDU-Wireline (VLAN match), FTTH ONT-Wireline, and UBR-MW at a different site via the UBR Link Report. Priority 3: RAN-MW proximity fallback (SUGGESTED)."
+  },
+  {
+    "id": "NETIQ-STI-021",
+    "category": "E2E Service Stitching Logic",
+    "question": "How is the TXN Link ID built?",
+    "answer": "Internal links use <SITE A NODE NAME> <PORT TYPE> <SLOT>/<PORT> _ <SITE B NODE NAME> <PORT TYPE> <SLOT>/<PORT> (for Wireline ends, the node interface). For external links: MW to MW takes the Link ID from the MW Link Report; UBR to UBR takes the Transmission Link ID from the UBR Link Report; FTTH to FTTH is built from Node A/B ID and interface; L2 to AGW takes the Link Name from the Wireline Link Report (or the Wireline_Cloud name if none); AGW to Core uses the IPCloud default link name. Port Type is no longer a separate column; it is embedded in INTERFACE and LINK ID."
+  },
+  {
+    "id": "NETIQ-STI-022",
+    "category": "E2E Service Stitching Logic",
+    "question": "How are site latitude and longitude determined for each hop?",
+    "answer": "From the Site Report by matching the A-End and Z-End Site IDs. If coordinates are not available, the values from the 'Default LATITUDE_LONGITUDE' sheet are used. Defaults apply to all Site IDs except Core sites; default coordinates are never applied to Core Site IDs."
+  },
+  {
+    "id": "NETIQ-STI-023",
+    "category": "E2E Service Stitching Logic",
+    "question": "How are the L3 and L2 circuit labels populated?",
+    "answer": "CIRCUIT LABEL (L3) comes from the L3 Circuit ID of the Wireline IP_VLAN row where the service Gateway IP is under WAN IP and the VLAN is under VLAN ID in the same row (GW-IP-only match if VLAN did not match). A special case for a Direct Aggregator with TIER T5 (ECI) or Node Domain CSR takes the L2 Circuit value, and a fallback uses L2VPNID_Name. CIRCUIT LABEL (L2) comes from the L2 Circuit column where the Access POP node name and VLAN match and the GW IP is not under WAN IP; it stays empty if no match. Entries with 'dummy' or 'lag' interfaces are ignored and numeric 'Port=' entries preferred; unique values are listed once."
+  },
+  {
+    "id": "NETIQ-STI-024",
+    "category": "E2E Service Stitching Logic",
+    "question": "What does the Service Stitching Report contain?",
+    "answer": "One row per hop per service (SEQ NO 1 to n) in a horizontal A-End / Z-End format, with service attributes (SERVICE ID, SITE ID, 4G/5G, PLANE, IP ADDRESS, GATEWAY IP, VLAN, IP (CORE)), hop TYPE (Internal, MW radio link, L2 circuit, L3 circuit), A-End and Z-End details (site, lat/long, domain, node ID/name, interface, VLAN), LINK ID, CIRCUIT LABEL (L2/L3), POP SITE ID (L2/L3) and result attributes STATUS, SCORE, FLAG and REMARKS/AUDIT FLAG. Sort by SCORE ascending to work the weakest services first."
+  },
+  {
+    "id": "NETIQ-STI-025",
+    "category": "E2E Service Stitching Logic",
+    "question": "What is the Service Path Explorer Canvas?",
+    "answer": "An interactive canvas (branded 'NetIQ Stitching - NOC Operations Platform') to trace end-to-end connectivity from RAN through transport to the core. It has BOQ/KPI cards (Total Sites, Fully Stitched, Partial, Unresolved, Suggested, Stitch %), a Map View and Topology View (Nodes/Topo toggle), a Filters Intelligence panel, a site service panel with PATH and AUDIT actions, an animated service path view and a Report tab. It is used for impact analysis, dependency checks and spotting single points of failure."
+  },
+  {
+    "id": "NETIQ-STI-026",
+    "category": "E2E Service Stitching Logic",
+    "question": "How do I read the animated service path view?",
+    "answer": "It draws the selected service left to right in lanes: RAN, TRANSPORT, ACCESS, AGGREGATION and CORE. Connectors are labelled INTERNAL (RAN to MW/UBR/FTTH), INTERNAL (MW to Access POP), L2 CIRCUIT (Access POP to Aggregation router, dashed where no physical link) and L3 CIRCUIT (Aggregation router to Core). Badges show AI INFERRED (proposed by the audit engine), Default_AGW/Default_AP placeholders and MISSING_CORE. Open it from a site's PATH button or the Smart Filter prompt 'Inspect E2E service pipeline flow'."
+  },
+  {
+    "id": "NETIQ-STI-027",
+    "category": "E2E Service Stitching Logic",
+    "question": "How do I check the blast radius before a maintenance window?",
+    "answer": "On the Service Path Explorer, search for the transport node (for example in the Filter Site ID box), select it and review every RAN site and service riding on it, along with the chain hops and status. This quantifies dependencies before approving the change."
+  },
+  {
+    "id": "NETIQ-STI-028",
+    "category": "E2E Service Stitching Logic",
+    "question": "What is the Haversine formula used for in NETIQ?",
+    "answer": "It computes the great-circle distance between two latitude/longitude points for the 100 m proximity search and the 6 km / 10 km geo-based AI searches: a = sin^2(dphi/2) + cos(phi1) x cos(phi2) x sin^2(dlambda/2); c = 2 x atan2(sqrt(a), sqrt(1-a)); d = R x c, with Earth mean radius R = 6,371,000 m. The documented worked example gives 1,115.755 m."
+  },
+  {
+    "id": "NETIQ-AIA-001",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What does the AI Audit Engine do in service stitching?",
+    "answer": "It runs after each stitching pass, inspects every service whose chain is incomplete (Partial or Unresolved), classifies the gap type, evaluates available evidence and generates a structured auto-suggestion with a confidence score. Results appear in the AI Audit report/dashboard and feed corrections back into the pipeline (L-6 to L-1 feedback loop). It uses inputs 1-11 and 13 of the stitching input set."
+  },
+  {
+    "id": "NETIQ-AIA-002",
+    "category": "AI Audit Engine for Stitching",
+    "question": "Which gap types does the AI Audit Engine detect?",
+    "answer": "MISSING RAN-TX (no MW/UBR/FTTH within 100 m; suggests the nearest MW node with a free port carrying the RAN VLAN), MISSING TX HOP (VLAN absent on an intermediate MW hop; hop flagged FREE INVENTORY and compared to planning), NO L2 (no Wireline node with the RAN VLAN after the TX chain), L2-AGW MISSING (no Wireline link; default cloud connection created), AGW L3-CORE ABSENT (IP Cloud created from the Core IP Report) and VLAN MISMATCH (best match below 70%; re-run at 50%)."
+  },
+  {
+    "id": "NETIQ-AIA-003",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is Condition A (CoLoco_AP / CoLoco_AGW)?",
+    "answer": "For each RAN site, the AI first checks whether it is directly connected to an L2 or L3 by looking up the Site ID in the Wireline Node Report. If the site is present but neither VLAN nor Gateway IP/WAN IP match, the Wireline node is classified CoLoco_AP (co-located Access POP) and AGW discovery continues (RAN, L2, L3, Core). If VLAN plus Gateway IP, or only Gateway IP, matches, it is CoLoco_AGW and Core association follows directly (RAN, L3, Core)."
+  },
+  {
+    "id": "NETIQ-AIA-004",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is Condition 1 (Default L2) and when is Default_AP created?",
+    "answer": "Condition 1 applies only to unresolved cases where the first Wireline node reached through an MW/UBR/FTTH chain has no matching VLAN or Gateway IP in the IP_VLAN Report, or no Wireline node is reached at all. NETIQ assigns Default_AP as the L2 Site/Node ID so the case can be stitched and continues to AGW and Core discovery; if no AGW is found it creates Default_AGW (Default_AP, Default_AGW, Core). Default_AP is not created when the AGW's Wireline node is TIER T5, CSR or Node Domain CEN."
+  },
+  {
+    "id": "NETIQ-AIA-005",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is Condition 2 (planning and inventory matched)?",
+    "answer": "When no MW/UBR media is linked at the RAN site in inventory but planning and inventory agree. NETIQ finds MW (first priority) or UBR candidates, matches the RAN VLAN on port VLAN TRUNK at the far-end site, follows the MW Link Report (or UBR Link Report) hop by hop, and uses the Planned vs Configured Link Report (Planned HOP NMS STATUS = Unmatched, matched on the Site ID before '_') when no link exists. It checks free ports with the Key ID rule and validates TX frequency against RX frequency of the connected site; if frequencies differ the link is still created with the remark 'Link Identified but Frequency Not Matched'."
+  },
+  {
+    "id": "NETIQ-AIA-006",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is Condition 3 (planning available, inventory mismatched)?",
+    "answer": "The RAN site is in the Planned vs Configured Link Report but its VLAN is not on any Port Report VLAN TRUNK. Case 1 (multiple far-end sites, VLAN not matched): use Key ID free-port detection and, if the VLAN is found, create the link on the planned sites with Node ID 'MW Inferred'; otherwise fall to Condition 4. Case 2 (several far ends carry the VLAN): pick the best candidate by distance, port availability, VLAN quality, node type closeness to L2/L3 and operational status. If no VLAN match or free port exists, the link is created from planning with the remark 'Link Created as per Planning; Inventory Mismatch (No VLAN match / No Free Port Found)'."
+  },
+  {
+    "id": "NETIQ-AIA-007",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is Condition 4 (geo-based mapping)?",
+    "answer": "Used when neither planning nor port data exists for the RAN site. NETIQ takes the RAN site latitude/longitude, searches all sites within 6 km for the nearest node carrying the RAN VLAN on an ETH/GETH/FETH/SFP port and creates the link with remark 'Link Created as per GEO Location Mapping using 6KM radius'. If none, it expands to 10 km (remark '...10KM radius'). If still none, the service is marked Unstitched with 'No Matching VLAN found within 10KM radius (Unstitched)'. Nearer sites get higher priority (0-2 km High/Very High, down to Very Low at 8-10 km)."
+  },
+  {
+    "id": "NETIQ-AIA-008",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is the Key ID logic for free-port detection?",
+    "answer": "Key IDs identify free ports on MW nodes. MW Key ID 1 and 2 are built from the MW Link Report (NE ID, Site, Equipment Model, Vendor plus cabinet/shelf/slot/index-on-slot/port of each end); the Port Report Key ID is built from Site ID, Node ID, Node Type, Manufacturer plus cabinet/shelf/slot/index/port. At the far-end site, if a Port Report Key matches an MW Key ID the port is in use; if there is no match the port is free. Links are only created on free ports; with none, Condition 4 applies."
+  },
+  {
+    "id": "NETIQ-AIA-009",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What is a Free Inventory Audit?",
+    "answer": "Free inventory is an MW node with at least one port carrying an IF frequency (active radio hardware) but no corresponding entry in the MW Link Report for that port. NETIQ flags it as FREE_INVENTORY_FOUND and compares it against planning links between the RAN site and that node; if a planning link exists it auto-suggests creating the MW link. It publishes node ID, site, port, IF frequency, nearest RAN site, distance and planning-link reference."
+  },
+  {
+    "id": "NETIQ-AIA-010",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What confidence does the AI assign to suggestions from free inventory?",
+    "answer": "Free inventory with a planning link is High (score 75-85); free inventory without a planning link is Medium (40-55); with neither, the result is Low, a cloud fallback with score 30."
+  },
+  {
+    "id": "NETIQ-AIA-011",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What are Infered_MW, Default_AP and Default_AGW?",
+    "answer": "They are AI placeholders. Infered_MW is the Node ID created (with default interface GETH) when no free SFP/FETH/GETH/ETH port exists for an internal connection. Default_AP and Default_AGW are placeholder L2 and L3 nodes created when no Access POP or AGW can be identified from configuration. All are shown with AI INFERRED badges and need field or data confirmation."
+  },
+  {
+    "id": "NETIQ-AIA-012",
+    "category": "AI Audit Engine for Stitching",
+    "question": "What does the AI Audit Report contain?",
+    "answer": "For every Partial/Unresolved service: Site ID and service key, gap type, condition applied (CoLoco_AP/CoLoco_AGW or Condition 1-4), evidence (Port Report Key ID, planning link, free inventory, geo distance), suggested link (A-End, Z-End, TXN Link ID), distance and priority band for geo cases, confidence score, standard remark and status (Suggested, Partial, Unresolved, Unstitched). Open it from a site's AUDIT button or the Report tab filtered to Partial/Unresolved."
+  },
+  {
+    "id": "NETIQ-SCR-001",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What are the stitching states and score ranges?",
+    "answer": "STITCHED: score 80 or more, all major segments resolved with confirmed evidence. PARTIAL: 70-79, at least one gap filled by a cloud or suggestion. SUGGESTED: 30-69, AI-inferred path with TX_SUGGESTION_FLAG = Y requiring field confirmation. UNRESOLVED: below 30, cannot be traced beyond the last confirmed segment. UNSTITCHED: no link even with the 10 km geo-mapping rule. The canvas also shows Error when a conflict or data problem prevented stitching."
+  },
+  {
+    "id": "NETIQ-SCR-002",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "How is the confidence score calculated?",
+    "answer": "Each stitched service receives a composite 0-100 score that is the sum of per-segment scores. Examples: RAN-MW with 100% VLAN match 15 (probability match 10, none 0); RAN-UBR 5; UBR-MW verified 5; RAN-FTTH 15; direct RAN-Wireline 25; L2 with VLAN found 25 (VLAN not found but path exists 15, unresolved 0); AGW with Gateway IP plus VLAN 50 (Gateway IP only 45); AGW L3-only fallback 25/20/15/0; Core physical TX link 25, IP Cloud 20, not identified 0; MW hop chain 10 (VLAN-verified), 8 (continuous but non-VLAN), 5 (missing hops); UBR chain 5; FTTH chain 10."
+  },
+  {
+    "id": "NETIQ-SCR-003",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What audit flags can appear on a stitched service?",
+    "answer": "VLAN_MISMATCH (best VLAN match below threshold, default 70%); NO_TX_NODE (no MW/UBR/FTTH at the site and no MW within 100 m); MISSING_TX_HOP (VLAN lost on an intermediate MW hop); MISSING_AGW (Gateway IP not under any WAN IP; Default_AGW assigned); SUSPECT_NON_LIVE_SERVICE (another IP/IP version of the same service is live on an AGW, this one is not); MISSING_CORE (destination node IP not in Core IP Report); FREE_INVENTORY_FOUND (MW port with IF frequency but no link); and TX_SUGGESTION_FLAG = Y (AI-suggested link)."
+  },
+  {
+    "id": "NETIQ-SCR-004",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What are the stitching KPIs, targets and alert thresholds?",
+    "answer": "Per circle per cycle: Stitching Coverage % (STITCHED / total RAN IPs) target 85% or more, alert below 70%; TX Discovery Rate 90% or more, alert below 75%; VLAN Match Rate (services with 70% or more match) 95% or more, alert below 85%; L2 Resolution Rate 88% or more, alert below 75%; Cloud Connection Rate 10% or less, alert above 25%; Audit Flag Resolution Rate (30-day) 80% or more, alert below 60%; Average Confidence Score 78 or more, alert below 65; Free Inventory Detected tracked weekly (alert above 5% of MW nodes)."
+  },
+  {
+    "id": "NETIQ-SCR-005",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What is Stitch %?",
+    "answer": "On the Service Path Explorer, Stitch % is the share of fully stitched sites out of total sites. In the data-quality KPI set, Stitching Coverage % is STITCHED services divided by total RAN IPs (services) x 100, with a target of at least 85%. Management uses the trend to report service readiness with evidence."
+  },
+  {
+    "id": "NETIQ-SCR-006",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What widgets does the Service Stitching dashboard provide?",
+    "answer": "Stitching status distribution per circle, technology and plane; confidence score profile and trend; transmission media mix (direct Wireline, MW, UBR, FTTH, proximity, AI-inferred); AI audit flags with 30-day resolution rate; AI suggestions from Conditions 1-4 for accept/reject; cloud dependency (L2-AGW and AGW-Core segments); and drill-down circle, site, service, hop linked to the report, topology and map views."
+  },
+  {
+    "id": "NETIQ-SCR-007",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "Why is my service Partial or Unresolved and how do I improve it?",
+    "answer": "Partial means at least one segment used an IP cloud or suggestion; Unresolved means the path could not be traced beyond the last confirmed segment. Check the flag and remark: VLAN_MISMATCH (RAN VLAN not on the transmission port), NO_TX_NODE (no transmission node at/near site), MISSING_TX_HOP (VLAN lost on a hop), MISSING_AGW (Gateway IP not on any Wireline WAN IP) or MISSING_CORE (destination IP not in the Core IP Report). Fix the source data, then confirm the status improves after the next cycle; stitching completeness depends on source data quality."
+  },
+  {
+    "id": "NETIQ-SCR-008",
+    "category": "Stitch Status, Confidence Score & Flags",
+    "question": "What does 'Link Created as per Planning; Inventory Mismatch' mean?",
+    "answer": "A link was taken from planning data because port inventory does not confirm it (no VLAN match or no free port found). It is created to continue the path but flagged to highlight the data inconsistency between planning and inventory. Validate it in the field or correct the inventory."
+  },
+  {
+    "id": "NETIQ-AIN-001",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What is the AI Insights Engine?",
+    "answer": "NETIQ's explainable intelligence layer that works only on your own network data. It infers Site, Node and Cell relationships and attributes where the raw dump is silent, each with a confidence score and a plain-language remark. Discovered facts are never silently mixed with inferred ones, and accepted inferences feed back into stitching, improving the stitch percentage cycle over cycle. Reports are under AI Insights Engine, RAN Inference Intelligence: Site, Node and Cell Inference."
+  },
+  {
+    "id": "NETIQ-AIN-002",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What does the AI Inference card on the RAN dashboard show?",
+    "answer": "Site, Node and Cell tabs report the AI-inferred count and a breakdown, for example Total Sites, Correct Sites, Node-Only and Cell-Only, with percentages and a confidence bar. It shows the accuracy split between directly discovered and inferred relationships."
+  },
+  {
+    "id": "NETIQ-AIN-003",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What is AI Intelligence (BETA)?",
+    "answer": "A sub-module of the Network Intelligence View with eight AI/ML audit dashboards: Degraded Link Audit, Frequency Deviation (Planned vs Configured), Missing Parameter Prediction, Duplicate Node & Cell Resolution, Baseline Parameter Audit, Cell-to-RU Mapping Suggestion, 5G Upgrade Readiness and GPS Suggestion. Each pairs a deterministic audit rule with an AI/ML prediction, separates discovered from inferred values and exposes drillable, exportable reports. Because it is BETA, validate counts and model outputs before using them as a source of truth."
+  },
+  {
+    "id": "NETIQ-AIN-004",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does the Degraded Link Audit work?",
+    "answer": "It reads status signals of every active MW/UBR hop from the latest link inventory, maps each hop to a signal class (Strong Signal, Nodes In Range, Holding Status, Improving Signal, Recovering States, Holding Steady or Critical Down Signal) using the previous cycle to detect improvement, and rolls them up into Healthy, At Risk or Degraded. The dashboard shows the Link Health Status Mix, signal-class counts and Operational links % (healthy hops / total hops x 100)."
+  },
+  {
+    "id": "NETIQ-AIN-005",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does the Frequency Deviation dashboard work?",
+    "answer": "It compares live MW/UBR link configuration with the planned MIDS design on frequency, channel spacing, modulation and HOP type, classifies every deviation (Missing Link, Unplanned Link, Modulation/Frequency/Channel Spacing Deviation and combinations, Out of Scope), ranks the categories and shows the top 10 plus Other. The Validation Outcome tile splits compared links into validated and deviating."
+  },
+  {
+    "id": "NETIQ-AIN-006",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does Missing Parameter Prediction work?",
+    "answer": "The Missing Field Detector finds missing mandatory attributes (EARFCN, MCC/MNC, TAC, latitude/longitude, cabinet product name and so on). For each gap NETIQ derives candidate values from sibling cells of the same node, the same site, the same band and other source reports, selects the most probable value and attaches a confidence and the evidence. Predictions are grouped by attribute set and by type (2G, 4G, 5G, HW). Fix the CM data at source; predicted values are not written back without acceptance."
+  },
+  {
+    "id": "NETIQ-AIN-007",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does Duplicate Node & Cell Resolution decide which record is correct?",
+    "answer": "It forms duplicate groups on the key (Node ID or Cell Name), scores each member on evidence (presence in the latest dump, NMS ownership, site consistency, cell-to-node mapping and naming rules) and classifies each group as Correct ID/Cell Identified, Having Issue, Removed (stale member) or Manual Validation Required. Tiles show Total Nodes, Dup Node IDs, Dup Cells and Correct Records. Unresolvable groups are routed to the owning team."
+  },
+  {
+    "id": "NETIQ-AIN-008",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What is the Baseline Parameter Audit?",
+    "answer": "It selects the approved baseline for each cell by technology, band and vendor (from the Reporting and Attribute Details workbook), compares configured values such as Bandwidth DL/UL and EARFCN DL/UL with the baseline, counts deviations per parameter and lists the deviating cells for a parameter-correction work order."
+  },
+  {
+    "id": "NETIQ-AIN-009",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does the Cell-to-RU Mapping Suggestion work?",
+    "answer": "It audits cells for a mapped radio unit (Hardware Mapped vs Missing HW). For cells without hardware, it learns RRU models used by comparable cells (same node, band, vendor) across reports ('model learning: multi-report frequency'), suggests the most frequent model with a High or Low confidence class and ranks the suggested RRU types. The dashboard shows Mapping Completeness (Hardware Mapped, AI Auto-Suggested High/Low Confidence, Unmapped Missing HW)."
+  },
+  {
+    "id": "NETIQ-AIN-010",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What does 5G Upgrade Readiness show?",
+    "answer": "It classifies every site (5G Active, 5G Not Available, Ghost Node, Site No Longer Present, Unknown Hardware), checks installed hardware of target sites against 5G compatibility, and classifies the upgrade path: Ready to Upgrade to 5G, HW Available/Compatible (SW Upgrade), HW Not Available/Compatible (HW Swap), Partial Upgrade Possible or Unknown Hardware. Useful for 5G rollout planning."
+  },
+  {
+    "id": "NETIQ-AIN-011",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How does GPS Suggestion impute missing coordinates?",
+    "answer": "For sites with missing or invalid GPS (GPS Accuracy Audit), NETIQ searches other source reports in order (RAN Site Report, 2G/4G/5G Cell Reports, Transmission Site Report, Planned vs Configured Link Report), takes valid coordinates for the same site and records the source report. Sites with no source are 'GPS Not Identified'. Summaries cover GPS Suggested %, source-wise counts, technology-wise status and circle-wise success rate."
+  },
+  {
+    "id": "NETIQ-AIN-012",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "How are AI suggestions governed?",
+    "answer": "Discovered and inferred values are stored and shown separately; every suggestion carries a confidence (score or High/Low class) and its evidence; suggestions are reviewed in the dashboard drill-down and only accepted values are written back with source tagging; results the model cannot resolve go to manual validation by the owning team; and counts and models are validated against field data before AI Intelligence leaves BETA."
+  },
+  {
+    "id": "NETIQ-AIN-013",
+    "category": "AI Inference & AI Intelligence (BETA)",
+    "question": "What do Site, Node and Cell Inference reports contain?",
+    "answer": "Site Inference predicts the correct Site ID for each record with a remark (for example 'Site ID correct - no issue') and proposes a Site ID where the dump leaves it unidentified. Node and Cell Inference complete node and cell relationships and attributes with a confidence and remark. Typical columns: Circle, predicted/inferred identity, Node/Cell Name, Remark, Vendor, EMS IP."
+  },
+  {
+    "id": "NETIQ-INV-001",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "What is the Network Truth Repository?",
+    "answer": "The normalised, audited single-source-of-truth inventory for nodes, cells, hardware, ports, links and IP across every domain, organised as RAN, TXN (Transport), FTTH and Wireline repositories. Each record carries source, site source and insert/update provenance. All grids share the common toolbar (columns, filters, export, advanced query)."
+  },
+  {
+    "id": "NETIQ-INV-002",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "Which reports are in the RAN Repository?",
+    "answer": "Node reports (All Nodes, BTS 2G, eNodeB 4G, gNodeB 5G, SRAN, Ghost Nodes), Cell reports (2G, 4G, 5G), Hardware Report, Cabinet Report, IP Data Report and Core / Network IP Report. Node reports show Circle, Node ID, Node Name, Site ID, Site Source, Latitude, Longitude and Location Source."
+  },
+  {
+    "id": "NETIQ-INV-003",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "Which reports are in the TXN, FTTH and Wireline repositories?",
+    "answer": "TXN: Site, Node, Hardware, Port, MW Link, UBR Link, IP, VLAN and Planned vs Configured Link reports. FTTH: Node Inventory, Hardware, Link and Port reports. Wireline: Node Inventory, Hardware, Port, Logical Inventory, VLAN Report and Link Inventory. The Wireline logical inventory is the largest dataset (millions of rows) and is served with server-side pagination."
+  },
+  {
+    "id": "NETIQ-INV-004",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "What key fields are in the RAN Node and 4G Cell reports?",
+    "answer": "Node Report: Node_ID (for example MRBTS-901305), Node_Name, Vendor, Technology (highest present), Latitude, Longitude, Cabinet_Model, Product_Code, Primary_IP and more. 4G Cell Report: Node ID/Name, Site ID, Site ID Source, EnodeB ID/Name, MCC, MNC, Cell Name, Cell ID, TAC, EARFCN UL/DL, Bandwidth UL/DL, plus CGI, admin status and duplex mode. 5G and 2G schemas are defined analogously in the Solution Document section 15."
+  },
+  {
+    "id": "NETIQ-INV-005",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "What is the Decommission Ledger?",
+    "answer": "A complete, auditable log of retired, deleted and decommissioned assets across RAN (NMS, Site, Node, Cell, Hardware inventory) and Transport (NMS, Site, Node, Hardware). Entities that disappear from a dump (the Deleted count on dashboards) land here. A date-range control (All Time or Days) answers questions such as 'what was decommissioned this week?' and supports tear-down reconciliation for change tickets."
+  },
+  {
+    "id": "NETIQ-INV-006",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "The Decommission Ledger shows 'No data found'. What should I do?",
+    "answer": "Widen the date range (for example All Time) or clear the column filters. The combination of filters may be too narrow for the chosen period or circle."
+  },
+  {
+    "id": "NETIQ-INV-007",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "What is the Planned vs Configured Link Report?",
+    "answer": "A transport report comparing the planned link design (MIDS plan) with what is discovered in the network. It lists planned HOP sites, NMS status (Matched / Unmatched), frequency, channel spacing, modulation and HOP type. It underpins Deployment Compliance, the Missing Txn Links insight and the AI Frequency Deviation dashboard, and the stitching AI audit uses it as supporting evidence."
+  },
+  {
+    "id": "NETIQ-INV-008",
+    "category": "Inventory Repository, Reports & Decommission Ledger",
+    "question": "What does the MW Link Report contain?",
+    "answer": "Link identity and the two sites and NEs (Link ID, Site 1/Site 2, NE ID 1/2), TX/RX frequency channels, cabinet/shelf/slot/index/port details of each end and D-XPIC TX/RX frequency, along with capacity, modulation, link configuration (for example 1+0, 1+1, XPIC) and status. It is a primary input for hop-chain tracing in stitching."
+  },
+  {
+    "id": "NETIQ-OPS-001",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What is the recommended daily operational routine?",
+    "answer": "Confirm each domain's latest collection cycle completed (scheduler record / last-refreshed); review discovery counts and the NMS health gauge for unexpected drops; work new high-severity audit findings and coordinate source corrections; confirm corrected findings clear next cycle and track the stitch-percentage trend; review the reject summary and re-ingest corrected files where needed."
+  },
+  {
+    "id": "NETIQ-OPS-002",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "How is platform health monitored?",
+    "answer": "Through the NMS health gauge and the 'All systems operational' status tile (with last-updated time), the scheduler-completion record per domain, records loaded/rejected per cycle, audit-finding volume by severity and Stitch %. These are complemented by infrastructure-level monitoring of the tiers."
+  },
+  {
+    "id": "NETIQ-OPS-003",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What is the support model and who handles which tier?",
+    "answer": "L1: first-line triage of anomalies and user queries (NOC/Operations). L2: data-quality investigation and source-correction coordination (Operations/Audit/Admin). L3: platform, rule and configuration issues (Avendum support / Super Admin). Response and resolution SLAs per severity and tier are to be agreed with the customer and recorded; they are not fixed in the documents."
+  },
+  {
+    "id": "NETIQ-OPS-004",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What are the support contact details?",
+    "answer": "The user manual leaves contact fields (help channels and escalation contacts) as placeholders to be completed per organisation. In the meantime, contact your NETIQ administrator, who can escalate to the Avendum support team. For problems not covered by the manual, the same route applies."
+  },
+  {
+    "id": "NETIQ-OPS-005",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What is the backup, RPO, RTO and disaster recovery approach?",
+    "answer": "Regular backup of inventory, audit results and configuration (sources, rules, schedules, users/roles). To recover, restore the latest backup to a standby environment and re-run collection; because ingestion is idempotent, this re-establishes the live state without duplication. Concrete backup frequency, RPO/RTO targets and DR topology are to be agreed with the customer and are not fixed in the document."
+  },
+  {
+    "id": "NETIQ-OPS-006",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "Is NETIQ highly available?",
+    "answer": "The design targets high availability for the web/application tier (minimum 99.5% console uptime target), while the processing tier runs on the collection schedule and tolerates a missed cycle without data loss. Exact HA topology (co-located or separated tiers) depends on the deployment."
+  },
+  {
+    "id": "NETIQ-OPS-007",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What are the main risks and their mitigations?",
+    "answer": "Incomplete/delayed source exports (monitor scheduler, alert on missing cycles, agree source SLAs); poor source data quality (continuous audits, fix-at-source, trend tracking); inconsistent identifiers across sources (normalisation, duplicate and mapping audits, AI inference); volume growth (capacity planning, server-side pagination, scale infrastructure); and RBAC misconfiguration (periodic access reviews, least privilege)."
+  },
+  {
+    "id": "NETIQ-OPS-008",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "What training is available for NETIQ?",
+    "answer": "Role-based training anchored on the User Manual: end users/read-only (navigation, dashboards, exports), operations/NOC (monitoring, triage, validation, escalation), audit (running and interpreting audits, exception handling) and administrators (users/roles, scheduler, rules, configuration). Knowledge transfer covers architecture, data flows, rule configuration and runbooks. New users can also launch the in-app Platform Tour."
+  },
+  {
+    "id": "NETIQ-OPS-009",
+    "category": "Operations, Monitoring, Support & DR",
+    "question": "How does cutover work, and is there a risk to existing systems?",
+    "answer": "Because NETIQ is read-and-reconcile and consumes source exports, cutover is low-risk: collection is enabled per domain, the first cycles establish the baseline, and audits and stitching improve as source data is corrected. No destructive migration of source systems is required."
+  },
+  {
+    "id": "NETIQ-KPI-001",
+    "category": "KPIs, Acceptance & Testing",
+    "question": "What are the acceptance criteria for NETIQ?",
+    "answer": "Parser accuracy of 99% or more per vendor/technology; audit detection rate of 100% for seeded High-severity issues and 98% or more for seeded Medium severity; and all mandatory columns populated in the Node/Cell/HW report schemas. Acceptance is validated through the defined test cases and UAT on production-like data against functional coverage, reporting accuracy and non-functional targets."
+  },
+  {
+    "id": "NETIQ-KPI-002",
+    "category": "KPIs, Acceptance & Testing",
+    "question": "What test cases are defined for NETIQ?",
+    "answer": "PAN-01 (PAN India totals equal the sum of Circle totals, 100% match); circle-level aggregation and vendor/technology splits; SITE-01 to SITE-05 (site count, no orphan sites, cells per site, GPS completeness, Site ID consistency between node and cell); node and cell availability; VAL-06 to VAL-11 duplicate checks (node name/ID, cell name/ID, IP, VLAN); VAL-12/13 missing class and attribute; VAL-22/23 cabinet and board completeness; and VAL-26/27 GPS completeness and range."
+  },
+  {
+    "id": "NETIQ-KPI-003",
+    "category": "KPIs, Acceptance & Testing",
+    "question": "Who signs off and what is the UAT approach?",
+    "answer": "UAT validates against production-like data in the UAT environment: functional coverage (section 12), reporting and audit accuracy (sections 15-18) and non-functional targets (sections 21-22). Sign-off roles are Solution Architect, Operations/NOC Lead, Delivery Manager and Customer SPOC, who accepts for production use."
+  },
+  {
+    "id": "NETIQ-TRB-001",
+    "category": "Troubleshooting & Common Issues",
+    "question": "A dashboard or the Service Path Explorer does not render correctly. What should I check?",
+    "answer": "Use a supported, current browser (Chrome, Edge or Firefox; not Internet Explorer); hard-refresh or clear the cache; reset browser zoom to 100% and use at least 1366x768 (1920x1080 recommended); disable ad-blockers or script-blocking extensions, or test in a private/incognito window; and allow pop-ups and downloads for the NETIQ site."
+  },
+  {
+    "id": "NETIQ-TRB-002",
+    "category": "Troubleshooting & Common Issues",
+    "question": "I see 'No data for the selected filters'. What does it mean?",
+    "answer": "The filter combination returns nothing, often because the date range, circle or technology is too narrow. Widen or clear the filters (use Reset All) and try again."
+  },
+  {
+    "id": "NETIQ-TRB-003",
+    "category": "Troubleshooting & Common Issues",
+    "question": "Export failed or the file did not download. What should I do?",
+    "answer": "Retry the export. If it recurs, check that the browser is not blocking pop-ups or downloads for the NETIQ site (see browser issues) and that the filtered result set is not excessively large. If it persists, note the exact message and screen and pass it to support."
+  },
+  {
+    "id": "NETIQ-TRB-004",
+    "category": "Troubleshooting & Common Issues",
+    "question": "I get 'Unable to load' or 'something went wrong'. What now?",
+    "answer": "It is usually a transient loading problem. Refresh the page; if it continues, clear the browser cache or sign out and back in. If it still persists, report the exact wording and the screen to support."
+  },
+  {
+    "id": "NETIQ-TRB-005",
+    "category": "Troubleshooting & Common Issues",
+    "question": "My session expired. What should I do?",
+    "answer": "Sessions expire after a period of inactivity for security and return you to the login screen. Sign in again. The exact timeout is set by deployment policy."
+  },
+  {
+    "id": "NETIQ-TRB-006",
+    "category": "Troubleshooting & Common Issues",
+    "question": "The data in NETIQ differs from my NMS. Why?",
+    "answer": "NETIQ reflects the last collected CM dump, so data freshness is bounded by the collection cadence. Differences can also be genuine: NETIQ reconciles multiple sources and flags ghost elements, duplicates, naming and mapping inconsistencies that the individual NMS may not show. Check the last-updated indicator, the NMS Updated/Non-Updated status for that NMS and the relevant audit report; correct at source and confirm after the next cycle."
+  },
+  {
+    "id": "NETIQ-TRB-007",
+    "category": "Troubleshooting & Common Issues",
+    "question": "Why does a finding still appear after the data was fixed?",
+    "answer": "The corrected CM dump has not been ingested yet. Findings clear automatically on the next cycle after the corrected data is ingested. Confirm the NMS dump was refreshed and check the reject summary in case the corrected rows were rejected."
+  },
+  {
+    "id": "NETIQ-TRB-008",
+    "category": "Troubleshooting & Common Issues",
+    "question": "Why is a site missing from the Service Path Explorer map or shown with wrong location?",
+    "answer": "Site coordinates come from the Site Report, falling back to the 'Default LATITUDE_LONGITUDE' sheet (never for Core sites). Missing or invalid GPS also blocks geo-based searches. Check the GPS Accuracy Audit and GPS Suggestion for that site and correct the source coordinates."
+  },
+  {
+    "id": "NETIQ-GLO-001",
+    "category": "Glossary & Definitions",
+    "question": "What does CM dump mean?",
+    "answer": "Configuration Management export: the raw configuration data collected from each NMS/EMS each cycle, which NETIQ parses and normalises."
+  },
+  {
+    "id": "NETIQ-GLO-002",
+    "category": "Glossary & Definitions",
+    "question": "What is an Access POP (L2) and an AGW (L3 POP)?",
+    "answer": "L2 (Access POP) is the first Wireline node on a RAN service path that carries the RAN VLAN but not the RAN Gateway IP. AGW (Aggregation Gateway, L3 POP) is the Wireline node whose WAN IP equals the RAN Gateway IP."
+  },
+  {
+    "id": "NETIQ-GLO-003",
+    "category": "Glossary & Definitions",
+    "question": "What do SRAN, BTS, eNodeB, gNodeB, RU and RRU mean?",
+    "answer": "BTS/eNodeB/gNodeB are 2G/4G/5G base stations; SRAN is Single RAN, a combined multi-technology radio node; RU/RRU is the (Remote) Radio Unit serving cells."
+  },
+  {
+    "id": "NETIQ-GLO-004",
+    "category": "Glossary & Definitions",
+    "question": "What do CGI, TAC, LAC, EARFCN and FDD/TDD mean?",
+    "answer": "CGI is Cell Global Identity (CGI = MCC-MNC-TAC/LAC-CI); TAC/LAC are Tracking/Location Area Codes; EARFCN is the carrier frequency channel number of an LTE cell; FDD/TDD are Frequency/Time Division Duplexing."
+  },
+  {
+    "id": "NETIQ-GLO-005",
+    "category": "Glossary & Definitions",
+    "question": "What do MW, UBR, FTTH and Wireline refer to in NETIQ?",
+    "answer": "MW is Microwave transport links; UBR is Ultra Broadband Radio links; FTTH is fibre-access (ONT/OLT) nodes and links; Wireline is the fixed-line backhaul/aggregation domain with nodes, ports, logical inventory, VLANs and links."
+  },
+  {
+    "id": "NETIQ-GLO-006",
+    "category": "Glossary & Definitions",
+    "question": "What is BOQ in the Service Path Explorer?",
+    "answer": "Bill of Quantity: a consolidated count of discovered assets shown as KPI cards (Total Sites, Fully Stitched, Partial, Unresolved, Suggested and Stitch %)."
+  },
+  {
+    "id": "NETIQ-GLO-007",
+    "category": "Glossary & Definitions",
+    "question": "What do RBAC, KPI, SLA, RPO and RTO mean in the documents?",
+    "answer": "RBAC: Role-Based Access Control; KPI: Key Performance Indicator; SLA: Service Level Agreement; RPO/RTO: Recovery Point / Recovery Time Objective."
+  },
+  {
+    "id": "NETIQ-GLO-008",
+    "category": "Glossary & Definitions",
+    "question": "What is VLAN Match % and Deployment Compliance?",
+    "answer": "VLAN Match % = common VLANs between a port VLAN trunk and the RAN VLAN group, divided by the RAN VLAN group size, x 100. Deployment Compliance = planned links deployed and matched divided by total planned links x 100."
+  }
+]
